@@ -1,20 +1,27 @@
-package com.example.foodiefrontend
+@file:OptIn(ExperimentalMaterial3Api::class)
 
+package com.example.foodiefrontend.presentation
+
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
@@ -33,6 +40,7 @@ class HomeFragment : Fragment() {
         ViewModelProvider.NewInstanceFactory()
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun HomeContent(username: String) {
         // Diseño del HomeFragment utilizando Jetpack Compose
@@ -62,6 +70,45 @@ class HomeFragment : Fragment() {
                 Text("Incluir cualquier ingrediente\n" + "!Hoy tengo que comprar!",
                     fontSize = 15.sp,
                     textAlign = TextAlign.Center)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween // Distribute cards evenly
+            ) {
+                repeat(5) { // Repeat 10 times to create 10 cards
+                    Card(
+                        modifier = Modifier
+                            .weight(1f) // Make each card occupy equal space
+                            .padding(8.dp), // Add some padding around each card
+                        onClick = { /* Handle card click */ }
+                    ) {
+                        // Content of each card (image, text, etc.)
+                        Text(text = "Card $it") // Placeholder text for now
+                    }
+                }
+            }
+            Text(text = "Tus Recetas favoritas",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Left)
+            val cards = listOf("Card 1", "Card 2", "Card 3", "Card 4", "Card 5")
+            val pagerState = rememberPagerState(pageCount = {
+                cards.size
+            })
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween // Distribute cards evenly
+            ){
+                HorizontalPager(state = pagerState) { page ->
+                    Card(
+                        modifier = Modifier
+                            .weight(1f) // Make each card occupy equal space
+                            .padding(8.dp), // Add some padding around each card
+                        onClick = { /* Handle card click */ }
+                    ) {
+                        // Content of each card (image, text, etc.)
+                        Text(text = cards[page]) // Placeholder text for now
+                    }
+                }
             }
         }
     }
