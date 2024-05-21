@@ -71,22 +71,22 @@ class HomeFragment : Fragment() {
                     fontSize = 15.sp,
                     textAlign = TextAlign.Center)
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween // Distribute cards evenly
-            ) {
-                repeat(5) { // Repeat 10 times to create 10 cards
-                    Card(
-                        modifier = Modifier
-                            .weight(1f) // Make each card occupy equal space
-                            .padding(8.dp), // Add some padding around each card
-                        onClick = { /* Handle card click */ }
-                    ) {
-                        // Content of each card (image, text, etc.)
-                        Text(text = "Card $it") // Placeholder text for now
-                    }
-                }
-            }
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween // Distribute cards evenly
+//            ) {
+//                repeat(5) { // Repeat 10 times to create 10 cards
+//                    Card(
+//                        modifier = Modifier
+//                            .weight(1f) // Make each card occupy equal space
+//                            .padding(8.dp), // Add some padding around each card
+//                        onClick = { /* Handle card click */ }
+//                    ) {
+//                        // Content of each card (image, text, etc.)
+//                        Text(text = "Card $it") // Placeholder text for now
+//                    }
+//                }
+//            }
             Text(text = "Tus Recetas favoritas",
                 fontSize = 20.sp,
                 textAlign = TextAlign.Left)
