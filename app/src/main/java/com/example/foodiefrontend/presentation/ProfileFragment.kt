@@ -49,8 +49,12 @@ class ProfileFragment : Fragment() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(text = "Tu perfil", fontSize = 30.sp, textAlign = TextAlign.Left)
-                Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
-                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.Black)
+                Button(onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
+                    Icon(imageVector = Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.Black,
+                        modifier = Modifier.size(35.dp))
                 }
             }
 
