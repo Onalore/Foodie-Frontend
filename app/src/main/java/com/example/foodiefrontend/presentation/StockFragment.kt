@@ -40,6 +40,7 @@ class StockFragment : Fragment() {
                 placeholder = { Text(text = "Buscar ingrediente") }
             )
             Text(text = "matriz de stock, 3 columnas por fila")
+
         }
     }
 
