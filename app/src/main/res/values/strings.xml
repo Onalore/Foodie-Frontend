@@ -6,4 +6,8 @@
     <string name="welcome_text">Explora infinitas recetas, basadas en tus preferencias y con los ingredientes que dispongas</string>
     <string name="registry">Registrarme</string>
     <string name="login">Ingresar</string>
+    <string name="enter_email">Ingrese correo</string>
+    <string name="password">Contraseña</string>
+    <string name="recover_password">Recuperar contraseña</string>
+    <string name="enter_with_google">Ingresar con Google</string>
 </resources>
