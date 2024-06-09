@@ -16,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -26,6 +28,8 @@ fun CustomButton(
     containerColor: Color,
     icon: Int? = null,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    modifier: Modifier = Modifier,
+    colorIcon: ColorFilter? = null,
     onClick: () -> Unit
 ) {
     Button(
@@ -33,12 +37,13 @@ fun CustomButton(
             onClick()
         },
         modifier = Modifier
+            .then(modifier)
             .fillMaxWidth()
             .height(60.dp)
             .border(
                 width = 2.dp,
                 color = if (containerColor == Color.Transparent) contentColor else containerColor,
-                shape = RoundedCornerShape(30.dp)
+                shape = RoundedCornerShape(60.dp)
             ),
         colors = ButtonDefaults.buttonColors(
             contentColor = contentColor,
@@ -50,12 +55,14 @@ fun CustomButton(
             ImageWithResource(
                 resourceId = icon,
                 modifier = Modifier
-                    .height(40.dp)
-                    .padding(end = 30.dp)
+                    .height(45.dp)
+                    .padding(end = 20.dp),
+                colorFilter = colorIcon
             )
         }
         Text(
             text = text,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
         )
     }

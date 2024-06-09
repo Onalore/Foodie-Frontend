@@ -10,4 +10,11 @@
     <string name="password">Contraseña</string>
     <string name="recover_password">Recuperar contraseña</string>
     <string name="enter_with_google">Ingresar con Google</string>
+    <string name="dont_have_account">"¿No tienes cuenta? "</string>
+    <string name="registry_now">" Regístrate ahora"</string>
+    <string name="glad_you_come_back">Nos alegra que vuelvas a elegirnos</string>
+    <string name="hi">Hola</string>
+    <string name="what_are_u_eating">¿Que vas a comer hoy?</string>
+    <string name="suggest_with_my_ingredients">Sugerir recetas con ingredientes que tengo</string>
+    <string name="suggest_without_my_ingredients">Sugerir recetas con cualquier ingrediente</string>
 </resources>

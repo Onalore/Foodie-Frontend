@@ -52,7 +52,7 @@ fun LoginScreen(navController: NavController) {
                 )
 
                 Text(
-                    text = "Nos alegra que vuelvas a elegirnos",
+                    text = stringResource(R.string.glad_you_come_back),
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -102,11 +102,11 @@ fun LoginScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "¿No tienes cuenta? "
+                        text = stringResource(R.string.dont_have_account)
                     )
 
                     Text(
-                        text = " Regístrate ahora",
+                        text = stringResource(R.string.registry_now),
                         color = Color(0xFF60A0F1),
                         fontWeight = FontWeight.Bold
                     )

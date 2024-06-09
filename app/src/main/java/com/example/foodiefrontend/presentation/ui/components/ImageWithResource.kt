@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 
 @Composable
@@ -12,14 +14,16 @@ fun ImageWithResource(
     resourceId: Int,
     contentDescription: String = "",
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit
+    contentScale: ContentScale = ContentScale.Fit,
+    colorFilter: ColorFilter? = null
 ) {
     val painter: Painter = painterResource(id = resourceId)
     Image(
         painter = painter,
         contentDescription = contentDescription,
         modifier = modifier,
-        contentScale = contentScale
+        contentScale = contentScale,
+        colorFilter = colorFilter
     )
 }
 
