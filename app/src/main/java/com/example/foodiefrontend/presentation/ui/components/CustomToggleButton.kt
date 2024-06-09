@@ -37,7 +37,7 @@ fun CustomToggleButton(
         modifier = Modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onTertiary
+            containerColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
@@ -52,7 +52,7 @@ fun CustomToggleButton(
                     .padding(2.dp),
                 colors = ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.tertiary,
-                    containerColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -66,7 +66,7 @@ fun CustomToggleButton(
                     .padding(2.dp),
                 colors = ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.tertiary,
-                    containerColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = MaterialTheme.colorScheme.onTertiary
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {

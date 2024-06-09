@@ -1,62 +1,115 @@
 package com.example.foodiefrontend.presentation.ui.screens.login
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
+import com.example.foodiefrontend.presentation.ui.components.CustomButton
+import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
-import com.example.foodiefrontend.presentation.ui.components.Title
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(navController: NavController) {
+    var emailValue by remember { mutableStateOf("") }
+    var passwordValue by remember { mutableStateOf("") }
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Foodie") }
-            )
-        },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.Center,
+                    .padding(start = 20.dp, end = 20.dp, bottom = 50.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ImageWithResource(resourceId = R.drawable.logo, modifier = Modifier.height(80.dp))
+                ImageWithResource(
+                    resourceId = R.drawable.logo,
+                    modifier = Modifier.width(220.dp),
+                    contentScale = ContentScale.FillWidth
+                )
 
-                Title(title = "Ingresa tu usuario")
+                Text(
+                    text = "Nos alegra que vuelvas a elegirnos",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                CustomTextField(
+                    value = emailValue,
+                    placeholder = stringResource(R.string.enter_email),
+                    onValueChange = {}
+                )
 
-                // Buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                CustomTextField(
+                    value = passwordValue,
+                    placeholder = stringResource(R.string.password),
+                    onValueChange = {}
+                )
+
+                Text(
+                    text = stringResource(R.string.recover_password),
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                CustomButton(
+                    text = stringResource(R.string.login),
+                    containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Button(
-                        onClick = {
-                            navController.navigate(AppScreens.HomeScreen.route)
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp)
-                            .background(color = MaterialTheme.colorScheme.secondary),
-                        colors = ButtonDefaults.buttonColors(
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        )
-                    ) {
-                        Text(text = "Ingresar")
-                    }
+                    navController.navigate(AppScreens.HomeScreen.route)
+                }
+
+                Divider(
+                    color = Color.Gray,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                CustomButton(
+                    text = stringResource(R.string.enter_with_google),
+                    icon = R.drawable.google_logo,
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    onClick = {}
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "¿No tienes cuenta? "
+                    )
+
+                    Text(
+                        text = " Regístrate ahora",
+                        color = Color(0xFF60A0F1),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -66,7 +119,9 @@ fun LoginScreen(navController: NavController) {
 @Preview
 @Composable
 private fun Preview() {
-    LoginScreen(
-        navController = rememberNavController()
-    )
+    FoodieFrontendTheme {
+        LoginScreen(
+            navController = rememberNavController()
+        )
+    }
 }

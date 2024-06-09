@@ -1,6 +1,7 @@
 package com.example.foodiefrontend.presentation.ui.screens.welcome
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,7 +30,8 @@ fun WelcomeScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(vertical = 50.dp, horizontal = 20.dp),
+                    .padding(vertical = 50.dp, horizontal = 20.dp)
+                    .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
