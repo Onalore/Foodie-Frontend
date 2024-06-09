@@ -2,4 +2,8 @@
     <string name="app_name">Foodie Frontend</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome_title">Descubre un mundo de recetas</string>
+    <string name="welcome_text">Explora infinitas recetas, basadas en tus preferencias y con los ingredientes que dispongas</string>
+    <string name="registry">Registrarme</string>
+    <string name="login">Ingresar</string>
 </resources>

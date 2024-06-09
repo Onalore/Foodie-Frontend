@@ -2,7 +2,12 @@ package com.example.foodiefrontend.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
+val PurpleSoft = Color(0xFFA28FF0)
+val Gray = Color(0xFF5C5964)
+val SoftGray = Color(0xFFECEAEF)
+val Green = Color(0xFF507C5C)
+val White = Color(0xFFFFFFFF)
+
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 

@@ -1,9 +1,10 @@
 package com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar
 
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.Dp
 
 data class BottomNavItem(
     val route: String,
-    val icon: ImageVector,
+    val icon: Painter,
     val label: String
 )

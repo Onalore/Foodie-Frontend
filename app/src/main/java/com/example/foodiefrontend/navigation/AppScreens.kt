@@ -3,4 +3,8 @@ package com.example.foodiefrontend.navigation
 sealed class AppScreens(val route: String) {
     object WelcomeScreen: AppScreens("welcome_screen")
     object LoginScreen: AppScreens("login_screen")
+    object HomeScreen: AppScreens("home_screen")
+    object RecipesScreen: AppScreens("recipes_screen")
+    object StockScreen: AppScreens("stock_screen")
+    object ProfileScreen: AppScreens("profile_screen")
 }

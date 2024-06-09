@@ -3,17 +3,27 @@ package com.example.foodiefrontend
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.navigation.AppNavigation
+import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
+import com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar.BottomNavigationBar
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -23,7 +33,27 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation()
+                    val navController = rememberNavController()
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
+
+                    Scaffold(
+                        bottomBar = {
+                            when (currentRoute) {
+                                AppScreens.HomeScreen.route,
+                                AppScreens.RecipesScreen.route,
+                                AppScreens.StockScreen.route,
+                                AppScreens.ProfileScreen.route
+                                -> {
+                                    BottomNavigationBar(navController = navController)
+                                }
+                            }
+                        }
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.padding(innerPadding)) {
+                            AppNavigation(navController)
+                        }
+                    }
                 }
             }
         }
@@ -31,7 +61,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(
+    name: String,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = "Hello $name!",
         modifier = modifier
@@ -42,6 +75,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     FoodieFrontendTheme {
-        AppNavigation()
+        AppNavigation(navController = rememberNavController())
     }
 }
