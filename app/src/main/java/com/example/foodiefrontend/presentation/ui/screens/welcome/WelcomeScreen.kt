@@ -35,7 +35,6 @@ fun WelcomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
                 ImageWithResource(
                     resourceId = R.drawable.logo,
                     modifier = Modifier
@@ -51,7 +50,8 @@ fun WelcomeScreen(navController: NavController) {
 
                 Title(
                     title = stringResource(R.string.welcome_title),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
                 )
 
                 Text(

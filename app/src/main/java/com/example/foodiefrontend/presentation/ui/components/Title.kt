@@ -16,13 +16,16 @@ import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 fun Title(
     title: String,
     color: Color = MaterialTheme.colorScheme.tertiary,
-    fontWeight: FontWeight = FontWeight.Bold
+    fontWeight: FontWeight = FontWeight.Bold,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start
 ) {
     FoodieFrontendTheme {
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge.copy(color = color, fontWeight = fontWeight),
-            textAlign = TextAlign.Center,
+            textAlign = textAlign,
+            modifier = modifier
         )
     }
 }

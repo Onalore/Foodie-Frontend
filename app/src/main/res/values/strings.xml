@@ -17,4 +17,9 @@
     <string name="what_are_u_eating">¿Que vas a comer hoy?</string>
     <string name="suggest_with_my_ingredients">Sugerir recetas con ingredientes que tengo</string>
     <string name="suggest_without_my_ingredients">Sugerir recetas con cualquier ingrediente</string>
+    <string name="home">Inicio</string>
+    <string name="recipes">Recetas</string>
+    <string name="stock">Stock</string>
+    <string name="profile">Perfil</string>
+    <string name="look_for_recipe">Buscar receta</string>
 </resources>

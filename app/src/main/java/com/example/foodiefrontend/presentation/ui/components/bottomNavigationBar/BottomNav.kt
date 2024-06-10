@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -33,10 +34,14 @@ fun BottomNavigationBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val items = listOf(
-        BottomNavItem("home_screen", painterResource(id = R.drawable.home), "Inicio"),
-        BottomNavItem("recipes_screen", painterResource(id = R.drawable.recipes), "Recetas"),
-        BottomNavItem("stock_screen", painterResource(id = R.drawable.stock), "Stock"),
-        BottomNavItem("profile_screen", painterResource(id = R.drawable.profile), "Perfil")
+        BottomNavItem("home_screen", painterResource(id = R.drawable.home),
+            stringResource(R.string.home)),
+        BottomNavItem("recipes_screen", painterResource(id = R.drawable.recipes),
+            stringResource(R.string.recipes)),
+        BottomNavItem("stock_screen", painterResource(id = R.drawable.stock),
+            stringResource(R.string.stock)),
+        BottomNavItem("profile_screen", painterResource(id = R.drawable.profile),
+            stringResource(R.string.profile))
     )
 
     BottomNavigation (
@@ -56,7 +61,9 @@ fun BottomNavigationBar(
                     Icon(
                         painter = item.icon,
                         contentDescription = null,
-                        modifier = Modifier.height(25.dp).padding(bottom = 5.dp)
+                        modifier = Modifier
+                            .height(25.dp)
+                            .padding(bottom = 5.dp)
                             .align(Alignment.CenterVertically)
                     )
                 },

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -32,38 +33,48 @@ fun CustomButton(
     colorIcon: ColorFilter? = null,
     onClick: () -> Unit
 ) {
-    Button(
-        onClick = {
-            onClick()
-        },
-        modifier = Modifier
-            .then(modifier)
+    val shape = RoundedCornerShape(60.dp)
+
+    Surface(
+        elevation = 4.dp,
+        shape = shape,
+        modifier = modifier
+            .height(70.dp)
             .fillMaxWidth()
-            .height(60.dp)
-            .border(
-                width = 2.dp,
-                color = if (containerColor == Color.Transparent) contentColor else containerColor,
-                shape = RoundedCornerShape(60.dp)
-            ),
-        colors = ButtonDefaults.buttonColors(
-            contentColor = contentColor,
-            containerColor = containerColor,
-        ),
     ) {
-        if (icon != null) {
-            Spacer(modifier = Modifier.width(15.dp))
-            ImageWithResource(
-                resourceId = icon,
-                modifier = Modifier
-                    .height(45.dp)
-                    .padding(end = 20.dp),
-                colorFilter = colorIcon
+        Button(
+            onClick = {
+                onClick()
+            },
+            modifier = Modifier
+                .then(modifier)
+                .fillMaxWidth()
+                .height(60.dp)
+                .border(
+                    width = 2.dp,
+                    color = if (containerColor == Color.Transparent) contentColor else containerColor,
+                    shape = RoundedCornerShape(60.dp)
+                ),
+            colors = ButtonDefaults.buttonColors(
+                contentColor = contentColor,
+                containerColor = containerColor,
+            ),
+        ) {
+            if (icon != null) {
+                Spacer(modifier = Modifier.width(15.dp))
+                ImageWithResource(
+                    resourceId = icon,
+                    modifier = Modifier
+                        .height(45.dp)
+                        .padding(end = 20.dp),
+                    colorFilter = colorIcon
+                )
+            }
+            Text(
+                text = text,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
             )
         }
-        Text(
-            text = text,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
     }
 }

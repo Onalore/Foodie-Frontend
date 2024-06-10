@@ -59,13 +59,17 @@ fun LoginScreen(navController: NavController) {
                 CustomTextField(
                     value = emailValue,
                     placeholder = stringResource(R.string.enter_email),
-                    onValueChange = {}
+                    onValueChange = {newValue ->
+                        emailValue = newValue
+                    }
                 )
 
                 CustomTextField(
                     value = passwordValue,
                     placeholder = stringResource(R.string.password),
-                    onValueChange = {}
+                    onValueChange = {newValue ->
+                        passwordValue = newValue
+                    }
                 )
 
                 Text(
