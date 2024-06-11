@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.foodiefrontend.presentation.ui.screens.camera.BarcodeScannerScreen
+import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
@@ -37,6 +39,9 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
+        }
+        composable(route = AppScreens.CameraScreen.route) {
+            CameraScreen()
         }
     }
 }

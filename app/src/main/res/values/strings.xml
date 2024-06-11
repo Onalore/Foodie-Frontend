@@ -22,4 +22,6 @@
     <string name="stock">Stock</string>
     <string name="profile">Perfil</string>
     <string name="look_for_recipe">Buscar receta</string>
+    <string name="look_for_ingredient">Buscar ingrediente</string>
+    <string name="your_stock">Tu stock</string>
 </resources>
