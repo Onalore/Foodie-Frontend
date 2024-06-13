@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.navigation.AppScreens
 
 
 @Composable
@@ -38,7 +39,7 @@ fun BottomNavigationBar(
             stringResource(R.string.home)),
         BottomNavItem("recipes_screen", painterResource(id = R.drawable.recipes),
             stringResource(R.string.recipes)),
-        BottomNavItem("stock_screen", painterResource(id = R.drawable.stock),
+        BottomNavItem(AppScreens.StockScreen.createRoute(null), painterResource(id = R.drawable.stock),
             stringResource(R.string.stock)),
         BottomNavItem("profile_screen", painterResource(id = R.drawable.profile),
             stringResource(R.string.profile))
