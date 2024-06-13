@@ -1,12 +1,11 @@
 package com.example.foodiefrontend.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.foodiefrontend.presentation.ui.screens.camera.BarcodeScannerScreen
+import androidx.navigation.navArgument
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
@@ -34,14 +33,25 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.RecipesScreen.route) {
             RecipesScreen(navController)
         }
+        // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
-            StockScreen(navController)
+            StockScreen(navController, null)
+        }
+        // Route with codeEan
+        composable(
+            route = "stock_screen/{codeEan}",
+            arguments = listOf(navArgument("codeEan") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val codeEan = backStackEntry.arguments?.getString("codeEan")
+            StockScreen(navController, codeEan)
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
         }
         composable(route = AppScreens.CameraScreen.route) {
-            CameraScreen()
+            CameraScreen(navController, navigateToScreen = { codeEan ->
+                navController.navigate(AppScreens.StockScreen.createRoute(codeEan))
+            })
         }
     }
 }
