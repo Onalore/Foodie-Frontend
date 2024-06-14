@@ -116,15 +116,17 @@ fun RecipesCardItem(
         )
 
         RecipeDescription(
+            name = title,
             modifier = Modifier
                 .padding(start = 100.dp, top = 10.dp)
                 .width(270.dp)
                 .height(120.dp),
             punctuation = false,
-            initialRating = initialRating
+            initialRating = initialRating ?: 0 // Manejo seguro del valor inicial
         )
     }
 }
+
 
 @Composable
 fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {
@@ -162,7 +164,7 @@ fun VerticalRecipes(items: List<Recipe>) {
         items.forEachIndexed { index, item ->
             item {
                 RecipesCardItem(
-                    title = item.title,
+                    title = item.name,
                     initialRating = item.rating,
                     image = item.imageUrl,
                     liked = item.liked
