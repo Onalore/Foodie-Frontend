@@ -45,7 +45,7 @@ fun WelcomeScreen(navController: NavController) {
 
                 ImageWithResource(
                     resourceId = R.drawable.ilustracion_login,
-                    modifier = Modifier.size(350.dp)
+                    modifier = Modifier.size(100.dp)
                 )
 
                 Title(

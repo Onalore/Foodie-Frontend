@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomButton(
-    text: String,
+    text: String = "",
     containerColor: Color,
     icon: Int? = null,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -39,7 +39,7 @@ fun CustomButton(
         elevation = 4.dp,
         shape = shape,
         modifier = modifier
-            .height(70.dp)
+            .height(40.dp)
             .fillMaxWidth()
     ) {
         Button(
@@ -49,7 +49,7 @@ fun CustomButton(
             modifier = Modifier
                 .then(modifier)
                 .fillMaxWidth()
-                .height(60.dp)
+                .height(50.dp)
                 .border(
                     width = 2.dp,
                     color = if (containerColor == Color.Transparent) contentColor else containerColor,
@@ -65,7 +65,7 @@ fun CustomButton(
                 ImageWithResource(
                     resourceId = icon,
                     modifier = Modifier
-                        .height(45.dp)
+                        .height(50.dp)
                         .padding(end = 20.dp),
                     colorFilter = colorIcon
                 )

@@ -7,21 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,18 +31,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
+import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
-import com.example.foodiefrontend.presentation.ui.components.Subtitle
 import com.example.foodiefrontend.presentation.ui.components.Title
-import com.example.foodiefrontend.presentation.ui.screens.home.HorizontalCardList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipesScreen(navController: NavController) {
+fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
     var recipe by remember { mutableStateOf("") }
 
     Column(
@@ -97,18 +90,10 @@ fun RecipesScreen(navController: NavController) {
                 "Carnivoras" to { },
                 "Sin TACC" to { }
             )
-            val recipes = listOf(
-                Recipe("Bombas de papa", 3, R.drawable.bombas_de_papa, true),
-                Recipe("Canelones", 2, R.drawable.bombas_de_papa),
-                Recipe("Vegetarianas", 0, R.drawable.bombas_de_papa, true),
-                Recipe("Carnivoras", 4, R.drawable.bombas_de_papa),
-                Recipe("Sin TACC", 3, R.drawable.bombas_de_papa)
-            )
-
 
             HorizontalButtonCategories(items = categories)
 
-            VerticalRecipes(items = recipes)
+            if (recipes != null) VerticalRecipes(items = recipes)
         }
     }
 }
@@ -116,9 +101,9 @@ fun RecipesScreen(navController: NavController) {
 @Composable
 fun RecipesCardItem(
     title: String,
-    image: Int,
+    image: String,
     liked: Boolean = false,
-    initialRating: Int,
+    initialRating: Int? = null,
     modifier: Modifier = Modifier
 ) {
     Box {
@@ -135,7 +120,7 @@ fun RecipesCardItem(
                 .padding(start = 100.dp, top = 10.dp)
                 .width(270.dp)
                 .height(120.dp),
-            punctuation = true,
+            punctuation = false,
             initialRating = initialRating
         )
     }
@@ -178,8 +163,8 @@ fun VerticalRecipes(items: List<Recipe>) {
             item {
                 RecipesCardItem(
                     title = item.title,
-                    initialRating = item.initialRating,
-                    image = item.image,
+                    initialRating = item.rating,
+                    image = item.imageUrl,
                     liked = item.liked
                 )
             }
@@ -190,5 +175,6 @@ fun VerticalRecipes(items: List<Recipe>) {
 @Preview(showBackground = true)
 @Composable
 fun RecipesContentPreview() {
-    RecipesScreen(navController = rememberNavController())
+
+    RecipesScreen(navController = rememberNavController(), SampleData.recipes)
 }

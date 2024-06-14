@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RecipeDescription(
     punctuation: Boolean = false,
-    initialRating: Int = 0,
+    initialRating: Int? = 0,
     modifier: Modifier
 ) {
 
@@ -52,7 +52,7 @@ fun RecipeDescription(
                 Subtitle(
                     title = "Bombas de papa con cosas"
                 )
-                if (punctuation) {
+                if (punctuation && initialRating != null) {
                     StarRating(
                         initialRating = initialRating,
                         onRatingChanged = {  }
@@ -60,10 +60,12 @@ fun RecipeDescription(
                 }
             }
 
-            SelectableHeartIcon(
-                selected = isSelected,
-                onSelectedChange = { isSelected = it }
-            )
+            if (punctuation) {
+                SelectableHeartIcon(
+                    selected = isSelected,
+                    onSelectedChange = { isSelected = it }
+                )
+            }
         }
     }
 }
