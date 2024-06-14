@@ -6,12 +6,16 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.foodiefrontend.data.Recipe
+import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
+import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
+import com.example.foodiefrontend.presentation.ui.screens.suggestedRecipes.SuggestedRecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 
 @Composable
@@ -30,8 +34,16 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.HomeScreen.route) {
             HomeScreen(navController)
         }
+        //Plural
         composable(route = AppScreens.RecipesScreen.route) {
-            RecipesScreen(navController)
+            RecipesScreen(navController, SampleData.recipes)
+        }
+        //Singular
+        composable(route = AppScreens.RecipeScreen.route) {
+            RecipeScreen(navController, SampleData.recipe)
+        }
+        composable(route = AppScreens.SuggestedRecipesScreen.route) {
+            SuggestedRecipesScreen(navController, SampleData.recipes)
         }
         // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {

@@ -24,4 +24,6 @@
     <string name="look_for_recipe">Buscar receta</string>
     <string name="look_for_ingredient">Buscar ingrediente</string>
     <string name="your_stock">Tu stock</string>
+    <string name="more_options">Quiero ver otras opciones</string>
+    <string name="suggests_for_you">Éstas son tus sugerencias</string>
 </resources>
