@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
@@ -43,7 +42,7 @@ fun AppNavigation(navController: NavHostController) {
             RecipeScreen(navController, SampleData.recipe)
         }
         composable(route = AppScreens.SuggestedRecipesScreen.route) {
-            SuggestedRecipesScreen(navController, SampleData.recipes)
+            SuggestedRecipesScreen(navController)
         }
         // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
