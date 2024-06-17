@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.service.RecipesApi
+import com.example.foodiefrontend.service.BackendApi
 import kotlinx.coroutines.launch
 import retrofit2.awaitResponse
 
@@ -20,7 +20,7 @@ class SuggestedRecipesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d("SuggestedRecipesViewModel", "fetchRecipes called")
-                val response = RecipesApi.create().getRecipes().awaitResponse()
+                val response = BackendApi.createRecipesService().getRecipes().awaitResponse()
                 if (response.isSuccessful) {
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)

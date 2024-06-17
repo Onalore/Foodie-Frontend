@@ -5,10 +5,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-object RecipesApi {
+object BackendApi {
 
     //En emulador 10.0.2.2 = localhost
-    private val BASE_URL = "http://10.0.2.2:8080/api/gemini/"
+    private val BASE_URL = "http://10.0.2.2:8080/api/"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -22,7 +22,7 @@ object RecipesApi {
         )
         .build()
 
-    fun create(): RecipesService {
+    fun createRecipesService(): RecipesService {
         return retrofit.create(RecipesService::class.java)
     }
 
