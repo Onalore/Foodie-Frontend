@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock
 
+import StockViewModel
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
@@ -37,12 +39,21 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockScreen(navController: NavController, codeEan: String? = "") {
+    val viewModel: StockViewModel = viewModel()
     var ingredient by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(codeEan != null && codeEan.isNotEmpty()) }
+
+    LaunchedEffect(codeEan) {
+        if (!codeEan.isNullOrEmpty()) {
+            viewModel.findProductByEan(codeEan)
+        }
+    }
+
+    val productType by viewModel.productType.observeAsState()
+    val error by viewModel.error.observeAsState()
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")
 
@@ -54,7 +65,8 @@ fun StockScreen(navController: NavController, codeEan: String? = "") {
                     text = "¿Escaneaste este producto?",
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold),
+                        fontWeight = FontWeight.Bold
+                    ),
                     textAlign = TextAlign.Center,
                 )
             },
@@ -64,6 +76,24 @@ fun StockScreen(navController: NavController, codeEan: String? = "") {
                         text = codeEan ?: "Producto desconocido",
                         textAlign = TextAlign.Center
                     )
+                    if (productType != null) {
+                        Log.d("ProductType", "Detected ProductType: $productType")
+                        Text(
+                            text = productType ?: "Producto desconocido",
+                            textAlign = TextAlign.Center
+                        )
+                    } else if (error != null) {
+                        Text(
+                            text = error ?: "Error desconocido",
+                            textAlign = TextAlign.Center,
+                            color = Color.Red
+                        )
+                    } else {
+                        Text(
+                            text = "Cargando...",
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             },
             dismissButton = {
@@ -146,7 +176,7 @@ fun StockScreen(navController: NavController, codeEan: String? = "") {
             )
         }
     }
-    }
+}
 
 @Preview(showBackground = true)
 @Composable
