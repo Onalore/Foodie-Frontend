@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -21,6 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecipeDescription(
+    name: String,
     punctuation: Boolean = false,
     initialRating: Int? = 0,
     modifier: Modifier
@@ -50,12 +49,12 @@ fun RecipeDescription(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Subtitle(
-                    title = "Bombas de papa con cosas"
+                    title = name
                 )
                 if (punctuation && initialRating != null) {
                     StarRating(
                         initialRating = initialRating,
-                        onRatingChanged = {  }
+                        onRatingChanged = { }
                     )
                 }
             }

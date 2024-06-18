@@ -29,7 +29,7 @@ object SampleData {
 
 
     val recipe = Recipe(
-        title = "Bondiolita a la cerveza",
+        name = "Bondiolita a la cerveza",
         imageUrl = "https://www.clarin.com/2021/01/20/uqrDLM9BM_600x600__1.jpg",
         ingredients = sampleIngredients,
         preparation = samplePreparation

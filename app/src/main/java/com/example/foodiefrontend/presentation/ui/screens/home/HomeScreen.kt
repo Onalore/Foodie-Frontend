@@ -120,7 +120,7 @@ fun HorizontalCardList(items: List<Recipe>) {
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            HomeCardItem(title = item.title, image = item.imageUrl)
+            HomeCardItem(title = item.name, image = item.imageUrl, liked = item.liked)
         }
     }
 }
@@ -142,6 +142,7 @@ fun HomeCardItem(
         )
 
         RecipeDescription(
+            name = title,
             modifier = Modifier
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
