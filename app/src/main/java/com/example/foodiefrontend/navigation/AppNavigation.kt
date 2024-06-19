@@ -54,7 +54,7 @@ fun AppNavigation(navController: NavHostController) {
             arguments = listOf(navArgument("codeEan") { type = NavType.StringType })
         ) { backStackEntry ->
             val codeEan = backStackEntry.arguments?.getString("codeEan")
-            StockScreen(navController, codeEan)
+            StockScreen(navController, codeEan = codeEan)
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
