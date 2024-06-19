@@ -26,4 +26,6 @@
     <string name="your_stock">Tu stock</string>
     <string name="more_options">Quiero ver otras opciones</string>
     <string name="suggests_for_you">Éstas son tus sugerencias</string>
+    <string name="enter_manually">Ingresar manualmente</string>
+    <string name="is_this_product">¿Escaneaste este producto?</string>
 </resources>

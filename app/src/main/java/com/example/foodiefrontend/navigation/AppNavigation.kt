@@ -50,7 +50,7 @@ fun AppNavigation(navController: NavHostController) {
         }
         // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
-            StockScreen(navController, null)
+            StockScreen(navController = navController, codeEan = null, listOfIngredients = SampleData.sampleIngredients)
         }
         // Route with codeEan
         composable(
@@ -58,7 +58,7 @@ fun AppNavigation(navController: NavHostController) {
             arguments = listOf(navArgument("codeEan") { type = NavType.StringType })
         ) { backStackEntry ->
             val codeEan = backStackEntry.arguments?.getString("codeEan")
-            StockScreen(navController, codeEan)
+            StockScreen(navController = navController, codeEan = codeEan)
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
