@@ -38,103 +38,25 @@ import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockScreen(navController: NavController, codeEan: String? = "") {
-    val viewModel: StockViewModel = viewModel()
+fun StockScreen(navController: NavController, codeEan: String? = null) {
     var ingredient by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(codeEan != null && codeEan.isNotEmpty()) }
+    var showDialog by remember { mutableStateOf(!codeEan.isNullOrEmpty()) }
 
-    LaunchedEffect(codeEan) {
-        if (!codeEan.isNullOrEmpty()) {
-            viewModel.findProductByEan(codeEan)
-        }
-    }
-
-    val productType by viewModel.productType.observeAsState()
-    val error by viewModel.error.observeAsState()
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = {
-                Text(
-                    text = "¿Escaneaste este producto?",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    textAlign = TextAlign.Center,
-                )
+    if (showDialog && codeEan != null) {
+        AlertIngredientScanned(
+            navController = navController,
+            setShowDialog = { param ->
+                showDialog = param
             },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = codeEan ?: "Producto desconocido",
-                        textAlign = TextAlign.Center
-                    )
-                    if (productType != null) {
-                        Log.d("ProductType", "Detected ProductType: $productType")
-                        Text(
-                            text = productType ?: "Producto desconocido",
-                            textAlign = TextAlign.Center
-                        )
-                    } else if (error != null) {
-                        Text(
-                            text = error ?: "Error desconocido",
-                            textAlign = TextAlign.Center,
-                            color = Color.Red
-                        )
-                    } else {
-                        Text(
-                            text = "Cargando...",
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            },
-            dismissButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    CustomButton(
-                        onClick = {
-                            navController.navigate("camera_screen")
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        icon = R.drawable.ic_retry,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
-                    CustomButton(
-                        onClick = {
-                            showDialog = false
-                            //TODO
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        icon = R.drawable.ic_check,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            },
-            confirmButton = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-
-                    CustomButton(
-                        onClick = {
-                            showDialog = false
-                            // Acción de confirmar
-                        },
-                        containerColor = Color(0xFFE8BB66),
-                        text = "Ingresar manualmente",
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+            codeEan = codeEan
         )
     }
 
@@ -176,7 +98,7 @@ fun StockScreen(navController: NavController, codeEan: String? = "") {
             )
         }
     }
-}
+    }
 
 @Preview(showBackground = true)
 @Composable
