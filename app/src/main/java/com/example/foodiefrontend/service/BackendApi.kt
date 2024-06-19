@@ -1,9 +1,12 @@
-package com.example.foodiefrontend.service
-
+import com.example.foodiefrontend.service.RecipesService
+import com.example.foodiefrontend.service.StockService
+import com.example.foodiefrontend.service.UserService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+
+package com.example.foodiefrontend.service
 
 object BackendApi {
 
@@ -30,6 +33,10 @@ object BackendApi {
 
     fun createStockService(): StockService {
         return retrofit.create(StockService::class.java)
+    }
+
+    fun createUserService(): UserService {
+        return retrofit.create(UserService::class.java)
     }
 
 }
