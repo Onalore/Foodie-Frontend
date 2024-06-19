@@ -180,7 +180,7 @@ private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?
 
                             Log.d("Barcode", "Detected EAN: $rawValue")
 
-                            buzzerInstance.beep()
+                            //buzzerInstance.beep()
 
                             navigateToScreen(rawValue)
 
