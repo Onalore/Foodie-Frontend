@@ -1,65 +1,56 @@
 package com.example.foodiefrontend.presentation.ui.screens.camera
 
-import androidx.compose.runtime.Composable
 import android.Manifest
-import androidx.camera.core.Camera
 import android.media.ToneGenerator
 import android.util.Log
 import android.view.SoundEffectConstants
 import android.view.ViewGroup
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
-import com.example.foodiefrontend.data.hardware.buzzer.Buzzer
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.hardware.buzzer.Buzzer
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -170,7 +161,6 @@ fun CameraBackBtn(navController: NavController) {
     }
 }
 
-
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?) -> Unit) {
     val mediaImage = imageProxy.image
@@ -204,10 +194,12 @@ private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?
                         }
                     }
                 }
+                imageProxy.close() // Ensure we close the proxy here
             }
             .addOnFailureListener {
                 // Handle failure
                 Log.e("Barcode", "Barcode scanning failed", it)
+                imageProxy.close() // Ensure we close the proxy here
             }
             .addOnCompleteListener {
                 // Close the imageProxy to avoid memory leaks
@@ -218,25 +210,37 @@ private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?
     }
 }
 
-
 class AndroidBuzzer : Buzzer {
 
-    private val toneGenerator: ToneGenerator?
-
-    init {
-        toneGenerator = try {
-            ToneGenerator(ToneGenerator.TONE_PROP_BEEP, 100)
-        } catch (e: Exception) {
-            null
-        }
+    private val toneGenerator: ToneGenerator? = try {
+        ToneGenerator(ToneGenerator.TONE_PROP_BEEP, 100)
+    } catch (e: Exception) {
+        null
     }
 
     override fun beep(count: Int, time: Int, interval: Int) {
         toneGenerator?.let { generator ->
-            repeat(count) {
+
+            /*repeat(count) {
                 generator.startTone(ToneGenerator.TONE_PROP_BEEP, time)
                 Thread.sleep((time + interval).toLong())
-            }
+            }*/
+
+            //ver si esta ok
+            Thread {
+                try {
+                    repeat(count) {
+                        generator.startTone(ToneGenerator.TONE_PROP_BEEP, time)
+                        Thread.sleep((time + interval).toLong())
+                    }
+                } catch (e: InterruptedException) {
+                    Log.d("AndroidBuzzer", "Buzzer interrupted", e)
+                } catch (e: Exception) {
+                    Log.d("AndroidBuzzer", "Buzzer error", e)
+                } finally {
+                    generator.release()
+                }
+            }.start()
         }
     }
 }

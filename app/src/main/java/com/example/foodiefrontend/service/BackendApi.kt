@@ -6,6 +6,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+package com.example.foodiefrontend.service
+
 object BackendApi {
 
     //En emulador 10.0.2.2 = localhost

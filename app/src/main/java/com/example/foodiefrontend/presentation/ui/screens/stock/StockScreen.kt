@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock
 
+import StockViewModel
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
@@ -36,75 +38,25 @@ import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockScreen(navController: NavController, codeEan: String? = "") {
+fun StockScreen(navController: NavController, codeEan: String? = null) {
     var ingredient by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(codeEan != null && codeEan.isNotEmpty()) }
+    var showDialog by remember { mutableStateOf(!codeEan.isNullOrEmpty()) }
+
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = {
-                Text(
-                    text = "¿Escaneaste este producto?",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center,
-                )
+    if (showDialog && codeEan != null) {
+        AlertIngredientScanned(
+            navController = navController,
+            setShowDialog = { param ->
+                showDialog = param
             },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = codeEan ?: "Producto desconocido",
-                        textAlign = TextAlign.Center
-                    )
-                }
-            },
-            dismissButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    CustomButton(
-                        onClick = {
-                            navController.navigate("camera_screen")
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        icon = R.drawable.ic_retry,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
-                    CustomButton(
-                        onClick = {
-                            showDialog = false
-                            //TODO
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        icon = R.drawable.ic_check,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            },
-            confirmButton = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-
-                    CustomButton(
-                        onClick = {
-                            showDialog = false
-                            // Acción de confirmar
-                        },
-                        containerColor = Color(0xFFE8BB66),
-                        text = "Ingresar manualmente",
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+            codeEan = codeEan
         )
     }
 

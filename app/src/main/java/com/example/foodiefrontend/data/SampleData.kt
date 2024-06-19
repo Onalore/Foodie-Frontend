@@ -11,6 +11,8 @@ object SampleData {
         Ingredient(description = "Queso", quantity = "1/4", unit = "kg")
     )
 
+    val sampleIngredient = Ingredient(description = "Espinaca", quantity = "1", unit = "u.")
+
     val samplePreparation = listOf(
         "Mezcle en una fuente la harina, el aceite, las zanahorias, la carne de soya hidratada, la cebolla y la sal",
         "Agregue agua mientras mezcla, deberá obtener una masa compacta.",
