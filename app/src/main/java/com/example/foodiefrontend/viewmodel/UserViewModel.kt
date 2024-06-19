@@ -1,6 +1,5 @@
 package com.example.foodiefrontend.viewmodel
 
-import BackendApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +8,7 @@ import com.example.foodiefrontend.data.AuthResponse
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
+import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.UserService
 import kotlinx.coroutines.launch
 import retrofit2.Call

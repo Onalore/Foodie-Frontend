@@ -1,12 +1,9 @@
-import com.example.foodiefrontend.service.RecipesService
-import com.example.foodiefrontend.service.StockService
-import com.example.foodiefrontend.service.UserService
+package com.example.foodiefrontend.service
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-package com.example.foodiefrontend.service
 
 object BackendApi {
 

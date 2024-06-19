@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.foodiefrontend.R
 import com.example.foodiefrontend.R.drawable
 import com.example.foodiefrontend.R.string
 import com.example.foodiefrontend.navigation.AppScreens
