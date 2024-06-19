@@ -20,14 +20,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.foodiefrontend.R
 import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.presentation.ui.components.CustomPasswordField
 import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,12 +59,12 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                CustomPasswordField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
+                    placeholder = stringResource(R.string.password),
+                    onValueChange = { newValue ->
+                        password = newValue
+                    }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
@@ -98,7 +100,7 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                     onClick = {
                         showError = email.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || edad.isEmpty()
                         if (!showError) {
-                            val restriccionList = restricciones.split(",").map { it.trim() }
+                            val restriccionList = if (restricciones.isEmpty()) emptyList() else restricciones.split(",").map { it.trim() }
                             viewModel.registerUser(email, password, nombre, apellido, edad.toInt(), restriccionList) { response ->
                                 if (response != null) {
                                     navController.navigate(AppScreens.LoginScreen.route)

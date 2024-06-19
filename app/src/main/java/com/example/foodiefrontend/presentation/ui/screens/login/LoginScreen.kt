@@ -39,6 +39,7 @@ import com.example.foodiefrontend.R
 import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
+import com.example.foodiefrontend.presentation.ui.components.CustomPasswordField
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.viewmodel.UserViewModel
@@ -62,7 +63,7 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
     }
 
     Scaffold(
-        content = { paddingValues ->
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -90,7 +91,7 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
                     }
                 )
 
-                CustomTextField(
+                CustomPasswordField(
                     value = passwordValue,
                     placeholder = stringResource(R.string.password),
                     onValueChange = { newValue ->
