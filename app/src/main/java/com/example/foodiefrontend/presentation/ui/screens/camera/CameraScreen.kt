@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,9 +60,16 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
     val permissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
     var camera: Camera? by remember { mutableStateOf(null) }
     var flashEnabled by remember { mutableStateOf(false) }
+    var isBarcodeProcessed by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         permissionState.launchPermissionRequest()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            isBarcodeProcessed = false
+        }
     }
 
     if (permissionState.status.isGranted) {
@@ -90,7 +98,13 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
 
                         val imageAnalyzer = ImageAnalysis.Builder().build().also { imageAnalysis ->
                             imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
-                                processImageProxy(imageProxy, navigateToScreen)
+                                processImageProxy(
+                                    imageProxy,
+                                    navigateToScreen,
+                                    isBarcodeProcessed
+                                ) {
+                                    isBarcodeProcessed = true
+                                }
                             }
                         }
 
@@ -162,7 +176,17 @@ fun CameraBackBtn(navController: NavController) {
 }
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
-private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?) -> Unit) {
+private fun processImageProxy(
+    imageProxy: ImageProxy,
+    navigateToScreen: (String?) -> Unit,
+    isBarcodeProcessed: Boolean,
+    onBarcodeProcessed: () -> Unit
+) {
+    if (isBarcodeProcessed) {
+        imageProxy.close()
+        return
+    }
+
     val mediaImage = imageProxy.image
     if (mediaImage != null) {
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
@@ -177,18 +201,19 @@ private fun processImageProxy(imageProxy: ImageProxy, navigateToScreen: (String?
                             val rawValue = barcode.rawValue
 
                             val buzzerInstance = AndroidBuzzer()
+                            // buzzerInstance.beep()
 
                             Log.d("Barcode", "Detected EAN: $rawValue")
 
-                            //buzzerInstance.beep()
-
                             navigateToScreen(rawValue)
+
+                            onBarcodeProcessed()
 
                             // Cierra cámara
                             imageProxy.close()
                             return@addOnSuccessListener
                         }
-                        // Add other cases if needed
+
                         else -> {
                             Log.d("Barcode", "Detected non-EAN barcode")
                         }
