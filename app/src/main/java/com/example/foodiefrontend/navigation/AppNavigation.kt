@@ -20,7 +20,6 @@ import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
-
     NavHost(
         navController = navController,
         startDestination = AppScreens.WelcomeScreen.route
@@ -50,7 +49,7 @@ fun AppNavigation(navController: NavHostController) {
         }
         // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
-            StockScreen(navController = navController, codeEan = null, listOfIngredients = SampleData.sampleIngredients)
+            StockScreen(navController = navController)
         }
         // Route with codeEan
         composable(
@@ -65,7 +64,7 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable(route = AppScreens.CameraScreen.route) {
             CameraScreen(navController, navigateToScreen = { codeEan ->
-                navController.navigate(AppScreens.StockScreen.createRoute(codeEan))
+                navController.navigate("stock_screen/$codeEan")
             })
         }
     }
