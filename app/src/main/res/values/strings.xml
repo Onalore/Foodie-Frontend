@@ -28,4 +28,9 @@
     <string name="suggests_for_you">Éstas son tus sugerencias</string>
     <string name="enter_manually">Ingresar manualmente</string>
     <string name="is_this_product">¿Escaneaste este producto?</string>
+    <string name="re_enter_password">Reingresar contraseña</string>
+    <string name="name">Nombre</string>
+    <string name="lastName">Apellido</string>
+    <string name="age">Edad</string>
+    <string name="complete_all_the_fields">Por favor, complete todos los campos</string>
 </resources>

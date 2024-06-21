@@ -87,7 +87,9 @@ fun WelcomeScreen(navController: NavController) {
                     CustomToggleButton(
                         firstButton = stringResource(string.registry),
                         secondButton = stringResource(string.login),
-                        onClickFirst = { navController.navigate(AppScreens.RegisterScreen.route)},
+                        onClickFirst = {
+                            navController.navigate(AppScreens.RegisterScreen.route)
+                        },
                         onClickSecond = {
                             navController.navigate(AppScreens.LoginScreen.route)
                         }
