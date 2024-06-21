@@ -42,10 +42,12 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.hardware.buzzer.Buzzer
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
+import com.example.foodiefrontend.viewmodel.StockViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -61,6 +63,8 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
     var camera: Camera? by remember { mutableStateOf(null) }
     var flashEnabled by remember { mutableStateOf(false) }
     var isBarcodeProcessed by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val stockViewModel: StockViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         permissionState.launchPermissionRequest()
@@ -73,7 +77,6 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
     }
 
     if (permissionState.status.isGranted) {
-        val context = LocalContext.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
@@ -104,6 +107,7 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
                                     isBarcodeProcessed
                                 ) {
                                     isBarcodeProcessed = true
+                                    stockViewModel.addProductByEan(it, 1, context) // Aquí se agrega el producto escaneado con cantidad 1
                                 }
                             }
                         }
@@ -180,7 +184,7 @@ private fun processImageProxy(
     imageProxy: ImageProxy,
     navigateToScreen: (String?) -> Unit,
     isBarcodeProcessed: Boolean,
-    onBarcodeProcessed: () -> Unit
+    onBarcodeProcessed: (String) -> Unit
 ) {
     if (isBarcodeProcessed) {
         imageProxy.close()
@@ -207,7 +211,9 @@ private fun processImageProxy(
 
                             navigateToScreen(rawValue)
 
-                            onBarcodeProcessed()
+                            if (rawValue != null) {
+                                onBarcodeProcessed(rawValue)
+                            }
 
                             // Cierra cámara
                             imageProxy.close()

@@ -1,6 +1,7 @@
 package com.example.foodiefrontend.presentation.ui.screens.login
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,17 +50,37 @@ import com.example.foodiefrontend.viewmodel.UserViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewModel()) {
+    val context = LocalContext.current
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
     val loginResult by viewModel.loginResult.observeAsState()
+    val userInfo by viewModel.userInfo.observeAsState()
 
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
-            navController.navigate(AppScreens.HomeScreen.route)
+            // Login successful, get user info
+            viewModel.getUserInfo(context)
         } else if (loginResult == null && showError) {
             // Show error message
+            Log.d("LoginScreen", "Login failed or no response.")
+        }
+    }
+
+    LaunchedEffect(userInfo) {
+        userInfo?.let {
+            val persona = it.persona
+            if (persona != null && persona.nombre != null) {
+                val username = persona.nombre
+                Log.d("LoginScreen", "Navigating to HomeScreen with username: $username (type: ${username::class.simpleName})")
+                // Navigate to HomeScreen with the user's name
+                navController.navigate("${AppScreens.HomeScreen.route}/$username")
+            } else {
+                Log.e("LoginScreen", "Persona or persona.nombre is null")
+            }
+        } ?: run {
+            Log.e("LoginScreen", "User info is null")
         }
     }
 
@@ -115,9 +137,13 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
 
                 CustomButton(
                     onClick = {
+                        Log.d("LoginScreen", "Login button clicked")
                         showError = emailValue.isEmpty() || passwordValue.isEmpty()
                         if (!showError) {
-                            viewModel.loginUser(emailValue, passwordValue)
+                            Log.d("LoginScreen", "Calling loginUser with email: $emailValue")
+                            viewModel.loginUser(context, emailValue, passwordValue)
+                        } else {
+                            Log.d("LoginScreen", "Email or password is empty")
                         }
                     },
                     text = stringResource(R.string.login),

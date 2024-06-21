@@ -12,7 +12,7 @@ object BackendApi {
     //Para levantarlo en el celu usar ngrok desde la terminal "ngrok http 8080" y usar url
     //private val BASE_URL = "https://ee8f-186-152-218-200.ngrok-free.app/api/"
     //para utilizar serveo
-    //private val BASE_URL = "https://b6f8d3facef479c59e400bcde633f011.serveo.net/api/"
+    //private val BASE_URL = "https://bc187da998b3c1d99a677b80e08db57d.serveo.net/api/"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

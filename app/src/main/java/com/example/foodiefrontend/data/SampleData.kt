@@ -4,14 +4,14 @@ object SampleData {
     val image = "https://lacocinadevero.com/wp-content/uploads/2021/02/carne-con-papas-1024x680.jpg"
 
     val sampleIngredients = listOf(
-        Ingredient(name = "Espinaca", quantity = "1", unit = "u."),
-        Ingredient(name = "Tomate cherry", quantity = "1/4", unit = "kg"),
-        Ingredient(name = "Huevo", quantity = "3", unit = "u."),
-        Ingredient(name = "Garbanzos", quantity = "", unit = ""),
-        Ingredient(name = "Queso", quantity = "1/4", unit = "kg")
+        Ingredient(id = "Espinaca", cantidad = "1", unidad = "u.", imageUrl = ""),
+        Ingredient(id = "Tomate cherry", cantidad = "1/4", unidad = "kg", imageUrl = ""),
+        Ingredient(id = "Huevo", cantidad = "3", unidad = "u.", imageUrl = ""),
+        Ingredient(id = "Garbanzos", cantidad = "", unidad = "", imageUrl = ""),
+        Ingredient(id = "Queso", cantidad = "1/4", unidad = "kg", imageUrl = "")
     )
 
-    val sampleIngredient = Ingredient(name = "Espinaca", quantity = "1", unit = "u.")
+    val sampleIngredient = Ingredient(id = "Espinaca", cantidad = "1", unidad = "u.", imageUrl = "")
 
     val samplePreparation = listOf(
         "Mezcle en una fuente la harina, el aceite, las zanahorias, la carne de soya hidratada, la cebolla y la sal",
