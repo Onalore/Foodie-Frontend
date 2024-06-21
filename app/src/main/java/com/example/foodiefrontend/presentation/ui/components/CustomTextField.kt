@@ -5,7 +5,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -20,14 +23,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun CustomTextField(
     value: String,
     placeholder: String,
+    label: String = "",
     onValueChange: (String) -> Unit,
     trailingIcon: Int? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickIcon: () -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    readOnly: Boolean = false
 ) {
     val shape = RoundedCornerShape(16.dp)
 
@@ -36,24 +43,35 @@ fun CustomTextField(
     Surface(
         elevation = 4.dp,
         shape = shape,
-        modifier = modifier
+        modifier = Modifier
             .height(70.dp)
             .fillMaxWidth()
+            .then(modifier),
+        onClick = { onClickIcon() }
     ) {
         TextField(
             value = value,
             onValueChange = onValueChange,
+            label = {
+                if(label != "") {
+                    Text(text = label)
+                } else {
+                    Text(text = placeholder)
+                }
+            },
             placeholder = {
                 Text(
                     text = placeholder,
-                    modifier = Modifier,
                     textAlign = TextAlign.Center
                 )
             },
-            modifier = modifier
+            readOnly = readOnly,
+            keyboardOptions = keyboardOptions,
+            modifier = Modifier
                 .background(MaterialTheme.colorScheme.onTertiary, shape)
                 .border(1.dp, MaterialTheme.colorScheme.onTertiary, shape)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .then(modifier),
             shape = shape,
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
@@ -66,7 +84,10 @@ fun CustomTextField(
                 if (trailingIcon != null) {
                     ImageWithResource(
                         resourceId = trailingIcon,
-                        modifier = Modifier.padding(end = 20.dp)
+                        modifier = Modifier
+                            .padding(end = 20.dp)
+                            .width(15.dp),
+                        onClick = { onClickIcon() }
                     )
                 }
             },

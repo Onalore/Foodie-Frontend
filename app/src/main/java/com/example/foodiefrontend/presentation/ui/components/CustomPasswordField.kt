@@ -67,7 +67,6 @@ fun CustomPasswordField(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Black,
-                textColor = MaterialTheme.colorScheme.onBackground,
                 placeholderColor = MaterialTheme.colorScheme.onBackground
             ),
             trailingIcon = {
