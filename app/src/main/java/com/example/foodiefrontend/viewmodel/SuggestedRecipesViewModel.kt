@@ -1,3 +1,5 @@
+package com.example.foodiefrontend.viewmodel
+
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,17 +21,17 @@ class SuggestedRecipesViewModel : ViewModel() {
     fun fetchRecipes() {
         viewModelScope.launch {
             try {
-                Log.d("SuggestedRecipesViewModel", "fetchRecipes called")
+                Log.d("com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel", "fetchRecipes called")
                 val response = BackendApi.createRecipesService().getRecipes().awaitResponse()
                 if (response.isSuccessful) {
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)
                 } else {
-                    Log.d("SuggestedRecipesViewModel", "Error Recipes fetched: ${response.message()}")
+                    Log.d("com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel", "Error Recipes fetched: ${response.message()}")
                     _error.postValue("No se pudieron recuperar las recetas: ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.d("SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
+                Log.d("com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
                 _error.postValue("Error de excepción: ${e.message}")
             }
         }

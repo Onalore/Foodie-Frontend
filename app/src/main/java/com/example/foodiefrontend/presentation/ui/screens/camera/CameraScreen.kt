@@ -58,11 +58,13 @@ import java.util.concurrent.Executors
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Unit, stockViewModel: StockViewModel = viewModel()) {
+fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Unit) {
     val permissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
     var camera: Camera? by remember { mutableStateOf(null) }
     var flashEnabled by remember { mutableStateOf(false) }
     var isBarcodeProcessed by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val stockViewModel: StockViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         permissionState.launchPermissionRequest()
@@ -75,7 +77,6 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
     }
 
     if (permissionState.status.isGranted) {
-        val context = LocalContext.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
@@ -106,7 +107,7 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
                                     isBarcodeProcessed
                                 ) {
                                     isBarcodeProcessed = true
-                                    stockViewModel.addProductByEan(it, 1) // Aquí se agrega el producto escaneado con cantidad 1
+                                    stockViewModel.addProductByEan(it, 1, context) // Aquí se agrega el producto escaneado con cantidad 1
                                 }
                             }
                         }

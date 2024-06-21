@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -38,79 +39,87 @@ import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.components.Subtitle
 import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar.BottomNavigationBar
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    username: String = "Nicolaqui"
+    username: String
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.onSurface),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        item {
-            Column(
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController) // Utilizar tu BottomNavigationBar
+        },
+        content = { paddingValues -> // Usar paddingValues para evitar superposiciones
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.onTertiary)
-                    .padding(horizontal = 15.dp, vertical = 40.dp),
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.onSurface)
+                    .padding(paddingValues), // Ajustar el contenido para evitar superposiciones con la barra de navegación
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                Title(title = "${stringResource(R.string.hi)} $username")
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = MaterialTheme.colorScheme.onTertiary)
+                            .padding(horizontal = 15.dp, vertical = 40.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Title(title = "${stringResource(R.string.hi)} $username")
 
-                Title(
-                    title = stringResource(R.string.what_are_u_eating),
-                    fontWeight = FontWeight.Normal
-                )
+                        Title(
+                            title = stringResource(R.string.what_are_u_eating),
+                            fontWeight = FontWeight.Normal
+                        )
 
-                Spacer(modifier = Modifier.height(25.dp))
+                        Spacer(modifier = Modifier.height(25.dp))
 
-                CustomButton(
-                    text = stringResource(R.string.suggest_with_my_ingredients),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    icon = R.drawable.stock,
-                    modifier = Modifier.height(100.dp),
-                    colorIcon = ColorFilter.tint(Color.White),
-                    onClick = {
-                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                        CustomButton(
+                            text = stringResource(R.string.suggest_with_my_ingredients),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            icon = R.drawable.stock,
+                            modifier = Modifier.height(100.dp),
+                            colorIcon = ColorFilter.tint(Color.White),
+                            onClick = {
+                                navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(25.dp))
+
+                        CustomButton(
+                            text = stringResource(R.string.suggest_without_my_ingredients),
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = R.drawable.dice,
+                            modifier = Modifier.height(100.dp),
+                            colorIcon = ColorFilter.tint(Color.White),
+                            onClick = { }
+                        )
                     }
-                )
 
-                Spacer(modifier = Modifier.height(25.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 40.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Subtitle(
+                            title = "Tus recetas favoritas",
+                            modifier = Modifier.padding(start = 15.dp)
+                        )
+                    }
 
-                CustomButton(
-                    text = stringResource(R.string.suggest_without_my_ingredients),
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    icon = R.drawable.dice,
-                    modifier = Modifier.height(100.dp),
-                    colorIcon = ColorFilter.tint(Color.White),
-                    onClick = { }
-                )
-
-
+                    //Está de ejemplo, se debe borrar una vez que se envíe la info verdadera
+                    HorizontalCardList(items = SampleData.recipes)
+                }
             }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Subtitle(
-                    title = "Tus recetas favoritas",
-                    modifier = Modifier.padding(start = 15.dp)
-                )
-            }
-
-            //Está de ejemplo, se debe borrar una vez que se envíe la info verdadera
-            HorizontalCardList(items = SampleData.recipes)
         }
-    }
+    )
 }
 
 @Composable

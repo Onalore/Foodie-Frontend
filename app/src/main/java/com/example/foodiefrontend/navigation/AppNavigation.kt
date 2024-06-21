@@ -12,7 +12,6 @@ import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
-import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
 import com.example.foodiefrontend.presentation.ui.screens.suggestedRecipes.SuggestedRecipesScreen
@@ -33,12 +32,12 @@ fun AppNavigation(navController: NavHostController) {
         composable(AppScreens.RegisterScreen.route) {
             RegisterScreen(navController)
         }
-        composable(route = AppScreens.HomeScreen.route) {
-            HomeScreen(navController)
-        }
-        //Plural
-        composable(route = AppScreens.RecipesScreen.route) {
-            RecipesScreen(navController, SampleData.recipes)
+        composable(
+            route = "${AppScreens.HomeScreen.route}/{username}",
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            HomeScreen(navController, username)
         }
         //Singular
         composable(route = AppScreens.RecipeScreen.route) {
@@ -49,23 +48,22 @@ fun AppNavigation(navController: NavHostController) {
         }
         // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
-            StockScreen(navController = navController)
+            StockScreen(navController)
         }
-        // Route with codeEan
         composable(
             route = "stock_screen/{codeEan}",
             arguments = listOf(navArgument("codeEan") { type = NavType.StringType })
         ) { backStackEntry ->
             val codeEan = backStackEntry.arguments?.getString("codeEan")
-            StockScreen(navController = navController, codeEan = codeEan)
+            StockScreen(navController, codeEan)
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
         }
         composable(route = AppScreens.CameraScreen.route) {
-            CameraScreen(navController, navigateToScreen = { codeEan ->
+            CameraScreen(navController) { codeEan ->
                 navController.navigate("stock_screen/$codeEan")
-            })
+            }
         }
     }
 }

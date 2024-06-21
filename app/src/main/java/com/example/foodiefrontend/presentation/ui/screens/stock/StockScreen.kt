@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,14 +41,15 @@ fun StockScreen(
     codeEan: String? = null
 ) {
     val viewModel: StockViewModel = viewModel()
-    val stockIngredients = viewModel.stockIngredients.observeAsState(emptyList()).value
+    val stockIngredients by viewModel.stockIngredients.observeAsState(emptyList())
     var ingredient by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(!codeEan.isNullOrEmpty()) }
+    val context = LocalContext.current
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")
 
     LaunchedEffect(Unit) {
-        viewModel.getUserStock()
+        viewModel.getUserStock(context)
     }
 
     if (showDialog && codeEan != null) {
@@ -100,14 +103,12 @@ fun StockScreen(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
         ) {
-            stockIngredients.forEach { ingredient ->
-                item {
-                    IngredientCard(
-                        ingredient = ingredient,
-                        onIncrement = { /* Implement increment action */ },
-                        onDecrement = { /* Implement decrement action */ }
-                    )
-                }
+            items(stockIngredients) { ingredient ->
+                IngredientCard(
+                    ingredient = ingredient,
+                    onIncrement = { /* Implement increment action */ },
+                    onDecrement = { /* Implement decrement action */ }
+                )
             }
         }
     }

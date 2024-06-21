@@ -17,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +34,7 @@ fun AlertIngredientScanned(
     setShowDialog: (Boolean) -> Unit,
     codeEan: String,
 ) {
+    val context = LocalContext.current
     val viewModel: StockViewModel = viewModel()
 
     LaunchedEffect(codeEan) {
@@ -101,7 +103,7 @@ fun AlertIngredientScanned(
                     onClick = {
                         setShowDialog(false)
                         if (productType != null) {
-                            viewModel.addProductByEan(codeEan, 1)
+                            viewModel.addProductByEan(codeEan, 1, context) // Pasa el contexto aquí
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
