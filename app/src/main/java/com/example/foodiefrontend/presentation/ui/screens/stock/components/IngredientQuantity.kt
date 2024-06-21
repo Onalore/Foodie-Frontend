@@ -17,7 +17,7 @@ import com.example.foodiefrontend.R
 @Composable
 fun IngredientQuantity(
     quantity: String,
-    unit: String,
+    unit: String?,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit
 ) {
@@ -35,7 +35,7 @@ fun IngredientQuantity(
                     modifier = Modifier.size(10.dp)
                 )
             }
-            Text(text = "$quantity $unit")
+            Text(text = "$quantity ${unit ?: ""}")
             IconButton(onClick = onIncrement) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus),

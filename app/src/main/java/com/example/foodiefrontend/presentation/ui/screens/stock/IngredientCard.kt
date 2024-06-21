@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.SampleData
@@ -44,11 +46,32 @@ fun IngredientCard(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(8.dp)
         ) {
+            val imageUrl = ingredient.imageUrl ?: "https://via.placeholder.com/150"
+            val painter = rememberAsyncImagePainter(model = imageUrl)
+            when (painter.state) {
+                is AsyncImagePainter.State.Loading -> {
+                    Log.d("IngredientCard", "Loading image: $imageUrl")
+                }
+
+                is AsyncImagePainter.State.Success -> {
+                    Log.d("IngredientCard", "Successfully loaded image: $imageUrl")
+                }
+
+                is AsyncImagePainter.State.Error -> {
+                    Log.e("IngredientCard", "Error loading image: $imageUrl")
+                }
+
+                else -> {
+                    Log.d("IngredientCard", "State: ${painter.state}")
+                }
+            }
             Image(
-                painter = rememberAsyncImagePainter(model = ingredient.imageUrl),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.height(50.dp)
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(50.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -61,8 +84,8 @@ fun IngredientCard(
             IngredientQuantity(
                 quantity = ingredient.cantidad,
                 unit = ingredient.unidad,
-                onDecrement = { /*TODO*/ },
-                onIncrement = {}
+                onDecrement = onDecrement,
+                onIncrement = onIncrement
             )
         }
     }
