@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,13 +45,13 @@ import com.example.foodiefrontend.viewmodel.UserViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: UserViewModel = viewModel()) {
-    var email by remember { mutableStateOf("") }
+    var mail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordBis by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var restrictions by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
+    var edad by remember { mutableStateOf("") }
+    var restricciones by remember { mutableStateOf(emptyList<String>()) }
     var showError by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -81,9 +79,9 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                             textAlign = TextAlign.Center
                         )
                         CustomTextField(
-                            value = email,
+                            value = mail,
                             placeholder = stringResource(id = R.string.enter_email),
-                            onValueChange = { email = it }
+                            onValueChange = { mail = it }
                         )
                         CustomPasswordField(
                             value = password,
@@ -106,22 +104,26 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                             modifier = Modifier.fillMaxWidth()
                         )
                         CustomTextField(
-                            value = name,
+                            value = nombre,
                             placeholder = stringResource(R.string.name),
-                            onValueChange = { name = it }
+                            onValueChange = { nombre = it }
                         )
                         CustomTextField(
-                            value = lastName,
+                            value = apellido,
                             placeholder = stringResource(R.string.lastName),
-                            onValueChange = { lastName = it }
+                            onValueChange = { apellido = it }
                         )
                         CustomTextField(
-                            value = age,
+                            value = edad,
                             placeholder = stringResource(R.string.age),
-                            onValueChange = { age = it },
+                            onValueChange = { edad = it },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
-                        CustomComboBox()
+                        CustomComboBox(
+                            selectedItems = restricciones,
+                            onSelectedItemsChange = { restricciones = it }
+
+                        )
 //                        TextField(
 //                            value = restricciones,
 //                            onValueChange = { restricciones = it },
@@ -133,27 +135,22 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                             Text(
                                 text = stringResource(R.string.complete_all_the_fields),
                                 color = androidx.compose.ui.graphics.Color.Red,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
                         CustomButton(
                             onClick = {
                                 showError =
-                                    email.isEmpty() || password.isEmpty() || name.isEmpty() || lastName.isEmpty() || age.isEmpty()
+                                    mail.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || edad.isEmpty()
                                 if (!showError) {
-                                    val restriccionList = if (restrictions.isEmpty())
-                                        emptyList()
-                                    else
-                                        restrictions.split(",").map { it.trim() }
-
                                     viewModel.registerUser(
-                                        email,
+                                        mail,
                                         password,
-                                        name,
-                                        lastName,
-                                        age.toInt(),
-                                        restriccionList
+                                        nombre,
+                                        apellido,
+                                        edad.toInt(),
+                                        restricciones
                                     ) { response ->
                                         if (response != null) {
                                             navController.navigate(AppScreens.LoginScreen.route)

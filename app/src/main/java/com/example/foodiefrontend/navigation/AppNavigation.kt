@@ -29,7 +29,7 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.LoginScreen.route) {
             LoginScreen(navController)
         }
-        composable(AppScreens.RegisterScreen.route) {
+        composable(route = AppScreens.RegisterScreen.route) {
             RegisterScreen(navController)
         }
         composable(
@@ -39,14 +39,12 @@ fun AppNavigation(navController: NavHostController) {
             val username = backStackEntry.arguments?.getString("username") ?: ""
             HomeScreen(navController, username)
         }
-        //Singular
         composable(route = AppScreens.RecipeScreen.route) {
             RecipeScreen(navController, SampleData.recipe)
         }
         composable(route = AppScreens.SuggestedRecipesScreen.route) {
             SuggestedRecipesScreen(navController)
         }
-        // Route without codeEan
         composable(route = AppScreens.StockScreen.route) {
             StockScreen(navController)
         }

@@ -147,19 +147,49 @@ class UserViewModel : ViewModel() {
     }
 
     fun registerUser(mail: String, password: String, nombre: String, apellido: String, edad: Int, restricciones: List<String>, onResult: (RegisterResponse?) -> Unit) {
+        Log.d("UserViewModel", "Registering user with email: $mail")
+        Log.d("UserViewModel", "Password: $password")
+        Log.d("UserViewModel", "Nombre: $nombre")
+        Log.d("UserViewModel", "Apellido: $apellido")
+        Log.d("UserViewModel", "Edad: $edad")
+        Log.d("UserViewModel", "Restricciones: $restricciones")
+
         val persona = Persona(nombre, apellido, edad, restricciones)
         val user = User(mail, password, persona)
+
+        val gson = Gson()
+        val userJson = gson.toJson(user)
+        Log.d("UserViewModel", "User JSON: $userJson")
+
+        // Verificar que todos los campos obligatorios no estén vacíos
+        if (mail.isBlank() || password.isBlank() || nombre.isBlank() || apellido.isBlank() || edad <= 0) {
+            Log.e("UserViewModel", "Validation failed: Some fields are blank or invalid")
+            onResult(null)
+            return
+        }
+
         viewModelScope.launch {
             apiService.registerUser(user).enqueue(object : Callback<RegisterResponse> {
                 override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
                     if (response.isSuccessful) {
+                        Log.d("UserViewModel", "User registered successfully: ${response.body()}")
                         onResult(response.body())
                     } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Registration failed with response code: ${response.code()}"
+                        )
+                        Log.e("UserViewModel", "Response message: ${response.message()}")
+                        Log.e(
+                            "UserViewModel",
+                            "Response error body: ${response.errorBody()?.string()}"
+                        )
                         onResult(null)
                     }
                 }
 
                 override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                    Log.e("UserViewModel", "Registration failed with error: ${t.message}")
                     onResult(null)
                 }
             })
