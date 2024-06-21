@@ -1,7 +1,5 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
-import StockViewModel
-import android.app.Dialog
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,23 +26,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
+import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @Composable
 fun AlertIngredientScanned(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
     codeEan: String,
-    ) {
+) {
+    val context = LocalContext.current
     val viewModel: StockViewModel = viewModel()
 
     LaunchedEffect(codeEan) {
-        if (!codeEan.isNullOrEmpty()) {
+        if (codeEan.isNotEmpty()) {
             viewModel.findProductByEan(codeEan)
         }
     }
 
     val productType by viewModel.productType.observeAsState()
     val error by viewModel.error.observeAsState()
+    val addProductResult by viewModel.addProductResult.observeAsState()
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -52,14 +54,15 @@ fun AlertIngredientScanned(
                 text = stringResource(R.string.is_this_product),
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold),
+                    fontWeight = FontWeight.Bold
+                ),
                 textAlign = TextAlign.Center,
             )
         },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = codeEan ?: "Producto desconocido",
+                    text = codeEan,
                     textAlign = TextAlign.Center
                 )
                 if (productType != null) {
@@ -99,7 +102,9 @@ fun AlertIngredientScanned(
                 CustomButton(
                     onClick = {
                         setShowDialog(false)
-                        //TODO
+                        if (productType != null) {
+                            viewModel.addProductByEan(codeEan, 1, context) // Pasa el contexto aquí
+                        }
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     icon = R.drawable.ic_check,
@@ -109,7 +114,6 @@ fun AlertIngredientScanned(
         },
         confirmButton = {
             Column(modifier = Modifier.fillMaxWidth()) {
-
                 CustomButton(
                     onClick = {
                         setShowDialog(false)
@@ -121,4 +125,15 @@ fun AlertIngredientScanned(
             }
         }
     )
+
+    LaunchedEffect(addProductResult) {
+        addProductResult?.let {
+            if (it) {
+                Log.d("AddProduct", "Product successfully added to stock.")
+                navController.navigate("stock_screen")
+            } else {
+                Log.d("AddProduct", "Failed to add product to stock.")
+            }
+        }
+    }
 }

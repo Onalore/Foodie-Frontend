@@ -1,6 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.suggestedRecipes
 
-import SuggestedRecipesViewModel
+import com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
