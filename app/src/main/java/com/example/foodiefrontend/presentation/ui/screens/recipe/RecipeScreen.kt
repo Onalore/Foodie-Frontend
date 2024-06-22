@@ -1,11 +1,16 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipe
 
-import androidx.compose.runtime.Composable
-
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.data.SampleData.recipe
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 
@@ -37,7 +42,7 @@ fun RecipeScreen(navController: NavController, recipe: Recipe) {
                 image = recipe.imageUrl,
                 modifier = Modifier,
                 modifierBox = Modifier
-                .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Color.Black.copy(alpha = 0.5f))
             )
 
             Column(
@@ -50,7 +55,7 @@ fun RecipeScreen(navController: NavController, recipe: Recipe) {
                     style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
                 )
                 Text(
-                    text = recipe.timeOfPrep.toString() + " min",
+                    text = "${recipe.preparation.size} min",
                     style = MaterialTheme.typography.titleMedium.copy(color = Color.White)
                 )
             }
@@ -66,7 +71,7 @@ fun RecipeScreen(navController: NavController, recipe: Recipe) {
         Spacer(modifier = Modifier.height(8.dp))
         recipe.ingredients.forEach { ingredient ->
             Text(
-                text = "• $ingredient",
+                text = "• ${ingredient.description} ${ingredient.quantity} ${ingredient.unit}",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -92,10 +97,7 @@ fun RecipeScreen(navController: NavController, recipe: Recipe) {
 @Preview
 @Composable
 private fun Preview() {
-
     FoodieFrontendTheme {
-
-        RecipeScreen(rememberNavController(), SampleData.recipe)
+        RecipeScreen(rememberNavController(), recipe = recipe)
     }
-
 }

@@ -2,20 +2,26 @@
 
 package com.example.foodiefrontend.presentation.ui.screens.recipes
 
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,90 +30,97 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
-import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
-import com.example.foodiefrontend.presentation.ui.components.CustomTextField
-import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
-import com.example.foodiefrontend.presentation.ui.components.Title
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
-    var recipe by remember { mutableStateOf("") }
-
+fun RecipeScreen(navController: NavController, recipe: Recipe) {
     Column(
         modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp)
     ) {
-        Column(
+        // Image and title section
+        Box(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 20.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+                .fillMaxWidth()
+                .height(200.dp)
         ) {
-            Row {
-                Title(
-                    title = stringResource(id = R.string.recipes),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = 30.dp)
-                )
-                ImageWithResource(resourceId = R.drawable.ic_filter)
-            }
+            RoundedImage(
+                image = recipe.imageUrl,
+                modifier = Modifier,
+                modifierBox = Modifier
+                    .background(Color.Black.copy(alpha = 0.5f))
+            )
 
-            CustomTextField(
-                value = recipe,
-                placeholder = stringResource(R.string.look_for_recipe),
-                onValueChange = { newValue ->
-                    recipe = newValue
-                },
-                trailingIcon = R.drawable.ic_search,
+            Column(
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
+                )
+                Text(
+                    text = recipe.timeOfPrep.toString() + " min",
+                    style = MaterialTheme.typography.titleMedium.copy(color = Color.White)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Ingredients section
+        Text(
+            text = "Ingredientes",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        recipe.ingredients.forEach { ingredient ->
+            Text(
+                text = "• $ingredient",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            val categories = listOf(
-                "Todas" to { },
-                "Favoritas" to { },
-                "Vegetarianas" to { },
-                "Carnivoras" to { },
-                "Sin TACC" to { }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Preparation section
+        Text(
+            text = "Preparación",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        recipe.preparation.forEachIndexed { index, step ->
+            Text(
+                text = "${index + 1}. $step",
+                style = MaterialTheme.typography.bodyMedium
             )
-
-            HorizontalButtonCategories(items = categories)
-
-            if (recipes != null) VerticalRecipes(items = recipes)
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
+
 
 @Composable
 fun RecipesCardItem(
     title: String,
     image: String,
-    liked: Boolean = false,
+    onClick: () -> Unit,
     initialRating: Int? = null,
     modifier: Modifier = Modifier
 ) {
-    Box {
+    Box(modifier = Modifier.clickable {
+        Log.d("RecipesCardItem", "Clicked on: $title")
+        onClick()
+    }) {
         RoundedImage(
             image = image,
             modifier = Modifier
@@ -123,11 +136,10 @@ fun RecipesCardItem(
                 .width(270.dp)
                 .height(120.dp),
             punctuation = false,
-            initialRating = initialRating ?: 0 // Manejo seguro del valor inicial
+            initialRating = initialRating ?: 0 // Safe handling of initial rating
         )
     }
 }
-
 
 @Composable
 fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {
@@ -157,28 +169,28 @@ fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {
 
 @Composable
 fun VerticalRecipes(items: List<Recipe>) {
-    var selectedButtonIndex by remember { mutableStateOf(0) }
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items.forEachIndexed { index, item ->
-            item {
-                RecipesCardItem(
-                    title = item.name,
-                    initialRating = item.rating,
-                    image = item.imageUrl,
-                    liked = item.liked
-                )
-            }
+        items(items) { item ->
+            RecipesCardItem(
+                title = item.name,
+                initialRating = item.rating,
+                image = item.imageUrl,
+                onClick = {
+                    // Implementar acción al hacer clic
+                }
+            )
         }
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun RecipesContentPreview() {
     FoodieFrontendTheme {
-        RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+        AppScreens.RecipesScreen(navController = rememberNavController())
     }
-}
+}*/

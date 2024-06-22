@@ -39,14 +39,14 @@ import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuggestedRecipesScreen(
+fun RandomRecipesScreen(
     navController: NavController,
     viewModel: SuggestedRecipesViewModel = viewModel()
 ) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.fetchRecipes(context)
+        viewModel.fetchRandomRecipes(context)
     }
 
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
@@ -112,8 +112,8 @@ fun SuggestedRecipesScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewSuggestedRecipes() {
+fun PreviewRandomRecipes() {
     FoodieFrontendTheme {
-        SuggestedRecipesScreen(rememberNavController())
+        RandomRecipesScreen(rememberNavController())
     }
 }
