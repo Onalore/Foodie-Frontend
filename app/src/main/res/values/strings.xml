@@ -33,4 +33,17 @@
     <string name="lastName">Apellido</string>
     <string name="age">Edad</string>
     <string name="complete_all_the_fields">Por favor, complete todos los campos</string>
+    <string name="go_to_login">Ir a loguearme</string>
+    <string name="successful_registry">¡Tu registro fue exitoso!</string>
+    <string name="passwords_dont_match">Las contraseñas no coinciden</string>
+    <string name="add_family">Añadir familiar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="yes_close_shift">Sí, cerrar sesión</string>
+    <string name="want_to_close_shift">¿Quieres cerrar tu sesión?</string>
+    <string name="come_back">¡Te esperamos la próxima!</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="family_config">Configuración de familiares</string>
+    <string name="restrictions">Restricciones alimentarias</string>
+    <string name="modify_family">Modificar familiar</string>
+    <string name="delete_family">Eliminar familiar</string>
 </resources>

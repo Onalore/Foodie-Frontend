@@ -1,4 +1,4 @@
-package com.example.foodiefrontend.presentation.ui.screens.suggestedRecipes
+package com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes
 
 import com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomToolbar
 import com.example.foodiefrontend.presentation.ui.components.Title
@@ -82,5 +83,7 @@ fun SuggestedRecipesScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSuggestedRecipes() {
-    SuggestedRecipesScreen(rememberNavController())
+    FoodieFrontendTheme {
+        SuggestedRecipesScreen(rememberNavController())
+    }
 }

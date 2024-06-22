@@ -36,7 +36,7 @@ fun CustomButton(
         elevation = 4.dp,
         shape = shape,
         modifier = modifier
-            .height(40.dp)
+            .height(60.dp)
             .fillMaxWidth()
     ) {
         Button(
@@ -46,7 +46,7 @@ fun CustomButton(
             modifier = Modifier
                 .then(modifier)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .border(
                     width = 2.dp,
                     color = if (containerColor == Color.Transparent) contentColor else containerColor,

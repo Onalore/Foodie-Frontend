@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
@@ -177,6 +178,7 @@ fun VerticalRecipes(items: List<Recipe>) {
 @Preview(showBackground = true)
 @Composable
 fun RecipesContentPreview() {
-
-    RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+    FoodieFrontendTheme {
+        RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+    }
 }

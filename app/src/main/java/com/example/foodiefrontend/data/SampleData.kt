@@ -35,4 +35,30 @@ object SampleData {
         preparation = samplePreparation
     )
 
+    val listOfPersona = listOf(
+        Persona(
+            nombre = "María",
+            apellido = "García",
+            edad = 25,
+            restricciones = listOf("Intolerancia a la lactosa", "Diabetes")
+        ),
+        Persona(
+            nombre = "Carlos",
+            apellido = "Rodríguez",
+            edad = 40,
+            restricciones = listOf("Hipertensión")
+        ),
+        Persona(
+            nombre = "Ana",
+            apellido = "Martínez",
+            edad = 35,
+            restricciones = listOf("Kosher", "Vegetarianismo")
+        ),
+        Persona(
+            nombre = "Luis",
+            apellido = "González",
+            edad = 28,
+            restricciones = listOf("Embarazo")
+        )
+    )
 }
