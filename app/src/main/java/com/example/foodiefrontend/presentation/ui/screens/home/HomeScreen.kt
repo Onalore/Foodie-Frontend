@@ -97,7 +97,9 @@ fun HomeScreen(
                             icon = R.drawable.dice,
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
-                            onClick = { }
+                            onClick = {
+                                navController.navigate(AppScreens.RandomRecipesScreen.route)
+                            }
                         )
                     }
 

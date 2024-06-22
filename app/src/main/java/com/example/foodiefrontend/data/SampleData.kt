@@ -1,17 +1,18 @@
+
 package com.example.foodiefrontend.data
 
 object SampleData {
     val image = "https://lacocinadevero.com/wp-content/uploads/2021/02/carne-con-papas-1024x680.jpg"
 
     val sampleIngredients = listOf(
-        Ingredient(id = "Espinaca", cantidad = "1", unidad = "u.", imageUrl = ""),
-        Ingredient(id = "Tomate cherry", cantidad = "1/4", unidad = "kg", imageUrl = ""),
-        Ingredient(id = "Huevo", cantidad = "3", unidad = "u.", imageUrl = ""),
-        Ingredient(id = "Garbanzos", cantidad = "", unidad = "", imageUrl = ""),
-        Ingredient(id = "Queso", cantidad = "1/4", unidad = "kg", imageUrl = "")
+        Ingredient(id = "Espinaca", quantity = "1", unit = "u.", imageUrl = ""),
+        Ingredient(id = "Tomate cherry", quantity = "1/4", unit = "kg", imageUrl = ""),
+        Ingredient(id = "Huevo", quantity = "3", unit = "u.", imageUrl = ""),
+        Ingredient(id = "Garbanzos", quantity = "", unit = "", imageUrl = ""),
+        Ingredient(id = "Queso", quantity = "1/4", unit = "kg", imageUrl = "")
     )
 
-    val sampleIngredient = Ingredient(id = "Espinaca", cantidad = "1", unidad = "u.", imageUrl = "")
+    val sampleIngredient = Ingredient(id = "Espinaca", quantity = "1", unit = "u.", imageUrl = "")
 
     val samplePreparation = listOf(
         "Mezcle en una fuente la harina, el aceite, las zanahorias, la carne de soya hidratada, la cebolla y la sal",
@@ -22,9 +23,9 @@ object SampleData {
     )
 
     val recipes = listOf(
-        Recipe("Bombas de papa", 3, image, true),
-        Recipe("Canelones", 2, image),
-        Recipe("Vegetarianas", 0, image, true)
+        Recipe("Bombas de papa", 3, image, true, listOf(), listOf()),
+        Recipe("Canelones", 2, image, true, listOf(), listOf()),
+        Recipe("Vegetarianas", 0, image, true, listOf(), listOf())
     )
 
 

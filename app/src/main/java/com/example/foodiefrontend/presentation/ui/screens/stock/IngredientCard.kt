@@ -74,19 +74,23 @@ fun IngredientCard(
                     .width(50.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = ingredient.id,
-                style = MaterialTheme.typography.subtitle1,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            ingredient.id?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.subtitle1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
-            IngredientQuantity(
-                quantity = ingredient.cantidad,
-                unit = ingredient.unidad,
-                onDecrement = onDecrement,
-                onIncrement = onIncrement
-            )
+            ingredient.quantity?.let {
+                IngredientQuantity(
+                    quantity = it,
+                    unit = ingredient.unit,
+                    onDecrement = onDecrement,
+                    onIncrement = onIncrement
+                )
+            }
         }
     }
 }

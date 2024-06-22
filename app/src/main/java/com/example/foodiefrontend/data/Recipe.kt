@@ -1,11 +1,13 @@
 package com.example.foodiefrontend.data
 
+import com.google.gson.annotations.SerializedName
+
 data class Recipe(
-    val name: String,
-    val rating: Int = 0,
-    val imageUrl: String,
-    val liked: Boolean = false,
-    val ingredients: List<Ingredient> = SampleData.sampleIngredients,
-    val preparation: List<String> = SampleData.samplePreparation,
-    val timeOfPrep: Int = 0
+    @SerializedName("name") val name: String = "",
+    @SerializedName("rating") val rating: Int = 0,
+    @SerializedName("imageUrl") val imageUrl: String = "",
+    @SerializedName("liked") val liked: Boolean = false,
+    @SerializedName("ingredients") val ingredients: List<Ingredient> = listOf(),
+    @SerializedName("steps") val preparation: List<String> = listOf(),
+    @SerializedName("timeOfPrep") val timeOfPrep: Int = 0
 )
