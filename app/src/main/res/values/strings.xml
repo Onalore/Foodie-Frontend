@@ -33,4 +33,6 @@
     <string name="lastName">Apellido</string>
     <string name="age">Edad</string>
     <string name="complete_all_the_fields">Por favor, complete todos los campos</string>
+    <string name="go_to_login">Ir a loguearme</string>
+    <string name="successful_registry">¡Tu registro fue exitoso!</string>
 </resources>
