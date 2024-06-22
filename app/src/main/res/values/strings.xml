@@ -44,4 +44,6 @@
     <string name="logout">Cerrar sesión</string>
     <string name="family_config">Configuración de familiares</string>
     <string name="restrictions">Restricciones alimentarias</string>
+    <string name="modify_family">Modificar familiar</string>
+    <string name="delete_family">Eliminar familiar</string>
 </resources>
