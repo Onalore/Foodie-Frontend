@@ -53,6 +53,7 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
     var edad by remember { mutableStateOf("") }
     var restricciones by remember { mutableStateOf(emptyList<String>()) }
     var showError by remember { mutableStateOf(false) }
+    var showPasswordError by remember { mutableStateOf(false) }
 
     Scaffold(
         content = {
@@ -61,7 +62,7 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
+                            .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -124,16 +125,17 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                             onSelectedItemsChange = { restricciones = it }
 
                         )
-//                        TextField(
-//                            value = restricciones,
-//                            onValueChange = { restricciones = it },
-//                            label = { Text("Restricciones (separadas por comas)") },
-//                            modifier = Modifier.fillMaxWidth()
-//                        )
 
                         if (showError) {
                             Text(
                                 text = stringResource(R.string.complete_all_the_fields),
+                                color = androidx.compose.ui.graphics.Color.Red,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else if (showPasswordError) {
+                            Text(
+                                text = stringResource(R.string.passwords_dont_match),
                                 color = androidx.compose.ui.graphics.Color.Red,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
@@ -143,7 +145,8 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                             onClick = {
                                 showError =
                                     mail.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || edad.isEmpty()
-                                if (!showError) {
+                                showPasswordError = password != passwordBis
+                                if (!showError || !showPasswordError) {
                                     viewModel.registerUser(
                                         mail,
                                         password,

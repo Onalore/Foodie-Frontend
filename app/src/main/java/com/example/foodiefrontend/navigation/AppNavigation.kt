@@ -8,13 +8,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
+import com.example.foodiefrontend.presentation.ui.screens.familyConfig.AddFamilyScreen
+import com.example.foodiefrontend.presentation.ui.screens.familyConfig.FamilyConfigScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
-import com.example.foodiefrontend.presentation.ui.screens.suggestedRecipes.SuggestedRecipesScreen
+import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.SuggestedRecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 
 @Composable
@@ -62,6 +64,12 @@ fun AppNavigation(navController: NavHostController) {
             CameraScreen(navController) { codeEan ->
                 navController.navigate("stock_screen/$codeEan")
             }
+        }
+        composable(route = AppScreens.FamilyConfigScreen.route) {
+            FamilyConfigScreen(navController, list = listOf())
+        }
+        composable(route = AppScreens.AddFamilyScreen.route) {
+            AddFamilyScreen(navController)
         }
     }
 }

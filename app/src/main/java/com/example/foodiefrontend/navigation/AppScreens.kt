@@ -14,4 +14,6 @@ sealed class AppScreens(val route: String) {
 
     object ProfileScreen : AppScreens("profile_screen")
     object CameraScreen : AppScreens("camera_screen")
+    object FamilyConfigScreen : AppScreens("family_config_screen")
+    object AddFamilyScreen : AppScreens("add_family_screen")
 }

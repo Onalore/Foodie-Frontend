@@ -43,7 +43,8 @@ class MainActivity : ComponentActivity() {
                                 AppScreens.HomeScreen.route,
                                 AppScreens.RecipesScreen.route,
                                 AppScreens.StockScreen.route,
-                                AppScreens.ProfileScreen.route
+                                AppScreens.ProfileScreen.route,
+                                AppScreens.FamilyConfigScreen.route
                                 -> {
                                     BottomNavigationBar(navController = navController)
                                 }
