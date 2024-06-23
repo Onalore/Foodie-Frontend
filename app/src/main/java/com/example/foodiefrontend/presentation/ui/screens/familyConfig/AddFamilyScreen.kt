@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
@@ -33,10 +34,11 @@ import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.CustomToolbar
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
+import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFamilyScreen(navController: NavController) {
+fun AddFamilyScreen(navController: NavController, viewModel: UserViewModel = viewModel()) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var edad by remember { mutableStateOf("") }
@@ -78,23 +80,25 @@ fun AddFamilyScreen(navController: NavController) {
             CustomTextField(
                 value = nombre,
                 placeholder = stringResource(R.string.name),
-                onValueChange = { nombre = it }
+                onValueChange = { nombre = it },
+                enabled = false
             )
             CustomTextField(
                 value = apellido,
                 placeholder = stringResource(R.string.lastName),
-                onValueChange = { apellido = it }
+                onValueChange = { apellido = it },
+                enabled = false
             )
             CustomTextField(
                 value = edad,
                 placeholder = stringResource(R.string.age),
                 onValueChange = { edad = it },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                enabled = false
             )
             CustomComboBox(
                 selectedItems = restricciones,
                 onSelectedItemsChange = { restricciones = it }
-
             )
 
             if (showError) {
@@ -108,22 +112,22 @@ fun AddFamilyScreen(navController: NavController) {
             Spacer(modifier = Modifier.weight(1f))
             CustomButton(
                 onClick = {
-                    showError =
-                        nombre.isEmpty() || apellido.isEmpty() || edad.isEmpty()
-//                    if (!showError) {
-//                        viewModel.registerUser(
-//                            nombre,
-//                            apellido,
-//                            edad.toInt(),
-//                            restricciones
-//                        ) { response ->
-//                            if (response != null) {
-//                                navController.navigate(AppScreens.LoginScreen.route)
-//                            } else {
-//                                showError = true
-//                            }
-//                        }
-//                    }
+                    showError = nombre.isEmpty() || apellido.isEmpty() || edad.isEmpty()
+                    if (!showError) {
+                        viewModel.addFamilyMember(
+                            context = navController.context,
+                            nombre = nombre,
+                            apellido = apellido,
+                            edad = edad.toInt(),
+                            restricciones = restricciones
+                        ) { success ->
+                            if (success) {
+                                navController.popBackStack() // Go back to the previous screen
+                            } else {
+                                showError = true
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.add_family),
@@ -133,7 +137,6 @@ fun AddFamilyScreen(navController: NavController) {
         }
     }
 }
-
 
 @Preview
 @Composable

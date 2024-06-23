@@ -2,7 +2,6 @@ package com.example.foodiefrontend.presentation.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,7 +36,8 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     onClickIcon: () -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    enabled: Boolean,
 ) {
     val shape = RoundedCornerShape(16.dp)
 
@@ -107,7 +107,8 @@ private fun Preview() {
             value = "value",
             placeholder = "placeholder",
             label = "label",
-            onValueChange = { }
+            onValueChange = { },
+            enabled = false
         )
     }
 }

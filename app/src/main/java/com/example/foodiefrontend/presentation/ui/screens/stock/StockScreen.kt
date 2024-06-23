@@ -97,7 +97,8 @@ fun StockScreen(
                     ingredient = newValue
                 },
                 trailingIcon = R.drawable.ic_search,
-                modifier = Modifier
+                modifier = Modifier,
+                enabled = false
             )
         }
         LazyVerticalGrid(

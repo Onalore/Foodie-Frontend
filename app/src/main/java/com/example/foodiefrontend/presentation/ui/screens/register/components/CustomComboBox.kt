@@ -46,17 +46,18 @@ fun CustomComboBox(
     Column() {
         CustomTextField(
             value = selectedItems.joinToString(", "),
-            label = "Restricciones alimentarias",
             placeholder = "",
+            label = "Restricciones alimentarias",
             onValueChange = { },
+            trailingIcon = icon,
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     textfieldSize = coordinates.size.toSize()
                 },
+            onClickIcon = { expanded = !expanded },
             readOnly = true,
-            trailingIcon = icon,
-            onClickIcon = { expanded = !expanded }
+            enabled = false
         )
         DropdownMenu(
             expanded = expanded,
