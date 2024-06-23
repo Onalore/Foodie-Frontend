@@ -16,6 +16,7 @@ import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.StockResponse
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
+import com.example.foodiefrontend.service.Config
 import com.example.foodiefrontend.service.UserService
 import com.example.foodiefrontend.utils.dataStore
 import com.google.gson.Gson
@@ -50,7 +51,10 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             Log.d("UserViewModel", "Starting loginUser with email: $mail")
             apiService.loginUser(loginRequest).enqueue(object : Callback<AuthResponse> {
-                override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                override fun onResponse(
+                    call: Call<AuthResponse>,
+                    response: Response<AuthResponse>
+                ) {
                     if (response.isSuccessful) {
                         val authResponse = response.body()
                         Log.d("UserViewModel", "Login successful: $authResponse")
@@ -62,9 +66,15 @@ class UserViewModel : ViewModel() {
                             }
                         }
                     } else {
-                        Log.d("UserViewModel", "Login failed with response code: ${response.code()}")
+                        Log.d(
+                            "UserViewModel",
+                            "Login failed with response code: ${response.code()}"
+                        )
                         Log.d("UserViewModel", "Response message: ${response.message()}")
-                        Log.d("UserViewModel", "Response error body: ${response.errorBody()?.string()}")
+                        Log.d(
+                            "UserViewModel",
+                            "Response error body: ${response.errorBody()?.string()}"
+                        )
                         _loginResult.value = null
                     }
                 }
@@ -96,7 +106,7 @@ class UserViewModel : ViewModel() {
             if (token != null) {
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("http://10.0.2.2:8080/api/usuarios")
+                    .url(Config.getBaseUrl() + "usuarios")
                     .addHeader("Authorization", "Bearer $token")
                     .build()
 
@@ -124,7 +134,7 @@ class UserViewModel : ViewModel() {
             if (token != null) {
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("http://10.0.2.2:8080/api/stock")
+                    .url(Config.getBaseUrl() + "stock")
                     .addHeader("Authorization", "Bearer $token")
                     .build()
 
@@ -132,7 +142,8 @@ class UserViewModel : ViewModel() {
                     client.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
                             val responseBody = response.body?.string()
-                            val stockResponse = Gson().fromJson(responseBody, StockResponse::class.java)
+                            val stockResponse =
+                                Gson().fromJson(responseBody, StockResponse::class.java)
                             _stockResult.postValue(stockResponse.ingredients)
                             Log.d("UserViewModel", "Stock fetched successfully")
                         } else {
@@ -146,7 +157,15 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun registerUser(mail: String, password: String, nombre: String, apellido: String, edad: Int, restricciones: List<String>, onResult: (RegisterResponse?) -> Unit) {
+    fun registerUser(
+        mail: String,
+        password: String,
+        nombre: String,
+        apellido: String,
+        edad: Int,
+        restricciones: List<String>,
+        onResult: (RegisterResponse?) -> Unit
+    ) {
         Log.d("UserViewModel", "Registering user with email: $mail")
         Log.d("UserViewModel", "Password: $password")
         Log.d("UserViewModel", "Nombre: $nombre")
@@ -170,7 +189,10 @@ class UserViewModel : ViewModel() {
 
         viewModelScope.launch {
             apiService.registerUser(user).enqueue(object : Callback<RegisterResponse> {
-                override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                override fun onResponse(
+                    call: Call<RegisterResponse>,
+                    response: Response<RegisterResponse>
+                ) {
                     if (response.isSuccessful) {
                         Log.d("UserViewModel", "User registered successfully: ${response.body()}")
                         onResult(response.body())

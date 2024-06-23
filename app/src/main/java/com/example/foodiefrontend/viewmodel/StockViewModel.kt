@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.service.BackendApi
+import com.example.foodiefrontend.service.Config
 import com.example.foodiefrontend.service.StockService
 import com.example.foodiefrontend.utils.dataStore
 import com.google.gson.Gson
@@ -65,7 +66,8 @@ class StockViewModel : ViewModel() {
                 val token = getToken(context)
                 Log.d("StockViewModel", "Token obtained for addProductByEan: $token")
                 val requestBody = mapOf("ean" to ean, "cantidad" to cantidad)
-                val response = stockService.addProductByEan(requestBody, "Bearer $token").awaitResponse()
+                val response =
+                    stockService.addProductByEan(requestBody, "Bearer $token").awaitResponse()
                 if (!response.isSuccessful) {
                     _error.value = "Error al agregar el producto: ${response.message()}"
                     _addProductResult.value = false
@@ -88,7 +90,7 @@ class StockViewModel : ViewModel() {
                 Log.d("StockViewModel", "Token obtained for getUserStock: $token")
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("http://10.0.2.2:8080/api/stock")
+                    .url(Config.getBaseUrl() + "stock")
                     .addHeader("Authorization", "Bearer $token")
                     .build()
 
@@ -97,7 +99,8 @@ class StockViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             val responseBody = response.body?.string()
                             val listType = object : TypeToken<List<Ingredient>>() {}.type
-                            val stockIngredients: List<Ingredient> = Gson().fromJson(responseBody, listType)
+                            val stockIngredients: List<Ingredient> =
+                                Gson().fromJson(responseBody, listType)
                             _stockResult.postValue(stockIngredients)
                             _stockIngredients.postValue(stockIngredients) // Ensure stockIngredients is updated
                             Log.d("ingredientes", stockIngredients.toString())
