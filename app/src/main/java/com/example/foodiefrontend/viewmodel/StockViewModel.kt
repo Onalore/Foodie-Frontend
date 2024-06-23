@@ -26,8 +26,8 @@ class StockViewModel : ViewModel() {
 
     private val stockService: StockService = BackendApi.createStockService()
 
-    private val _productType = MutableLiveData<String>()
-    val productType: LiveData<String> get() = _productType
+    private val _productType = MutableLiveData<Ingredient?>()
+    val productType: LiveData<Ingredient?> get() = _productType
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
@@ -48,7 +48,14 @@ class StockViewModel : ViewModel() {
                 val response = stockService.findProductByEan(ean).awaitResponse()
                 if (response.isSuccessful) {
                     val eanResponse = response.body()
-                    _productType.postValue(eanResponse?.tipo)
+                    val ingredient = eanResponse?.let {
+                        Ingredient(
+                            description = it.tipo ?: "",
+                            unit = it.unidad ?: "",
+                            imageUrl = it.imageUrl ?: ""
+                        )
+                    }
+                    _productType.postValue(ingredient)
                 } else {
                     Log.d("StockViewModel", "Error fetching product: ${response.message()}")
                     _error.postValue("No se pudo encontrar el producto: ${response.message()}")
