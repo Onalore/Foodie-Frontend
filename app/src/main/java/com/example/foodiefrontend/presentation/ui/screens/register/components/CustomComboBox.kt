@@ -22,18 +22,11 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 @Composable
 fun CustomComboBox(
     selectedItems: List<String>,
-    onSelectedItemsChange: (List<String>) -> Unit
+    label: String,
+    onSelectedItemsChange: (List<String>) -> Unit,
+    items: List<String>,
+    isMultiSelect: Boolean
 ) {
-    val restricciones = listOf(
-        "Celiaquía",
-        "Embarazo",
-        "Vegetarianismo",
-        "Veganismo",
-        "Diabetes",
-        "Kosher",
-        "Hipertensión",
-        "Intolerancia a la Lactosa"
-    )
     var expanded by remember { mutableStateOf(false) }
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
@@ -46,7 +39,7 @@ fun CustomComboBox(
     Column() {
         CustomTextField(
             value = selectedItems.joinToString(", "),
-            label = "Restricciones alimentarias",
+            label = label,
             placeholder = "",
             onValueChange = { },
             modifier = Modifier
@@ -64,16 +57,18 @@ fun CustomComboBox(
             modifier = Modifier
                 .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
         ) {
-            restricciones.forEach { label ->
+            items.forEach { label ->
                 val isSelected = selectedItems.contains(label)
-                DropdownMenuItem(onClick = {
-                    val newSelectedItems = if (isSelected) {
-                        selectedItems - label
-                    } else {
-                        selectedItems + label
-                    }
-                    onSelectedItemsChange(newSelectedItems)
-                }) {
+                DropdownMenuItem(
+                    onClick = {
+                        val newSelectedItems = if (isSelected) {
+                            selectedItems - label
+                        } else {
+                            selectedItems + label
+                        }
+                        onSelectedItemsChange(newSelectedItems)
+                        expanded = isMultiSelect
+                    }) {
                     Text(text = label + if (isSelected) " ✓" else "")
                 }
             }

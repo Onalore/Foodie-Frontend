@@ -29,29 +29,36 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Persona
+import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
+import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
+import com.example.foodiefrontend.utils.Constants
 
 @Composable
-fun AlertCloseShift(
+fun AlertAskDiners(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
+    var comensales by remember { mutableStateOf(emptyList<String>()) }
+    var comida by remember { mutableStateOf(emptyList<String>()) }
+
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ImageWithResource(
-                    resourceId = R.drawable.cry,
+                    resourceId = R.drawable.family,
                     modifier = Modifier
                         .width(100.dp)
                         .padding(vertical = 30.dp)
                 )
                 Text(
-                    text = stringResource(R.string.want_to_close_shift),
+                    text = "¿Quienes comen hoy?",
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
@@ -61,35 +68,57 @@ fun AlertCloseShift(
             }
         },
         text = {
-            Text(
-                text = stringResource(R.string.come_back),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Text(
+                    text = "Se preparará una receta especialmente para la cantidad de comensales y sus restricciones alimentarias",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                CustomComboBox(
+                    selectedItems = comensales,
+                    onSelectedItemsChange = { comensales = it },
+                    label = "Seleccionar comensales",
+                    items = createNameList(SampleData.listOfPersona),
+                    isMultiSelect = true
+                )
+                CustomComboBox(
+                    selectedItems = comida,
+                    onSelectedItemsChange = { comida = it },
+                    label = "Seleccionar comida",
+                    items = Constants.comidas,
+                    isMultiSelect = false
+                )
+            }
         },
         dismissButton = {
+            CustomButton(
+                onClick = {
+                    setShowDialog(false)
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                text = "Generar receta",
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        confirmButton = {
             CustomButton(
                 onClick = {
                     /*TODO*/
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.yes_close_shift),
+                text = stringResource(R.string.btn_cancel),
                 modifier = Modifier
             )
-        },
-        confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                CustomButton(
-                    onClick = {
-                        setShowDialog(false)
-                    },
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    text = stringResource(R.string.btn_cancel),
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            }
         }
     )
+}
+
+private fun createNameList(personas: List<Persona>): List<String> {
+    return personas.map { "${it.nombre} ${it.apellido}" }
 }
 
 
@@ -98,9 +127,9 @@ fun AlertCloseShift(
 private fun Preview() {
     var showDialog by remember { mutableStateOf(true) }
 
-
     FoodieFrontendTheme {
-        AlertCloseShift(navController = rememberNavController(),
+        AlertAskDiners(
+            navController = rememberNavController(),
             setShowDialog = { param ->
                 showDialog = param
             }

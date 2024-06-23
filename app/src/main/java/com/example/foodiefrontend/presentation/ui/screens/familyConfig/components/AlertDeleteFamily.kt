@@ -67,7 +67,7 @@ fun AlertDeleteFamily(
                     /*TODO*/
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.yes_close_shift),
+                text = stringResource(R.string.btn_cancel),
                 modifier = Modifier
             )
         },
@@ -78,7 +78,7 @@ fun AlertDeleteFamily(
                         setShowDialog(false)
                     },
                     containerColor = Color(0xFFD03333),
-                    text = stringResource(R.string.btn_cancel),
+                    text = "Sí, eliminar",
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 )
             }
