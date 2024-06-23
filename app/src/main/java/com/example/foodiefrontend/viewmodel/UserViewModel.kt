@@ -15,6 +15,7 @@ import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
+import com.example.foodiefrontend.service.Config
 import com.example.foodiefrontend.service.UserService
 import com.example.foodiefrontend.utils.dataStore
 import com.google.gson.Gson
@@ -107,7 +108,7 @@ class UserViewModel : ViewModel() {
             if (token != null) {
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("http://10.0.2.2:8080/api/usuarios")
+                    .url(Config.getBaseUrl() + "usuarios")
                     .addHeader("Authorization", "Bearer $token")
                     .build()
 
@@ -133,7 +134,8 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             val token = getToken(context)
             if (token != null) {
-                Log.d("UserViewModel", "Fetching family members with token: $token")
+
+              Log.d("UserViewModel", "Fetching family members with token: $token")
                 apiService.getFamilyMembers("Bearer $token")
                     .enqueue(object : Callback<List<Persona>> {
                         override fun onResponse(
@@ -161,6 +163,7 @@ class UserViewModel : ViewModel() {
 
                         override fun onFailure(call: Call<List<Persona>>, t: Throwable) {
                             Log.e("UserViewModel", "Failed to fetch family members: ${t.message}")
+
                         }
                     })
             } else {
@@ -169,7 +172,15 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun registerUser(mail: String, password: String, nombre: String, apellido: String, edad: Int, restricciones: List<String>, onResult: (RegisterResponse?) -> Unit) {
+    fun registerUser(
+        mail: String,
+        password: String,
+        nombre: String,
+        apellido: String,
+        edad: Int,
+        restricciones: List<String>,
+        onResult: (RegisterResponse?) -> Unit
+    ) {
         Log.d("UserViewModel", "Registering user with email: $mail")
         Log.d("UserViewModel", "Password: $password")
         Log.d("UserViewModel", "Nombre: $nombre")
@@ -193,7 +204,10 @@ class UserViewModel : ViewModel() {
 
         viewModelScope.launch {
             apiService.registerUser(user).enqueue(object : Callback<RegisterResponse> {
-                override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                override fun onResponse(
+                    call: Call<RegisterResponse>,
+                    response: Response<RegisterResponse>
+                ) {
                     if (response.isSuccessful) {
                         Log.d("UserViewModel", "User registered successfully: ${response.body()}")
                         onResult(response.body())
