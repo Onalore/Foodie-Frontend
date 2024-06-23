@@ -44,13 +44,16 @@ fun AlertAskDiners(
 ) {
     val context = LocalContext.current
     var comensales by remember { mutableStateOf(emptyList<String>()) }
-    var comida by remember { mutableStateOf(emptyList<String>()) }
+    var comida by remember { mutableStateOf("") }
 
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
         title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 ImageWithResource(
                     resourceId = R.drawable.family,
                     modifier = Modifier
@@ -86,11 +89,10 @@ fun AlertAskDiners(
                     isMultiSelect = true
                 )
                 CustomComboBox(
-                    selectedItems = comida,
-                    onSelectedItemsChange = { comida = it },
+                    selectedItem = comida.toString(),
+                    onSelectedItemChange = { comida = it },
                     label = "Seleccionar comida",
-                    items = Constants.comidas,
-                    isMultiSelect = false
+                    items = Constants.comidas
                 )
             }
         },

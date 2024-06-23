@@ -17,10 +17,44 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 
 @Composable
 fun CustomComboBox(
+    selectedItems: List<String>,
+    label: String,
+    onSelectedItemsChange: (List<String>) -> Unit,
+    items: List<String>,
+    isMultiSelect: Boolean = true
+) {
+    CustomComboBoxBase(
+        selectedItems = selectedItems,
+        label = label,
+        onSelectedItemsChange = { onSelectedItemsChange(it as List<String>) },
+        items = items,
+        isMultiSelect = isMultiSelect
+    )
+}
+
+@Composable
+fun CustomComboBox(
+    selectedItem: String,
+    label: String,
+    onSelectedItemChange: (String) -> Unit,
+    items: List<String>
+) {
+    CustomComboBoxBase(
+        selectedItems = listOf(selectedItem),
+        label = label,
+        onSelectedItemsChange = { selectedItems -> onSelectedItemChange(selectedItems.first()) },
+        items = items,
+        isMultiSelect = false
+    )
+}
+
+@Composable
+private fun CustomComboBoxBase(
     selectedItems: List<String>,
     label: String,
     onSelectedItemsChange: (List<String>) -> Unit,
@@ -30,13 +64,9 @@ fun CustomComboBox(
     var expanded by remember { mutableStateOf(false) }
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
-    val icon = if (expanded)
-        R.drawable.ic_chevron_up
-    else
-        R.drawable.ic_chevron_down
+    val icon = if (expanded) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down
 
-
-    Column() {
+    Column {
         CustomTextField(
             value = selectedItems.joinToString(", "),
             label = label,
@@ -54,24 +84,25 @@ fun CustomComboBox(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
+            modifier = Modifier.width(with(LocalDensity.current) { textfieldSize.width.toDp() })
         ) {
-            items.forEach { label ->
-                val isSelected = selectedItems.contains(label)
+            items.forEach { item ->
+                val isSelected = selectedItems.contains(item)
                 DropdownMenuItem(
                     onClick = {
-                        val newSelectedItems = if (isSelected) {
-                            selectedItems - label
+                        val newSelectedItems = if (isMultiSelect) {
+                            if (isSelected) selectedItems - item else selectedItems + item
                         } else {
-                            selectedItems + label
+                            if (isSelected) emptyList() else listOf(item)
                         }
                         onSelectedItemsChange(newSelectedItems)
-                        expanded = isMultiSelect
-                    }) {
-                    Text(text = label + if (isSelected) " ✓" else "")
+                        expanded = isMultiSelect // Cerrar el menú si es selección simple
+                    }
+                ) {
+                    Text(text = item + if (isSelected) " ✓" else "")
                 }
             }
         }
     }
 }
+
