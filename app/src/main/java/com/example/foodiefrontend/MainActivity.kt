@@ -21,11 +21,15 @@ import com.example.foodiefrontend.navigation.AppNavigation
 import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar.BottomNavigationBar
+import com.example.foodiefrontend.service.Config
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Config.load(this)
+
         setContent {
             FoodieFrontendTheme {
                 // A surface container using the 'background' color from the theme
