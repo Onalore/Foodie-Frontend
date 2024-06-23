@@ -1,11 +1,13 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.viewmodel.StockViewModel
@@ -66,11 +69,24 @@ fun AlertIngredientScanned(
                     textAlign = TextAlign.Center
                 )
                 if (productType != null) {
-                    Log.d("ProductType", "Detected ProductType: $productType")
+                    Log.d("Product", "Detected Product: $productType")
                     Text(
-                        text = productType ?: "Producto desconocido",
+                        text = productType?.description ?: "Producto desconocido",
                         textAlign = TextAlign.Center
                     )
+                    productType?.unit?.let {
+                        Text(
+                            text = "Unidad: $it",
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    productType?.imageUrl?.let {
+                        Image(
+                            painter = rememberImagePainter(it),
+                            contentDescription = null,
+                            modifier = Modifier.size(128.dp)
+                        )
+                    }
                 } else if (error != null) {
                     Text(
                         text = error ?: "Error desconocido",
