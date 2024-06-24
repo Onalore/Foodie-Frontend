@@ -39,6 +39,7 @@ import com.example.foodiefrontend.presentation.ui.components.CustomPasswordField
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
+import com.example.foodiefrontend.utils.Constants
 import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -126,7 +127,10 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                         )
                         CustomComboBox(
                             selectedItems = restricciones,
+                            label = "Restricciones alimentarias",
+                            items = Constants.restricciones,
                             onSelectedItemsChange = { restricciones = it },
+                            isMultiSelect = true
                         )
 
                         if (showError) {

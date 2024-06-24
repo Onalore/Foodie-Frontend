@@ -22,14 +22,17 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 @Composable
 fun CustomComboBox(
     selectedItems: List<String>,
-    onSelectedItemsChange: (List<String>) -> Unit
+    onSelectedItemsChange: (List<String>) -> Unit,
+    items: List<String>,
+    label: String,
+    isMultiSelect: Boolean
 ) {
     CustomComboBoxBase(
-        selectedItems = listOf(selectedItem),
+        selectedItems = selectedItems,
         label = label,
-        onSelectedItemsChange = { selectedItems -> onSelectedItemChange(selectedItems.first()) },
+        onSelectedItemsChange = onSelectedItemsChange,
         items = items,
-        isMultiSelect = false
+        isMultiSelect = isMultiSelect
     )
 }
 
@@ -59,7 +62,8 @@ private fun CustomComboBoxBase(
                 },
             readOnly = true,
             trailingIcon = icon,
-            onClickIcon = { expanded = !expanded }
+            onClickIcon = { expanded = !expanded },
+            enabled = true
         )
         DropdownMenu(
             expanded = expanded,

@@ -38,6 +38,7 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.CustomToolbar
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.components.AlertDeleteFamily
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
+import com.example.foodiefrontend.utils.Constants
 import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,9 +123,12 @@ fun ModifyFamilyScreen(
             )
             CustomComboBox(
                 selectedItems = restricciones,
+                label = "Restricciones alimentarias",
+                items = Constants.restricciones,
                 onSelectedItemsChange = {
                     restricciones = it.filter { it.isNotBlank() }
-                } // Remove blank items
+                },
+                isMultiSelect = true
             )
 
             if (showError) {
