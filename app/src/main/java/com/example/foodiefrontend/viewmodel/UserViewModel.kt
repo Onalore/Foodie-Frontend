@@ -352,4 +352,15 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun logout(context: Context, onLogoutComplete: () -> Unit) {
+        viewModelScope.launch {
+            // Limpiar los datos del usuario (por ejemplo, SharedPreferences)
+            val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().clear().apply()
+
+            // Notificar que el cierre de sesión está completo
+            onLogoutComplete()
+        }
+    }
 }
