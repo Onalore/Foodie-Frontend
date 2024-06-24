@@ -102,7 +102,8 @@ fun RecipesCardItem(
     liked: Boolean = false,
     initialRating: Int? = null,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    scored: Boolean = true
 ) {
     Box {
         RoundedImage(
@@ -120,11 +121,11 @@ fun RecipesCardItem(
                 .width(270.dp)
                 .height(120.dp),
             punctuation = false,
-            initialRating = initialRating ?: 0 // Manejo seguro del valor inicial
+            initialRating = initialRating ?: 0,
+            scored = scored
         )
     }
 }
-
 
 @Composable
 fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {

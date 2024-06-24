@@ -17,20 +17,21 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 
 @Composable
 fun CustomComboBox(
     selectedItems: List<String>,
+    label: String,
     onSelectedItemsChange: (List<String>) -> Unit,
     items: List<String>,
-    label: String,
-    isMultiSelect: Boolean
+    isMultiSelect: Boolean = true
 ) {
     CustomComboBoxBase(
         selectedItems = selectedItems,
         label = label,
-        onSelectedItemsChange = onSelectedItemsChange,
+        onSelectedItemsChange = { onSelectedItemsChange(it as List<String>) },
         items = items,
         isMultiSelect = isMultiSelect
     )
@@ -71,15 +72,15 @@ private fun CustomComboBoxBase(
             label = label,
             placeholder = "",
             onValueChange = { },
+            trailingIcon = icon,
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     textfieldSize = coordinates.size.toSize()
                 },
-            readOnly = true,
-            trailingIcon = icon,
             onClickIcon = { expanded = !expanded },
-            enabled = true
+            readOnly = true,
+            enabled = false
         )
         DropdownMenu(
             expanded = expanded,

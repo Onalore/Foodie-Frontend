@@ -2,6 +2,7 @@
 
 package com.example.foodiefrontend.presentation.ui.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,29 +39,45 @@ import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.components.Subtitle
 import com.example.foodiefrontend.presentation.ui.components.Title
 import com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar.BottomNavigationBar
+import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertAskDiners
+import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesCardItem
+import com.google.gson.Gson
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    username: String
+    username: String,
+    recipeInProgress: Recipe? = null
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    var withStock by remember { mutableStateOf(true) }
+
+    if (showDialog) {
+        AlertAskDiners(
+            navController = navController,
+            setShowDialog = { param ->
+                showDialog = param
+            },
+            withStock = withStock
+        )
+    }
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController) // Utilizar tu BottomNavigationBar
-        },
-        content = { paddingValues -> // Usar paddingValues para evitar superposiciones
+        content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.onSurface)
-                    .padding(paddingValues), // Ajustar el contenido para evitar superposiciones con la barra de navegación
+                    .padding(paddingValues),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -85,7 +106,7 @@ fun HomeScreen(
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
                             onClick = {
-                                navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                                showDialog = true
                             }
                         )
 
@@ -98,25 +119,56 @@ fun HomeScreen(
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
                             onClick = {
-                                navController.navigate(AppScreens.RandomRecipesScreen.route)
+                                showDialog = true
                             }
                         )
                     }
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 40.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Subtitle(
-                            title = "Tus recetas favoritas",
-                            modifier = Modifier.padding(start = 15.dp)
-                        )
+                    if (recipeInProgress != null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 30.dp, horizontal = 15.dp),
+                            verticalArrangement = Arrangement.spacedBy(20.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Subtitle(
+                                title = "Receta en proceso",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+                            RecipesCardItem(
+                                title = recipeInProgress.name,
+                                image = recipeInProgress.imageUrl,
+                                scored = false,
+                                onClick = {
+                                    val recipeJson = Gson().toJson(recipeInProgress)
+                                    val encodedRecipeJson =
+                                        URLEncoder.encode(
+                                            recipeJson,
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                    Log.d(
+                                        "Navigation",
+                                        "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                                    )
+                                    navController.navigate(
+                                        AppScreens.RecipeScreen.createRoute(
+                                            encodedRecipeJson
+                                        )
+                                    )
+                                }
+                            )
+                        }
                     }
-
+                    Subtitle(
+                        title = "Tus recetas favoritas",
+                        modifier = Modifier
+                            .padding(start = 15.dp)
+                            .fillMaxWidth()
+                    )
                     //Está de ejemplo, se debe borrar una vez que se envíe la info verdadera
+                    /* TODO */
                     HorizontalCardList(items = SampleData.recipes)
                 }
             }
@@ -165,8 +217,11 @@ fun HomeCardItem(
 @Preview(showBackground = true)
 @Composable
 fun HomeContentPreview() {
-    HomeScreen(
-        navController = rememberNavController(),
-        username = "Usuario"
-    )
+    FoodieFrontendTheme {
+        HomeScreen(
+            navController = rememberNavController(),
+            username = "Usuario",
+            recipeInProgress = SampleData.recipe
+        )
+    }
 }
