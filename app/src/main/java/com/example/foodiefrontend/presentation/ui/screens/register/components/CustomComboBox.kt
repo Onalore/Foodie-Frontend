@@ -24,60 +24,65 @@ fun CustomComboBox(
     selectedItems: List<String>,
     onSelectedItemsChange: (List<String>) -> Unit
 ) {
-    val restricciones = listOf(
-        "Celiaquía",
-        "Embarazo",
-        "Vegetarianismo",
-        "Veganismo",
-        "Diabetes",
-        "Kosher",
-        "Hipertensión",
-        "Intolerancia a la Lactosa"
+    CustomComboBoxBase(
+        selectedItems = listOf(selectedItem),
+        label = label,
+        onSelectedItemsChange = { selectedItems -> onSelectedItemChange(selectedItems.first()) },
+        items = items,
+        isMultiSelect = false
     )
+}
+
+@Composable
+private fun CustomComboBoxBase(
+    selectedItems: List<String>,
+    label: String,
+    onSelectedItemsChange: (List<String>) -> Unit,
+    items: List<String>,
+    isMultiSelect: Boolean
+) {
     var expanded by remember { mutableStateOf(false) }
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
-    val icon = if (expanded)
-        R.drawable.ic_chevron_up
-    else
-        R.drawable.ic_chevron_down
+    val icon = if (expanded) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down
 
-
-    Column() {
+    Column {
         CustomTextField(
             value = selectedItems.joinToString(", "),
+            label = label,
             placeholder = "",
-            label = "Restricciones alimentarias",
             onValueChange = { },
-            trailingIcon = icon,
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     textfieldSize = coordinates.size.toSize()
                 },
-            onClickIcon = { expanded = !expanded },
             readOnly = true,
-            enabled = false
+            trailingIcon = icon,
+            onClickIcon = { expanded = !expanded }
         )
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
+            modifier = Modifier.width(with(LocalDensity.current) { textfieldSize.width.toDp() })
         ) {
-            restricciones.forEach { label ->
-                val isSelected = selectedItems.contains(label)
-                DropdownMenuItem(onClick = {
-                    val newSelectedItems = if (isSelected) {
-                        selectedItems - label
-                    } else {
-                        selectedItems + label
+            items.forEach { item ->
+                val isSelected = selectedItems.contains(item)
+                DropdownMenuItem(
+                    onClick = {
+                        val newSelectedItems = if (isMultiSelect) {
+                            if (isSelected) selectedItems - item else selectedItems + item
+                        } else {
+                            if (isSelected) emptyList() else listOf(item)
+                        }
+                        onSelectedItemsChange(newSelectedItems)
+                        expanded = isMultiSelect // Cerrar el menú si es selección simple
                     }
-                    onSelectedItemsChange(newSelectedItems)
-                }) {
-                    Text(text = label + if (isSelected) " ✓" else "")
+                ) {
+                    Text(text = item + if (isSelected) " ✓" else "")
                 }
             }
         }
     }
 }
+
