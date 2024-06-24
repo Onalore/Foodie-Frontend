@@ -13,6 +13,7 @@ import com.example.foodiefrontend.data.DinersData
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
+import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
@@ -51,6 +52,9 @@ class UserViewModel : ViewModel() {
 
     private val _familyMembers = MutableLiveData<List<Persona>>()
     val familyMembers: LiveData<List<Persona>> = _familyMembers
+
+    private val _favoriteRecipes = MutableLiveData<List<Recipe>?>()
+    val favoriteRecipes: MutableLiveData<List<Recipe>?> get() = _favoriteRecipes
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
@@ -388,5 +392,40 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun fetchFavoriteRecipes(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getFavoriteRecipes("Bearer $token")
+                    Log.d("UserViewModel", "Request sent to /favoritas with token: Bearer $token")
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        Log.d("UserViewModel", "Response body: $responseBody")
+
+                        val recipes = responseBody?.recetas
+                        if (recipes != null && recipes.isNotEmpty()) {
+                            _favoriteRecipes.postValue(recipes)
+                            Log.d("UserViewModel", "Favorite recipes fetched successfully")
+                        } else {
+                            Log.e("UserViewModel", "No recipes found in the response")
+                        }
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching favorite recipes: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching favorite recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
 }
 

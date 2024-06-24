@@ -1,5 +1,7 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipes
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,7 +107,12 @@ fun RecipesCardItem(
     onClick: () -> Unit = {},
     scored: Boolean = true
 ) {
-    Box {
+    Box(
+        modifier = modifier.clickable {
+            Log.d("RecipesCardItem", "Recipe card clicked: $title")
+            onClick()
+        }
+    ) {
         RoundedImage(
             image = image,
             modifier = Modifier

@@ -2,6 +2,7 @@ package com.example.foodiefrontend.presentation.ui.screens.home
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,16 +33,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.navigation.AppScreens
-import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
@@ -65,10 +62,12 @@ fun HomeScreen(
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
     val familyMembers by userViewModel.familyMembers.observeAsState(emptyList())
+    val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         userViewModel.getFamilyMembers(context)
+        userViewModel.fetchFavoriteRecipes(context)
     }
 
     if (showDialog) {
@@ -177,7 +176,12 @@ fun HomeScreen(
                             .padding(start = 15.dp)
                             .fillMaxWidth()
                     )
-                    HorizontalCardList(items = SampleData.recipes)
+                    favoriteRecipes?.let {
+                        HorizontalCardList(
+                            items = it,
+                            navController = navController
+                        )
+                    }
                 }
             }
         }
@@ -185,13 +189,22 @@ fun HomeScreen(
 }
 
 @Composable
-fun HorizontalCardList(items: List<Recipe>) {
+fun HorizontalCardList(items: List<Recipe>, navController: NavController) {
     LazyRow(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            HomeCardItem(title = item.name, image = item.imageUrl, liked = item.liked)
+            HomeCardItem(title = item.name, image = item.imageUrl, liked = item.liked, onClick = {
+                val recipeJson = Gson().toJson(item)
+                val encodedRecipeJson =
+                    URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
+                Log.d(
+                    "Navigation",
+                    "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                )
+                navController.navigate(AppScreens.RecipeScreen.createRoute(encodedRecipeJson))
+            })
         }
     }
 }
@@ -201,9 +214,10 @@ fun HomeCardItem(
     title: String,
     image: String,
     liked: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
-    Box {
+    Box(modifier = Modifier.clickable(onClick = onClick)) {
         RoundedImage(
             image = image,
             modifier = Modifier
@@ -218,18 +232,6 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeContentPreview() {
-    FoodieFrontendTheme {
-        HomeScreen(
-            navController = rememberNavController(),
-            username = "Usuario",
-            recipeInProgress = SampleData.recipe
         )
     }
 }
