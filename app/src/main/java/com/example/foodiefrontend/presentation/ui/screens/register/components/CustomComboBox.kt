@@ -37,6 +37,22 @@ fun CustomComboBox(
 }
 
 @Composable
+fun CustomComboBox(
+    selectedItem: String,
+    label: String,
+    onSelectedItemChange: (String) -> Unit,
+    items: List<String>
+) {
+    CustomComboBoxBase(
+        selectedItems = listOf(selectedItem),
+        label = label,
+        onSelectedItemsChange = { selectedItems -> onSelectedItemChange(selectedItems.first()) },
+        items = items,
+        isMultiSelect = false
+    )
+}
+
+@Composable
 private fun CustomComboBoxBase(
     selectedItems: List<String>,
     label: String,

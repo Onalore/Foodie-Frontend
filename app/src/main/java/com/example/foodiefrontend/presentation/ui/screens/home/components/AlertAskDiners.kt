@@ -81,11 +81,10 @@ fun AlertAskDiners(
                     isMultiSelect = true
                 )
                 CustomComboBox(
-                    selectedItems = listOf(comida),
-                    onSelectedItemsChange = { if (it.isNotEmpty()) comida = it[0] },
+                    selectedItem = comida.toString(),
+                    onSelectedItemChange = { comida = it },
                     label = "Seleccionar comida",
-                    items = Constants.comidas,
-                    isMultiSelect = true
+                    items = Constants.comidas
                 )
             }
         },
