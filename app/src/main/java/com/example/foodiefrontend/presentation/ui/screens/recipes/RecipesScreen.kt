@@ -31,9 +31,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.data.Recipe
+import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
@@ -115,7 +119,8 @@ fun RecipesCardItem(
     image: String,
     onClick: () -> Unit,
     initialRating: Int? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scored: Boolean = true
 ) {
     Box(modifier = Modifier.clickable {
         Log.d("RecipesCardItem", "Clicked on: $title")
@@ -136,7 +141,8 @@ fun RecipesCardItem(
                 .width(270.dp)
                 .height(120.dp),
             punctuation = false,
-            initialRating = initialRating ?: 0 // Safe handling of initial rating
+            initialRating = initialRating ?: 0,
+            scored = scored
         )
     }
 }

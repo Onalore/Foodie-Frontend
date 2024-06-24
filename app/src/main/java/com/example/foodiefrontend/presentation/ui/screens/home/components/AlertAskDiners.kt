@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
@@ -41,8 +42,8 @@ import com.example.foodiefrontend.utils.Constants
 fun AlertAskDiners(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
+    withStock: Boolean
 ) {
-    val context = LocalContext.current
     var comensales by remember { mutableStateOf(emptyList<String>()) }
     var comida by remember { mutableStateOf("") }
 
@@ -109,7 +110,12 @@ fun AlertAskDiners(
         confirmButton = {
             CustomButton(
                 onClick = {
-                    /*TODO*/
+                    if (withStock) {
+                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                    } else {
+                        navController.navigate(AppScreens.RandomRecipesScreen.route)
+                    }
+
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 text = stringResource(R.string.btn_cancel),
@@ -134,7 +140,8 @@ private fun Preview() {
             navController = rememberNavController(),
             setShowDialog = { param ->
                 showDialog = param
-            }
+            },
+            withStock = true
         )
     }
 }

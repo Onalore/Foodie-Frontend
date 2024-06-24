@@ -21,7 +21,7 @@ fun Subtitle(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(color = color, fontWeight = fontWeight),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.then(modifier)
