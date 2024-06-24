@@ -12,7 +12,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserService {
     @POST("usuarios")
@@ -36,9 +36,10 @@ interface UserService {
         @Body persona: Persona
     ): Call<Void>
 
-    @DELETE("comensales/{personaId}")
+    @DELETE("comensales")
     fun deleteFamilyMember(
         @Header("Authorization") token: String,
-        @Path("personaId") personaId: String
+        @Query("nombre") nombre: String,
+        @Query("apellido") apellido: String
     ): Call<Void>
 }

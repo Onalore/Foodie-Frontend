@@ -169,25 +169,31 @@ fun ModifyFamilyScreen(
                 containerColor = MaterialTheme.colorScheme.primary
             )
             CustomButton(
-                onClick = {/*
-                    // Lógica para eliminar los cambios
-                    val persona = Persona(
-                        nombre = nombre,
-                        apellido = apellido,
-                        edad = edad.toInt(),
-                        restricciones = restricciones
-                    )
-                    Log.d("ModifyFamilyScreen", "Deleting persona: $persona")
-                    userViewModel.deleteFamilyMember(context, persona) { success ->
-                        if (success) {
-                            Log.d("ModifyFamilyScreen", "Delete successful")
-                            navController.navigateUp()
-                        } else {
-                            Log.e("ModifyFamilyScreen", "Delete failed")
-                            showError = true
+                onClick = {
+                    showError = nombre.isEmpty() || apellido.isEmpty()
+                    if (!showError) {
+                        val persona = Persona(
+                            nombre = nombre,
+                            apellido = apellido,
+                            edad = edad.toIntOrNull() ?: 0,
+                            restricciones = restricciones
+                        )
+                        Log.d("ModifyFamilyScreen", "Deleting persona: $persona")
+                        userViewModel.deleteFamilyMember(context, persona) { success ->
+                            if (success) {
+                                Log.d("ModifyFamilyScreen", "Delete successful")
+                                navController.navigateUp()
+                            } else {
+                                Log.e("ModifyFamilyScreen", "Delete failed")
+                                showError = true
+                            }
                         }
+                    } else {
+                        Log.e(
+                            "ModifyFamilyScreen",
+                            "Validation failed: nombre or apellido is empty"
+                        )
                     }
-                */
                 },
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.delete_family),
@@ -226,4 +232,3 @@ private fun PreviewDeleteFamilyScreen() {
         )
     }
 }
-

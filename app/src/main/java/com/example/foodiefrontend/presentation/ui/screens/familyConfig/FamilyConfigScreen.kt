@@ -81,12 +81,11 @@ fun FamilyConfigScreen(
                     text = "${persona.nombre} ${persona.apellido}",
                     icon = Icons.Outlined.Edit,
                     onClick = {
-                        val restricciones = persona.restricciones.joinToString(",")
                         val route = AppScreens.ModifyFamilyScreen.createRoute(
-                            persona.nombre ?: "",  // Proporciona un valor por defecto si es nulo
-                            persona.apellido ?: "",  // Proporciona un valor por defecto si es nulo
-                            persona.edad ?: 0,  // Proporciona un valor por defecto si es nulo
-                            restricciones
+                            nombre = persona.nombre ?: "",
+                            apellido = persona.apellido ?: "",
+                            edad = persona.edad ?: 0,
+                            restricciones = persona.restricciones.joinToString(",")
                         )
                         Log.d("FamilyConfigScreen", "Navigating to: $route")
                         navController.navigate(route)
