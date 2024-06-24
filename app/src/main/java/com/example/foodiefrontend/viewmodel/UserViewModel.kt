@@ -13,7 +13,6 @@ import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.RegisterResponse
-import com.example.foodiefrontend.data.StockResponse
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.Config
@@ -45,6 +44,9 @@ class UserViewModel : ViewModel() {
 
     private val _stockResult = MutableLiveData<List<Ingredient>>()
     val stockResult: LiveData<List<Ingredient>> = _stockResult
+
+    private val _familyMembers = MutableLiveData<List<Persona>>()
+    val familyMembers: LiveData<List<Persona>> = _familyMembers
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
@@ -128,29 +130,40 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun getUserStock(context: Context) {
+    fun getFamilyMembers(context: Context) {
         viewModelScope.launch {
             val token = getToken(context)
             if (token != null) {
-                val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url(Config.getBaseUrl() + "stock")
-                    .addHeader("Authorization", "Bearer $token")
-                    .build()
-
-                withContext(Dispatchers.IO) {
-                    client.newCall(request).execute().use { response ->
-                        if (response.isSuccessful) {
-                            val responseBody = response.body?.string()
-                            val stockResponse =
-                                Gson().fromJson(responseBody, StockResponse::class.java)
-                            _stockResult.postValue(stockResponse.ingredients)
-                            Log.d("UserViewModel", "Stock fetched successfully")
-                        } else {
-                            Log.e("UserViewModel", "Error fetching stock: ${response.message}")
+                Log.d("UserViewModel", "Fetching family members with token: $token")
+                apiService.getFamilyMembers("Bearer $token")
+                    .enqueue(object : Callback<List<Persona>> {
+                        override fun onResponse(
+                            call: Call<List<Persona>>,
+                            response: Response<List<Persona>>
+                        ) {
+                            if (response.isSuccessful) {
+                                Log.d(
+                                    "UserViewModel",
+                                    "Family members fetched successfully: ${response.body()}"
+                                )
+                                _familyMembers.postValue(response.body())
+                            } else {
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error fetching family members: ${response.message()}"
+                                )
+                                Log.e("UserViewModel", "Response code: ${response.code()}")
+                                Log.e(
+                                    "UserViewModel",
+                                    "Response error body: ${response.errorBody()?.string()}"
+                                )
+                            }
                         }
-                    }
-                }
+
+                        override fun onFailure(call: Call<List<Persona>>, t: Throwable) {
+                            Log.e("UserViewModel", "Failed to fetch family members: ${t.message}")
+                        }
+                    })
             } else {
                 Log.e("UserViewModel", "Token not found")
             }
@@ -166,6 +179,12 @@ class UserViewModel : ViewModel() {
         restricciones: List<String>,
         onResult: (RegisterResponse?) -> Unit
     ) {
+        // Create Persona object
+        val persona = Persona(nombre, apellido, edad, restricciones)
+        // Create User object
+        val user = User(mail, password, persona)
+
+        // Logging data to ensure everything is passed correctly
         Log.d("UserViewModel", "Registering user with email: $mail")
         Log.d("UserViewModel", "Password: $password")
         Log.d("UserViewModel", "Nombre: $nombre")
@@ -173,20 +192,19 @@ class UserViewModel : ViewModel() {
         Log.d("UserViewModel", "Edad: $edad")
         Log.d("UserViewModel", "Restricciones: $restricciones")
 
-        val persona = Persona(nombre, apellido, edad, restricciones)
-        val user = User(mail, password, persona)
-
+        // Convert User object to JSON for additional logging
         val gson = Gson()
         val userJson = gson.toJson(user)
         Log.d("UserViewModel", "User JSON: $userJson")
 
-        // Verificar que todos los campos obligatorios no estén vacíos
+        // Check for empty fields before making the API call
         if (mail.isBlank() || password.isBlank() || nombre.isBlank() || apellido.isBlank() || edad <= 0) {
-            Log.e("UserViewModel", "Validation failed: Some fields are blank or invalid")
+            Log.e("UserViewModel", "One or more fields are empty or invalid")
             onResult(null)
             return
         }
 
+        // Make the API call to register the user
         viewModelScope.launch {
             apiService.registerUser(user).enqueue(object : Callback<RegisterResponse> {
                 override fun onResponse(
@@ -194,7 +212,7 @@ class UserViewModel : ViewModel() {
                     response: Response<RegisterResponse>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d("UserViewModel", "User registered successfully: ${response.body()}")
+                        Log.d("UserViewModel", "Registration successful")
                         onResult(response.body())
                     } else {
                         Log.e(
@@ -215,6 +233,123 @@ class UserViewModel : ViewModel() {
                     onResult(null)
                 }
             })
+        }
+    }
+    fun addFamilyMember(
+        context: Context,
+        nombre: String,
+        apellido: String,
+        edad: Int,
+        restricciones: List<String>,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                val persona = Persona(
+                    nombre = nombre,
+                    apellido = apellido,
+                    edad = edad,
+                    restricciones = restricciones
+                )
+                apiService.addFamilyMember("Bearer $token", persona)
+                    .enqueue(object : Callback<Persona> {
+                        override fun onResponse(call: Call<Persona>, response: Response<Persona>) {
+                            if (response.isSuccessful) {
+                                Log.d(
+                                    "UserViewModel",
+                                    "Family member added successfully: ${response.body()}"
+                                )
+                                onResult(true)
+                                getFamilyMembers(context) // Refresh the family members list
+                            } else {
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error adding family member: ${response.message()}"
+                                )
+                                Log.e("UserViewModel", "Response code: ${response.code()}")
+                                Log.e(
+                                    "UserViewModel",
+                                    "Response error body: ${response.errorBody()?.string()}"
+                                )
+                                onResult(false)
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Persona>, t: Throwable) {
+                            Log.e("UserViewModel", "Failed to add family member: ${t.message}")
+                            onResult(false)
+                        }
+                    })
+            } else {
+                Log.e("UserViewModel", "Token not found")
+                onResult(false)
+            }
+        }
+    }
+
+    fun updateFamilyMember(context: Context, persona: Persona, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                Log.d("UserViewModel", "Retrieved token: $token")
+                apiService.updateFamilyMember("Bearer $token", persona)
+                    .enqueue(object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                            if (response.isSuccessful) {
+                                onResult(true)
+                            } else {
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error updating family member: ${response.message()}"
+                                )
+                                onResult(false)
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            Log.e("UserViewModel", "Update family member failed: ${t.message}")
+                            onResult(false)
+                        }
+                    })
+            } else {
+                Log.e("UserViewModel", "Token not found")
+                onResult(false)
+            }
+        }
+    }
+
+    fun deleteFamilyMember(context: Context, persona: Persona, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                apiService.deleteFamilyMember(
+                    "Bearer $token",
+                    persona.nombre ?: "",
+                    persona.apellido ?: ""
+                ).enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            onResult(true)
+                            getFamilyMembers(context) // Refresh the family members list
+                        } else {
+                            Log.e(
+                                "UserViewModel",
+                                "Error deleting family member: ${response.message()}"
+                            )
+                            onResult(false)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("UserViewModel", "Delete family member failed: ${t.message}")
+                        onResult(false)
+                    }
+                })
+            } else {
+                Log.e("UserViewModel", "Token not found")
+                onResult(false)
+            }
         }
     }
 }

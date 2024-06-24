@@ -2,7 +2,6 @@ package com.example.foodiefrontend.navigation
 
 sealed class AppScreens(val route: String) {
 
-
     object WelcomeScreen : AppScreens("welcome_screen")
     object LoginScreen : AppScreens("login_screen")
     object RegisterScreen : AppScreens("register_screen")
@@ -22,4 +21,13 @@ sealed class AppScreens(val route: String) {
     object CameraScreen : AppScreens("camera_screen")
     object FamilyConfigScreen : AppScreens("family_config_screen")
     object AddFamilyScreen : AppScreens("add_family_screen")
+    object ModifyFamilyScreen :
+        AppScreens("modify_family_screen/{nombre}/{apellido}/{edad}/{restricciones}") {
+        fun createRoute(nombre: String, apellido: String, edad: Int, restricciones: String?) =
+            if (restricciones.isNullOrEmpty()) {
+                "modify_family_screen/$nombre/$apellido/$edad"
+            } else {
+                "modify_family_screen/$nombre/$apellido/$edad/$restricciones"
+            }
+    }
 }

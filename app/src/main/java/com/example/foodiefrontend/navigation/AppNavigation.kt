@@ -9,10 +9,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.AddFamilyScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.FamilyConfigScreen
+import com.example.foodiefrontend.presentation.ui.screens.familyConfig.ModifyFamilyScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.RandomRecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.SuggestedRecipesScreen
@@ -87,13 +89,38 @@ fun AppNavigation(navController: NavHostController) {
             }
         }
         composable(route = AppScreens.FamilyConfigScreen.route) {
-            FamilyConfigScreen(navController, list = listOf())
+            FamilyConfigScreen(navController, userViewModel)
         }
         composable(route = AppScreens.AddFamilyScreen.route) {
             AddFamilyScreen(navController)
         }
-        composable(route = AppScreens.HomeScreen.route) {
-            HomeScreen(navController, "")
+        composable(
+            route = AppScreens.ModifyFamilyScreen.route,
+            arguments = listOf(
+                navArgument("nombre") { type = NavType.StringType },
+                navArgument("apellido") { type = NavType.StringType },
+                navArgument("edad") { type = NavType.IntType },
+                navArgument("restricciones") {
+                    type = NavType.StringType; nullable = true; defaultValue = ""
+                }
+            ),
+            deepLinks = listOf(navDeepLink {
+                uriPattern =
+                    "android-app://androidx.navigation/modify_family_screen/{nombre}/{apellido}/{edad}?restricciones={restricciones}"
+            })
+        ) { backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+            val apellido = backStackEntry.arguments?.getString("apellido") ?: ""
+            val edad = backStackEntry.arguments?.getInt("edad") ?: 0
+            val restricciones =
+                backStackEntry.arguments?.getString("restricciones")?.split(",") ?: emptyList()
+            ModifyFamilyScreen(
+                navController = navController,
+                initialNombre = nombre,
+                initialApellido = apellido,
+                initialEdad = edad,
+                initialRestricciones = restricciones
+            )
         }
     }
 }

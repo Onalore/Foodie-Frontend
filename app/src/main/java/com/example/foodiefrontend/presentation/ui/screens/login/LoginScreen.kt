@@ -110,7 +110,8 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
                     placeholder = stringResource(R.string.enter_email),
                     onValueChange = { newValue ->
                         emailValue = newValue
-                    }
+                    },
+                    enabled = false
                 )
 
                 CustomPasswordField(
