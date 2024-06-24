@@ -83,7 +83,8 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                         CustomTextField(
                             value = mail,
                             placeholder = stringResource(id = R.string.enter_email),
-                            onValueChange = { mail = it }
+                            onValueChange = { mail = it },
+                            enabled = true
                         )
                         CustomPasswordField(
                             value = password,
@@ -108,18 +109,21 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                         CustomTextField(
                             value = nombre,
                             placeholder = stringResource(R.string.name),
-                            onValueChange = { nombre = it }
+                            onValueChange = { nombre = it },
+                            enabled = true
                         )
                         CustomTextField(
                             value = apellido,
                             placeholder = stringResource(R.string.lastName),
-                            onValueChange = { apellido = it }
+                            onValueChange = { apellido = it },
+                            enabled = true
                         )
                         CustomTextField(
                             value = edad,
                             placeholder = stringResource(R.string.age),
                             onValueChange = { edad = it },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            enabled = true,
                         )
                         CustomComboBox(
                             selectedItems = restricciones,

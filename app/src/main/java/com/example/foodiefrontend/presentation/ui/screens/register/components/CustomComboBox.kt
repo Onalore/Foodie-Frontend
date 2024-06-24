@@ -72,14 +72,15 @@ private fun CustomComboBoxBase(
             label = label,
             placeholder = "",
             onValueChange = { },
+            trailingIcon = icon,
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     textfieldSize = coordinates.size.toSize()
                 },
+            onClickIcon = { expanded = !expanded },
             readOnly = true,
-            trailingIcon = icon,
-            onClickIcon = { expanded = !expanded }
+            enabled = false
         )
         DropdownMenu(
             expanded = expanded,
