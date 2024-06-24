@@ -55,7 +55,7 @@ fun AppNavigation(navController: NavHostController) {
             HomeScreen(navController, username)
         }
         composable(
-            route = "recipe_screen/{recipeJson}",
+            route = AppScreens.RecipeScreen.route,
             arguments = listOf(navArgument("recipeJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val encodedRecipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""

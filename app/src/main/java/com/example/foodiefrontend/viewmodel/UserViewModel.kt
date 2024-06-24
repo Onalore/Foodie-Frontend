@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.AuthResponse
+import com.example.foodiefrontend.data.DinersData
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
@@ -16,8 +17,10 @@ import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.Config
+import com.example.foodiefrontend.service.RecipesService
 import com.example.foodiefrontend.service.UserService
 import com.example.foodiefrontend.utils.dataStore
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.HttpException
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -32,6 +35,7 @@ import retrofit2.Response
 class UserViewModel : ViewModel() {
 
     private val apiService: UserService = BackendApi.createUserService()
+    private val apiRecipeService: RecipesService = BackendApi.createRecipesService()
 
     private val _loginResult = MutableLiveData<AuthResponse?>()
     val loginResult: LiveData<AuthResponse?> = _loginResult
@@ -363,4 +367,26 @@ class UserViewModel : ViewModel() {
             onLogoutComplete()
         }
     }
+
+    fun sendSelectedData(context: Context, comensales: List<String>, comida: String) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response =
+                        apiRecipeService.sendDinersData(token, DinersData(comensales, comida))
+                    if (response.isSuccessful) {
+                        // Manejar respuesta exitosa
+                        val responseBody = response.body()
+                    } else {
+                        // Manejar respuestas de error no exitosas
+                        Log.e("API_ERROR", "Error: ${response.code()} ${response.message()}")
+                    }
+                } catch (e: HttpException) {
+                    Log.e("API_ERROR", "HttpException: ${e.message}")
+                }
+            }
+        }
+    }
 }
+

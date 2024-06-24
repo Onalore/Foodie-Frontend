@@ -100,6 +100,7 @@ fun SuggestedRecipesScreen(
                 CustomButton(
                     onClick = {
                         //TODO
+                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.more_options),
