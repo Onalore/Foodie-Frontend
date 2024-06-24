@@ -17,39 +17,22 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 
 @Composable
 fun CustomComboBox(
     selectedItems: List<String>,
-    label: String,
     onSelectedItemsChange: (List<String>) -> Unit,
     items: List<String>,
-    isMultiSelect: Boolean = true
+    label: String,
+    isMultiSelect: Boolean
 ) {
     CustomComboBoxBase(
         selectedItems = selectedItems,
         label = label,
-        onSelectedItemsChange = { onSelectedItemsChange(it as List<String>) },
+        onSelectedItemsChange = onSelectedItemsChange,
         items = items,
         isMultiSelect = isMultiSelect
-    )
-}
-
-@Composable
-fun CustomComboBox(
-    selectedItem: String,
-    label: String,
-    onSelectedItemChange: (String) -> Unit,
-    items: List<String>
-) {
-    CustomComboBoxBase(
-        selectedItems = listOf(selectedItem),
-        label = label,
-        onSelectedItemsChange = { selectedItems -> onSelectedItemChange(selectedItems.first()) },
-        items = items,
-        isMultiSelect = false
     )
 }
 
@@ -72,15 +55,15 @@ private fun CustomComboBoxBase(
             label = label,
             placeholder = "",
             onValueChange = { },
-            trailingIcon = icon,
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     textfieldSize = coordinates.size.toSize()
                 },
-            onClickIcon = { expanded = !expanded },
             readOnly = true,
-            enabled = false
+            trailingIcon = icon,
+            onClickIcon = { expanded = !expanded },
+            enabled = true
         )
         DropdownMenu(
             expanded = expanded,

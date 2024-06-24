@@ -105,7 +105,13 @@ fun ProfileScreen(
         ProfileOptionItem(
             text = stringResource(R.string.logout),
             icon = Icons.AutoMirrored.Filled.ArrowForward,
-            onClick = {}
+            onClick = {
+                userViewModel.logout(context) {
+                    navController.navigate(AppScreens.WelcomeScreen.route) {
+                        popUpTo(AppScreens.ProfileScreen.route) { inclusive = true }
+                    }
+                }
+            }
         )
     }
 }

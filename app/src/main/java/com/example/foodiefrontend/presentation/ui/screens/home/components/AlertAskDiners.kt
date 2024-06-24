@@ -1,11 +1,8 @@
-package com.example.foodiefrontend.presentation.ui.screens.profile.components
+package com.example.foodiefrontend.presentation.ui.screens.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
@@ -18,9 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,10 +36,8 @@ fun AlertAskDiners(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
 ) {
-    val context = LocalContext.current
     var comensales by remember { mutableStateOf(emptyList<String>()) }
     var comida by remember { mutableStateOf("") }
-
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -89,10 +81,11 @@ fun AlertAskDiners(
                     isMultiSelect = true
                 )
                 CustomComboBox(
-                    selectedItem = comida.toString(),
-                    onSelectedItemChange = { comida = it },
+                    selectedItems = listOf(comida),
+                    onSelectedItemsChange = { if (it.isNotEmpty()) comida = it[0] },
                     label = "Seleccionar comida",
-                    items = Constants.comidas
+                    items = Constants.comidas,
+                    isMultiSelect = true
                 )
             }
         },
@@ -102,14 +95,14 @@ fun AlertAskDiners(
                     setShowDialog(false)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
-                text = "Generar receta",
+                text = "Cancelar",
                 contentColor = MaterialTheme.colorScheme.onSurface
             )
         },
         confirmButton = {
             CustomButton(
                 onClick = {
-                    /*TODO*/
+                    // TODO: Add confirmation action
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 text = stringResource(R.string.btn_cancel),
@@ -122,7 +115,6 @@ fun AlertAskDiners(
 private fun createNameList(personas: List<Persona>): List<String> {
     return personas.map { "${it.nombre} ${it.apellido}" }
 }
-
 
 @Preview(showBackground = true)
 @Composable

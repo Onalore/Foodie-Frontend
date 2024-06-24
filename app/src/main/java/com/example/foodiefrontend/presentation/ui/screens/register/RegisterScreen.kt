@@ -127,9 +127,9 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                         )
                         CustomComboBox(
                             selectedItems = restricciones,
-                            onSelectedItemsChange = { restricciones = it },
                             label = "Restricciones alimentarias",
                             items = Constants.restricciones,
+                            onSelectedItemsChange = { restricciones = it },
                             isMultiSelect = true
                         )
 
