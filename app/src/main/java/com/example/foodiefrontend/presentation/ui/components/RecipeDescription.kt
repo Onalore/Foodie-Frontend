@@ -55,12 +55,16 @@ fun RecipeDescription(
                 modifier = Modifier
                     .padding(end = 5.dp)
                     .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Subtitle(
-                    title = name,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Subtitle(
+                        title = name,
+                    )
+                }
                 if (punctuation && initialRating != null) {
                     StarRating(
                         initialRating = initialRating,
