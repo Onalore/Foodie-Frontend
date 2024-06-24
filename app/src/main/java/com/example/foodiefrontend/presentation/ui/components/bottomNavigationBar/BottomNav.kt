@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar
 
+import android.util.Log
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -11,17 +12,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.navigation.AppScreens
 
-
 @Composable
 fun BottomNavigationBar(
-    navController: NavController = rememberNavController()
+    navController: NavController
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    Log.d("BottomNavigationBar", "Current route: $currentRoute")
 
     val items = listOf(
         BottomNavItem(
@@ -39,18 +40,32 @@ fun BottomNavigationBar(
     )
 
     BottomNavigation(
-        backgroundColor = Color(0xFFFFFFFF)
+        backgroundColor = Color.White
     ) {
         items.forEach { item ->
+            val isSelected = currentRoute?.startsWith(item.route) == true
+            Log.d("BottomNavigationBar", "Item route: ${item.route}, is selected: $isSelected")
             BottomNavigationItem(
-                selected = currentRoute == item.route,
+                selected = isSelected,
                 onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    Log.d("BottomNavigationBar", "Navigating to: ${item.route}")
+
+                    if (item.route == AppScreens.HomeScreen.route) {
+                        navController.navigate("${AppScreens.HomeScreen.route}/defaultUser") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    } else {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 },
                 icon = {
