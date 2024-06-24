@@ -35,6 +35,8 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.CustomToolbar
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
 import com.example.foodiefrontend.viewmodel.UserViewModel
+import com.example.foodiefrontend.utils.Constants
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +100,11 @@ fun AddFamilyScreen(navController: NavController, viewModel: UserViewModel = vie
             )
             CustomComboBox(
                 selectedItems = restricciones,
-                onSelectedItemsChange = { restricciones = it }
+
+                onSelectedItemsChange = { restricciones = it },
+                label = "Restricciones alimentarias",
+                items = Constants.restricciones,
+                isMultiSelect = true
             )
 
             if (showError) {
