@@ -13,6 +13,7 @@ import com.example.foodiefrontend.data.DinersData
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
+import com.example.foodiefrontend.data.RatingData
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
@@ -457,6 +458,57 @@ class UserViewModel : ViewModel() {
                     }
                 } catch (e: Exception) {
                     Log.e("UserViewModel", "Error fetching favorite recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun rateRecipe(context: Context, puntuacion: Int, favorita: Boolean) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val ratingData = RatingData(puntuacion, favorita)
+                    val response = apiRecipeService.rateRecipe("Bearer $token", ratingData)
+                    if (response.isSuccessful) {
+                        Log.d("UserViewModel", "Recipe rated successfully")
+                        fetchTemporaryRecipe(context) // Refresh temporary recipe
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error rating recipe: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error rating recipe: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun deleteTemporaryRecipe(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.deleteTemporaryRecipe("Bearer $token")
+                    if (response.isSuccessful) {
+                        Log.d("UserViewModel", "Temporary recipe deleted successfully")
+                        fetchTemporaryRecipe(context) // Refresh temporary recipe
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error deleting temporary recipe: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error deleting temporary recipe: ${e.message}")
                 }
             } else {
                 Log.e("UserViewModel", "Token not found")
