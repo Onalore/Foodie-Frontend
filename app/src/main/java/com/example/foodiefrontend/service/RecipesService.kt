@@ -14,11 +14,17 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface RecipesService {
-    @GET("recetas/user")
-    fun getRecipes(@Header("Authorization") token: String): Call<List<Recipe>>
+    @POST("recetas/user")
+    fun getRecipes(
+        @Header("Authorization") token: String,
+        @Body dinersData: DinersData
+    ): Call<List<Recipe>>
 
-    @GET("recetas/random")
-    fun randomRecipes(@Header("Authorization") token: String): Call<List<Recipe>>
+    @POST("recetas/random")
+    fun randomRecipes(
+        @Header("Authorization") token: String,
+        @Body dinersData: DinersData
+    ): Call<List<Recipe>>
 
     @GET("recetas/ver")
     suspend fun getTemporaryRecipe(@Header("Authorization") token: String): Response<TemporaryRecipeResponse>

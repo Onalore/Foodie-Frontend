@@ -1,5 +1,10 @@
 package com.example.foodiefrontend.navigation
 
+import com.example.foodiefrontend.data.Persona
+import com.google.gson.Gson
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 sealed class AppScreens(val route: String) {
 
     object WelcomeScreen : AppScreens("welcome_screen")
@@ -14,9 +19,24 @@ sealed class AppScreens(val route: String) {
     object RecipeScreen : AppScreens("recipe_screen/{recipeJson}") {
         fun createRoute(recipeJson: String) = "recipe_screen/$recipeJson"
     }
-    object SuggestedRecipesScreen : AppScreens("suggested_recipes_screen")
-    object RandomRecipesScreen : AppScreens("random_recipes_screen")
 
+    object SuggestedRecipesScreen : AppScreens("suggested_recipes_screen/{comensales}/{comida}") {
+        fun createRoute(comensales: List<Persona>, comida: String): String {
+            val encodedComensales =
+                URLEncoder.encode(Gson().toJson(comensales), StandardCharsets.UTF_8.toString())
+            val encodedComida = URLEncoder.encode(comida, StandardCharsets.UTF_8.toString())
+            return "suggested_recipes_screen/$encodedComensales/$encodedComida"
+        }
+    }
+
+    object RandomRecipesScreen : AppScreens("suggested_recipes_screen/{comensales}/{comida}") {
+        fun createRoute(comensales: List<Persona>, comida: String): String {
+            val encodedComensales =
+                URLEncoder.encode(Gson().toJson(comensales), StandardCharsets.UTF_8.toString())
+            val encodedComida = URLEncoder.encode(comida, StandardCharsets.UTF_8.toString())
+            return "random_recipes_screen/$encodedComensales/$encodedComida"
+        }
+    }
     object StockScreen : AppScreens("stock_screen") {
         fun createRoute(codeEan: String?) = if (codeEan != null) "stock_screen/$codeEan" else "stock_screen"
     }

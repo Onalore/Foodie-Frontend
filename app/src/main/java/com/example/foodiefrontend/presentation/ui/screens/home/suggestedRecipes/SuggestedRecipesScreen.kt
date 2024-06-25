@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
@@ -41,13 +42,15 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun SuggestedRecipesScreen(
     navController: NavController,
-    viewModel: SuggestedRecipesViewModel = viewModel()
+    comensales: List<Persona>,
+    comida: String
 ) {
     val context = LocalContext.current
+    val viewModel: SuggestedRecipesViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         Log.d("SuggestedRecipesScreen", "Fetching recipes")
-        viewModel.fetchRecipes(context)
+        viewModel.fetchRecipes(context, comensales, comida) //
     }
 
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
@@ -114,7 +117,15 @@ fun SuggestedRecipesScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSuggestedRecipes() {
+    val navController = rememberNavController()
+    val comensales = listOf<Persona>()
+    val comida = "Desayuno"
+
     FoodieFrontendTheme {
-        SuggestedRecipesScreen(rememberNavController())
+        SuggestedRecipesScreen(
+            navController = navController,
+            comensales = comensales,
+            comida = comida
+        )
     }
 }

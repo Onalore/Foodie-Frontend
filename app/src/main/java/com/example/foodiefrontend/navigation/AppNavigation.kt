@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.AddFamilyScreen
@@ -85,14 +86,38 @@ fun AppNavigation(navController: NavHostController) {
             Log.d("Navigation", "Navigating to RecipeScreen with recipe: $recipe")
             RecipeScreen(navController, recipe)
         }
-        composable(route = AppScreens.SuggestedRecipesScreen.route) {
-            SuggestedRecipesScreen(navController)
+        composable(
+            route = AppScreens.SuggestedRecipesScreen.route,
+            arguments = listOf(navArgument("comensales") { type = NavType.StringType },
+                navArgument("comida") { type = NavType.StringType })
+        ) { entry ->
+            val comensalesJson = entry.arguments?.getString("comensales") ?: "[]"
+            val comensales = Gson().fromJson(
+                URLDecoder.decode(
+                    comensalesJson,
+                    StandardCharsets.UTF_8.toString()
+                ), Array<Persona>::class.java
+            ).toList()
+            val comida = entry.arguments?.getString("comida") ?: ""
+            SuggestedRecipesScreen(navController, comensales, comida)
+        }
+        composable(
+            route = AppScreens.RandomRecipesScreen.route,
+            arguments = listOf(navArgument("comensales") { type = NavType.StringType },
+                navArgument("comida") { type = NavType.StringType })
+        ) { entry ->
+            val comensalesJson = entry.arguments?.getString("comensales") ?: "[]"
+            val comensales = Gson().fromJson(
+                URLDecoder.decode(
+                    comensalesJson,
+                    StandardCharsets.UTF_8.toString()
+                ), Array<Persona>::class.java
+            ).toList()
+            val comida = entry.arguments?.getString("comida") ?: ""
+            RandomRecipesScreen(navController, comensales, comida)
         }
         composable(route = AppScreens.RecipesScreen.route) {
             RecipesScreen(navController, userViewModel)
-        }
-        composable(route = AppScreens.RandomRecipesScreen.route) {
-            RandomRecipesScreen(navController)
         }
         composable(route = AppScreens.StockScreen.route) {
             StockScreen(navController)
