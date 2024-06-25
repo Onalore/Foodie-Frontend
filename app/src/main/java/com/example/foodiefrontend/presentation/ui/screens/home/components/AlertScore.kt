@@ -5,48 +5,46 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
-import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.StarRating
-import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @Composable
 fun AlertScore(
     navController: NavController,
+    recipe: Recipe,
     setShowDialog: (Boolean) -> Unit,
-    recipe: Recipe
+    userViewModel: UserViewModel = viewModel()
 ) {
-    var puntuacion by remember { mutableIntStateOf(0) }
-    var liked by remember { mutableStateOf(false) }
-
+    var puntuacion by remember { mutableStateOf(0) }
+    var isFavorite by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -79,6 +77,7 @@ fun AlertScore(
                     onRatingChanged = { rating ->
                         puntuacion = rating
                     },
+
                     widthStar = 40.dp,
                 )
                 Row(
@@ -89,17 +88,17 @@ fun AlertScore(
                         text = "Añadir a favoritos",
                         textAlign = TextAlign.Center,
                         modifier = Modifier.clickable {
-                            liked = !liked
+                            isFavorite = !isFavorite
                         },
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     ImageWithResource(
-                        resourceId = if (liked)
+                        resourceId = if (isFavorite)
                             R.drawable.ic_heart_filled
                         else
                             R.drawable.ic_heart_outline,
                         modifier = Modifier.size(20.dp),
-                        onClick = { liked = !liked}
+                        onClick = { isFavorite = !isFavorite }
                     )
                 }
             }
@@ -107,18 +106,23 @@ fun AlertScore(
         dismissButton = {
             CustomButton(
                 onClick = {
+                    userViewModel.rateRecipe(context, puntuacion, isFavorite)
                     setShowDialog(false)
                 },
-                containerColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.primary,
                 text = stringResource(R.string.send_score),
                 contentColor = MaterialTheme.colorScheme.onSurface
             )
         },
         confirmButton = {
             CustomButton(
-                onClick = { /*TODO*/ },
-                containerColor = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.recipe_doesnt_happen)
+                onClick = {
+                    userViewModel.deleteTemporaryRecipe(context)
+                    setShowDialog(false)
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                text = stringResource(R.string.recipe_doesnt_happen),
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         }
     )

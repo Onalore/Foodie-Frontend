@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,8 +56,7 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun HomeScreen(
     navController: NavController,
-    username: String,
-    userViewModel: UserViewModel = viewModel(), // Add ViewModel here
+    userViewModel: UserViewModel = viewModel(),
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
@@ -64,8 +64,10 @@ fun HomeScreen(
     val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
     val context = LocalContext.current
     val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState(null) // Observe temporaryRecipe
+    val userInfo by userViewModel.userInfo.observeAsState()
 
     LaunchedEffect(Unit) {
+        userViewModel.getUserInfo(context)
         userViewModel.getFamilyMembers(context)
         userViewModel.fetchFavoriteRecipes(context)
         userViewModel.fetchTemporaryRecipe(context)
@@ -100,7 +102,9 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Title(title = "${stringResource(R.string.hi)} $username")
+                        userInfo?.let { user ->
+                            Title(title = "${stringResource(R.string.hi)} ${user.persona.nombre}")
+                        }
 
                         Title(
                             title = stringResource(R.string.what_are_u_eating),
@@ -169,6 +173,34 @@ fun HomeScreen(
                                     )
                                 }
                             )
+                            Text(
+                                text = "Puntuar",
+                                modifier = Modifier
+                                    .clickable {
+                                        Log.d("HomeScreen", "Puntuar text clicked")
+                                        val recipeJson = Gson().toJson(temporaryRecipe)
+                                        val encodedRecipeJson =
+                                            URLEncoder.encode(
+                                                recipeJson,
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                        Log.d(
+                                            "HomeScreen",
+                                            "Navigating to RateRecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                                        )
+                                        navController.navigate(
+                                            AppScreens.RateRecipeScreen.createRoute(
+                                                encodedRecipeJson
+                                            )
+                                        )
+                                    }
+                                    .padding(8.dp)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                color = Color.White,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
                         }
                     }
                     Subtitle(
@@ -233,8 +265,6 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
-            punctuation = true,
-            initialRating = 0
         )
     }
 }
