@@ -1,13 +1,9 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipes.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,25 +23,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Persona
-import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
-import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.data.FilterCriteria
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
-import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.StarRating
-import com.example.foodiefrontend.presentation.ui.components.Title
 
 @Composable
 fun AlertFilter(
     navController: NavController,
-    setShowDialog: (Boolean) -> Unit
+    setShowDialog: (Boolean) -> Unit,
+    applyFilter: (FilterCriteria) -> Unit
 ) {
     var puntuacion by remember { mutableIntStateOf(0) }
-    var liked by remember { mutableStateOf(false) }
-
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -79,7 +67,7 @@ fun AlertFilter(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    StarRating (
+                    StarRating(
                         initialRating = puntuacion,
                         onRatingChanged = { rating ->
                             puntuacion = rating
@@ -89,34 +77,32 @@ fun AlertFilter(
                     Text(
                         text = "ó más",
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.clickable {
-                            liked = !liked
-                        },
                         color = Color(0xFFE8BB66)
                     )
                 }
             }
         },
-        dismissButton = {
+        confirmButton = {
             CustomButton(
                 onClick = {
+                    val criteria = FilterCriteria(minRating = puntuacion)
+                    applyFilter(criteria)
                     setShowDialog(false)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
-                text = "Confirmar",
-                contentColor = MaterialTheme.colorScheme.onSurface
+                text = "Confirmar"
             )
         },
-        confirmButton = {
+        dismissButton = {
             CustomButton(
-                onClick = { /*TODO*/ },
+                onClick = { setShowDialog(false) },
                 containerColor = MaterialTheme.colorScheme.primary,
-                text = "Predeterminado"
+                text = "Cancelar",
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         }
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -128,7 +114,8 @@ private fun Preview() {
             navController = rememberNavController(),
             setShowDialog = { param ->
                 showDialog = param
-            }
+            },
+            applyFilter = {}
         )
     }
 }

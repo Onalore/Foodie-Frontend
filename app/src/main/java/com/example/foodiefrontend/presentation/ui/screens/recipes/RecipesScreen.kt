@@ -57,8 +57,8 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
     val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState()
     val createdRecipes by userViewModel.createdRecipes.observeAsState()
     val historyRecipes by userViewModel.historyRecipes.observeAsState()
+    val filteredRecipes by userViewModel.filteredRecipes.observeAsState()
     val context = LocalContext.current
-
 
     LaunchedEffect(Unit) {
         userViewModel.fetchFavoriteRecipes(context)
@@ -69,7 +69,14 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
     if (showDialog) {
         AlertFilter(
             navController = rememberNavController(),
-            setShowDialog = { showDialog = it }
+            setShowDialog = { showDialog = it },
+            applyFilter = { criteria ->
+                Log.d("RecipesScreen", "Applying filter: $criteria")
+                when (selectedButtonIndex) {
+                    0 -> userViewModel.filterRecipes(favoriteRecipes, criteria)
+                    2 -> userViewModel.filterRecipes(historyRecipes, criteria)
+                }
+            }
         )
     }
 
@@ -120,9 +127,15 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
         ) {
             HorizontalButtonCategories(
                 items = listOf(
-                    "Favoritas" to { userViewModel.fetchFavoriteRecipes(context) },
+                    "Favoritas" to {
+                        userViewModel.fetchFavoriteRecipes(context)
+                        userViewModel.clearFilteredRecipes() // Restablecer filtro
+                    },
                     "Creadas" to { userViewModel.fetchCreatedRecipes(context) },
-                    "Historial" to { userViewModel.fetchHistoryRecipes(context) }
+                    "Historial" to {
+                        userViewModel.fetchHistoryRecipes(context)
+                        userViewModel.clearFilteredRecipes() // Restablecer filtro
+                    }
                 ),
                 selectedButtonIndex = selectedButtonIndex,
                 setSelectedButtonIndex = { selected ->
@@ -131,7 +144,14 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
             )
 
             when (selectedButtonIndex) {
-                0 -> favoriteRecipes?.let {
+                0 -> filteredRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying filtered favorite recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                } ?: favoriteRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying favorite recipes: ${it.size}")
                     VerticalRecipes(
                         items = it,
                         navController = navController
@@ -139,13 +159,21 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
 
                 1 -> createdRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying created recipes: ${it.size}")
                     VerticalRecipes(
                         items = it,
                         navController = navController
                     )
                 }
 
-                2 -> historyRecipes?.let {
+                2 -> filteredRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying filtered history recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                } ?: historyRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying created recipes: ${it.size}")
                     VerticalRecipes(
                         items = it,
                         navController = navController
@@ -155,6 +183,7 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
         }
     }
 }
+
 
 @Composable
 fun RecipesCardItem(
@@ -245,6 +274,7 @@ fun VerticalRecipes(items: List<Recipe>, navController: NavController) {
             }
         }
     }
+
 }
 
 @Preview(showBackground = true)

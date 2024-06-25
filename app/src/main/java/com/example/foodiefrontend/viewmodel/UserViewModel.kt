@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.AuthResponse
 import com.example.foodiefrontend.data.DinersData
+import com.example.foodiefrontend.data.FilterCriteria
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
@@ -65,6 +66,9 @@ class UserViewModel : ViewModel() {
 
     private val _historyRecipes = MutableLiveData<List<Recipe>?>()
     val historyRecipes: LiveData<List<Recipe>?> = _historyRecipes
+
+    private val _filteredRecipes = MutableLiveData<List<Recipe>?>()
+    val filteredRecipes: LiveData<List<Recipe>?> = _filteredRecipes
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
@@ -568,6 +572,33 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun filterRecipes(recipes: List<Recipe>?, criteria: FilterCriteria) {
+        if (recipes == null) return
+
+        Log.d("UserViewModel", "Filter criteria: $criteria")
+        Log.d("UserViewModel", "Recipes before filtering: ${recipes.size}")
+
+        recipes.forEach { recipe ->
+            Log.d("UserViewModel", "Recipe: ${recipe.name}, Rating: ${recipe.rating}")
+        }
+
+        val filtered = recipes.filter { recipe ->
+            criteria.minRating?.let { minRating ->
+                recipe.rating >= minRating
+            } ?: true
+        }
+
+        Log.d("UserViewModel", "Recipes after filtering: ${filtered.size}")
+        _filteredRecipes.postValue(filtered)
+    }
+
+    fun clearFilteredRecipes() {
+        _filteredRecipes.postValue(null)
+        Log.d("UserViewModel", "Filtered recipes cleared")
+    }
+
+
 }
 
 
