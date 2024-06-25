@@ -57,17 +57,18 @@ fun HomeScreen(
     navController: NavController,
     username: String,
     userViewModel: UserViewModel = viewModel(), // Add ViewModel here
-    recipeInProgress: Recipe? = null
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
     val familyMembers by userViewModel.familyMembers.observeAsState(emptyList())
     val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
     val context = LocalContext.current
+    val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState(null) // Observe temporaryRecipe
 
     LaunchedEffect(Unit) {
         userViewModel.getFamilyMembers(context)
         userViewModel.fetchFavoriteRecipes(context)
+        userViewModel.fetchTemporaryRecipe(context)
     }
 
     if (showDialog) {
@@ -133,7 +134,7 @@ fun HomeScreen(
                         )
                     }
 
-                    if (recipeInProgress != null) {
+                    if (temporaryRecipe != null) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -147,11 +148,11 @@ fun HomeScreen(
                                     .fillMaxWidth()
                             )
                             RecipesCardItem(
-                                title = recipeInProgress.name,
-                                image = recipeInProgress.imageUrl,
+                                title = temporaryRecipe!!.name,
+                                image = temporaryRecipe!!.imageUrl,
                                 scored = false,
                                 onClick = {
-                                    val recipeJson = Gson().toJson(recipeInProgress)
+                                    val recipeJson = Gson().toJson(temporaryRecipe)
                                     val encodedRecipeJson =
                                         URLEncoder.encode(
                                             recipeJson,

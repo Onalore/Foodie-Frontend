@@ -1,6 +1,7 @@
 package com.example.foodiefrontend.service
 
 import FavoriteRecipesResponse
+import TemporaryRecipeResponse
 import com.example.foodiefrontend.data.DinersData
 import com.example.foodiefrontend.data.Recipe
 import retrofit2.Call
@@ -20,10 +21,13 @@ interface RecipesService {
     @GET("recetas/favoritas")
     suspend fun getFavoriteRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
 
+    @GET("recetas/ver")
+    suspend fun getTemporaryRecipe(@Header("Authorization") token: String): Response<TemporaryRecipeResponse>
+
     //enviado informacion comensales
     @POST("recetas/info")
     suspend fun sendDinersData(
         @Header("Authorization") token: String,
         @Body data: DinersData
-    ): retrofit2.Response<Unit>
+    ): Response<Unit>
 }

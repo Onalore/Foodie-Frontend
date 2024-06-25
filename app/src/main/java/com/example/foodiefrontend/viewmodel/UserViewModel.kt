@@ -56,6 +56,9 @@ class UserViewModel : ViewModel() {
     private val _favoriteRecipes = MutableLiveData<List<Recipe>?>()
     val favoriteRecipes: MutableLiveData<List<Recipe>?> get() = _favoriteRecipes
 
+    private val _temporaryRecipe = MutableLiveData<Recipe?>()
+    val temporaryRecipe: MutableLiveData<Recipe?> get() = _temporaryRecipe
+
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
         viewModelScope.launch {
@@ -427,5 +430,41 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun fetchTemporaryRecipe(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getTemporaryRecipe("Bearer $token")
+                    Log.d("UserViewModel", "Request sent to /ver with token: Bearer $token")
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        Log.d("UserViewModel", "Response body: $responseBody")
+
+                        val recipe = responseBody?.recetaTemporal
+                        if (recipe != null) {
+                            _temporaryRecipe.postValue(recipe)
+                            Log.d("UserViewModel", "Temporal recipe fetched successfully")
+                        } else {
+                            Log.e("UserViewModel", "No temporal recipe found in the response")
+                        }
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching favorite recipes: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching favorite recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
 }
+
+
 
