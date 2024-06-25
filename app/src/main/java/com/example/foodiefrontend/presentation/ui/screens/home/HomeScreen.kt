@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +57,7 @@ import java.nio.charset.StandardCharsets
 fun HomeScreen(
     navController: NavController,
     username: String,
-    userViewModel: UserViewModel = viewModel(), // Add ViewModel here
+    userViewModel: UserViewModel = viewModel(),
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
@@ -169,6 +170,34 @@ fun HomeScreen(
                                     )
                                 }
                             )
+                            Text(
+                                text = "Puntuar",
+                                modifier = Modifier
+                                    .clickable {
+                                        Log.d("HomeScreen", "Puntuar text clicked")
+                                        val recipeJson = Gson().toJson(temporaryRecipe)
+                                        val encodedRecipeJson =
+                                            URLEncoder.encode(
+                                                recipeJson,
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                        Log.d(
+                                            "HomeScreen",
+                                            "Navigating to RateRecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                                        )
+                                        navController.navigate(
+                                            AppScreens.RateRecipeScreen.createRoute(
+                                                encodedRecipeJson
+                                            )
+                                        )
+                                    }
+                                    .padding(8.dp)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                color = Color.White,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
                         }
                     }
                     Subtitle(
@@ -233,8 +262,6 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
-            punctuation = true,
-            initialRating = 0
         )
     }
 }

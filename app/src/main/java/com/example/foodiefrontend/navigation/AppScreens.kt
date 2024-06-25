@@ -6,6 +6,10 @@ sealed class AppScreens(val route: String) {
     object LoginScreen : AppScreens("login_screen")
     object RegisterScreen : AppScreens("register_screen")
     object HomeScreen : AppScreens("home_screen")
+
+    object RateRecipeScreen : AppScreens("rate_recipe/{recipeJson}") {
+        fun createRoute(recipeJson: String) = "rate_recipe/$recipeJson"
+    }
     object RecipesScreen : AppScreens("recipes_screen")
     object RecipeScreen : AppScreens("recipe_screen/{recipeJson}") {
         fun createRoute(recipeJson: String) = "recipe_screen/$recipeJson"
