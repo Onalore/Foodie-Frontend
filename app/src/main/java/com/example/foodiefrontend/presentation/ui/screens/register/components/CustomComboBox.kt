@@ -39,6 +39,23 @@ fun CustomComboBox(
 
 @Composable
 fun CustomComboBox(
+    selectedPerson: List<Persona>,
+    label: String,
+    onSelectedPersonChange: (List<Persona>) -> Unit,
+    items: List<Persona>
+) {
+    CustomComboBoxBasePersona(
+        selectedItems = selectedPerson,
+        label = label,
+        onSelectedItemsChange = { onSelectedPersonChange(it) },
+        items = items,
+        isMultiSelect = true
+    )
+}
+
+
+@Composable
+fun CustomComboBox(
     selectedItem: String,
     label: String,
     onSelectedItemChange: (String) -> Unit,
@@ -107,3 +124,57 @@ private fun CustomComboBoxBase(
     }
 }
 
+
+@Composable
+private fun CustomComboBoxBasePersona(
+    selectedItems: List<Persona>,
+    label: String,
+    onSelectedItemsChange: (List<Persona>) -> Unit,
+    items: List<Persona>,
+    isMultiSelect: Boolean
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var textfieldSize by remember { mutableStateOf(Size.Zero) }
+
+    val icon = if (expanded) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down
+
+    Column {
+        CustomTextField(
+            value = selectedItems.joinToString(", ") { "${it.nombre} ${it.apellido}" },
+            label = label,
+            placeholder = "",
+            onValueChange = { },
+            trailingIcon = icon,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    textfieldSize = coordinates.size.toSize()
+                },
+            onClickIcon = { expanded = !expanded },
+            readOnly = true,
+            enabled = false
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(with(LocalDensity.current) { textfieldSize.width.toDp() })
+        ) {
+            items.forEach { item ->
+                val isSelected = selectedItems.contains(item)
+                DropdownMenuItem(
+                    onClick = {
+                        val newSelectedItems = if (isMultiSelect) {
+                            if (isSelected) selectedItems - item else selectedItems + item
+                        } else {
+                            if (isSelected) emptyList() else listOf(item)
+                        }
+                        onSelectedItemsChange(newSelectedItems)
+                        expanded = isMultiSelect
+                    }
+                ) {
+                    Text(text = "${item.nombre} ${item.apellido}" + if (isSelected) " ✓" else "")
+                }
+            }
+        }
+    }
+}
