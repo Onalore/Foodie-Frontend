@@ -52,4 +52,7 @@
     <string name="who_eat_today">¿Quienes comen hoy?</string>
     <string name="send_score">Enviar puntuación</string>
     <string name="recipe_doesnt_happen">No hice la receta</string>
+    <string name="estimated_cost">Costo estimado</string>
+    <string name="lets_cook">Sí ¡A cocinar!</string>
+    <string name="keep_looking">No, seguir buscando</string>
 </resources>

@@ -18,4 +18,10 @@ object Constants {
         "Merienda",
         "Cena"
     )
+
+    val categories = listOf(
+        "Favoritas" to { },
+        "Historial" to { },
+        "Creadas" to { }
+    )
 }
