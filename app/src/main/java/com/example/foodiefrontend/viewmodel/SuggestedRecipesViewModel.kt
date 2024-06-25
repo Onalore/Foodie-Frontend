@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.DinersData
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.utils.dataStore
@@ -22,12 +24,17 @@ class SuggestedRecipesViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
-    fun fetchRecipes(context: Context) {
+    fun fetchRecipes(context: Context, comensales: List<Persona>, comida: String) {
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
                 Log.d("SuggestedRecipesViewModel", "fetchRecipes called with token $token")
-                val response = BackendApi.createRecipesService().getRecipes(token).awaitResponse()
+
+                val dinersData =
+                    DinersData(comensales, comida) // Ajusta la clase DinersData a tus necesidades
+                val response =
+                    BackendApi.createRecipesService().getRecipes(token, dinersData).awaitResponse()
+
                 if (response.isSuccessful) {
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)
@@ -50,13 +57,16 @@ class SuggestedRecipesViewModel : ViewModel() {
         }
     }
 
-    fun fetchRandomRecipes(context: Context) {
+
+    fun fetchRandomRecipes(context: Context, comensales: List<Persona>, comida: String) {
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
                 Log.d("SuggestedRecipesViewModel", "fetchRecipes called with token $token")
+                val dinersData = DinersData(comensales, comida)
                 val response =
-                    BackendApi.createRecipesService().randomRecipes(token).awaitResponse()
+                    BackendApi.createRecipesService().randomRecipes(token, dinersData)
+                        .awaitResponse()
                 if (response.isSuccessful) {
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)
