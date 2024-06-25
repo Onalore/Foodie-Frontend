@@ -233,6 +233,8 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
+            punctuation = true,
+            initialRating = 0
         )
     }
 }

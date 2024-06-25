@@ -46,4 +46,10 @@
     <string name="restrictions">Restricciones alimentarias</string>
     <string name="modify_family">Modificar familiar</string>
     <string name="delete_family">Eliminar familiar</string>
+    <string name="select_meal">Seleccionar comida</string>
+    <string name="select_diners">Seleccionar comensales</string>
+    <string name="alert_diners_text">Se preparará una receta especialmente para la cantidad de comensales y sus restricciones alimentarias</string>
+    <string name="who_eat_today">¿Quienes comen hoy?</string>
+    <string name="send_score">Enviar puntuación</string>
+    <string name="recipe_doesnt_happen">No hice la receta</string>
 </resources>

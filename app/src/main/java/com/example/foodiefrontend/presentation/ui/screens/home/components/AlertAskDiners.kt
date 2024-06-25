@@ -43,7 +43,7 @@ fun AlertAskDiners(
     grupoFamiliar: List<Persona>, // Pass the user's family group here
     userViewModel: UserViewModel = viewModel()
 ) {
-    var comensales by remember { mutableStateOf(emptyList<String>()) }
+    var comensales by remember { mutableStateOf(emptyList<Persona>()) }
     var comida by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -61,7 +61,7 @@ fun AlertAskDiners(
                         .padding(vertical = 30.dp)
                 )
                 Text(
-                    text = "¿Quienes comen hoy?",
+                    text = stringResource(R.string.who_eat_today),
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
@@ -76,22 +76,21 @@ fun AlertAskDiners(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Text(
-                    text = "Se preparará una receta especialmente para la cantidad de comensales y sus restricciones alimentarias",
+                    text = stringResource(R.string.alert_diners_text),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 CustomComboBox(
-                    selectedItems = comensales,
-                    onSelectedItemsChange = { comensales = it },
-                    label = "Seleccionar comensales",
-                    items = createNameList(grupoFamiliar), // Use grupoFamiliar here
-                    isMultiSelect = true
+                    selectedPerson = comensales,
+                    onSelectedPersonChange = { comensales = it },
+                    label = stringResource(R.string.select_diners),
+                    items = grupoFamiliar
                 )
                 CustomComboBox(
                     selectedItem = comida.toString(),
                     onSelectedItemChange = { comida = it },
-                    label = "Seleccionar comida",
+                    label = stringResource(R.string.select_meal),
                     items = Constants.comidas
                 )
             }
@@ -128,9 +127,6 @@ fun AlertAskDiners(
     )
 }
 
-private fun createNameList(personas: List<Persona>): List<String> {
-    return personas.map { "${it.nombre} ${it.apellido}" }
-}
 
 @Preview(showBackground = true)
 @Composable

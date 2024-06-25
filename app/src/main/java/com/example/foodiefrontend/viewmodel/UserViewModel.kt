@@ -376,7 +376,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun sendSelectedData(context: Context, comensales: List<String>, comida: String) {
+    fun sendSelectedData(context: Context, comensales: List<Persona>, comida: String) {
         viewModelScope.launch {
             val token = getToken(context)
             if (token != null) {
