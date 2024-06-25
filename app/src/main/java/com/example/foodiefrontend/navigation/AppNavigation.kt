@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.navigation
 
+import SuggestedRecipesScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,11 +22,10 @@ import com.example.foodiefrontend.presentation.ui.screens.familyConfig.AddFamily
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.FamilyConfigScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.ModifyFamilyScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
+import com.example.foodiefrontend.presentation.ui.screens.home.components.AlertScore
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.RandomRecipesScreen
-import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.SuggestedRecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
-import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertScore
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen

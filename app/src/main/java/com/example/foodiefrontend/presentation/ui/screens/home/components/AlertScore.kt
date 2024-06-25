@@ -1,4 +1,4 @@
-package com.example.foodiefrontend.presentation.ui.screens.profile.components
+package com.example.foodiefrontend.presentation.ui.screens.home.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +29,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.StarRating
 import com.example.foodiefrontend.viewmodel.UserViewModel
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun AlertScore(
@@ -45,6 +48,7 @@ fun AlertScore(
     var puntuacion by remember { mutableStateOf(0) }
     var isFavorite by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val decodedRecipeName = URLDecoder.decode(recipe.name, StandardCharsets.UTF_8.toString())
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -54,7 +58,7 @@ fun AlertScore(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = recipe.name,
+                    text = decodedRecipeName,
                     textAlign = TextAlign.Center,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold
@@ -107,7 +111,7 @@ fun AlertScore(
             CustomButton(
                 onClick = {
                     userViewModel.rateRecipe(context, puntuacion, isFavorite)
-                    setShowDialog(false)
+                    navController.navigate(AppScreens.HomeScreen.route)
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 text = stringResource(R.string.send_score),
@@ -118,7 +122,7 @@ fun AlertScore(
             CustomButton(
                 onClick = {
                     userViewModel.deleteTemporaryRecipe(context)
-                    setShowDialog(false)
+                    navController.navigate(AppScreens.HomeScreen.route)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 text = stringResource(R.string.recipe_doesnt_happen),
