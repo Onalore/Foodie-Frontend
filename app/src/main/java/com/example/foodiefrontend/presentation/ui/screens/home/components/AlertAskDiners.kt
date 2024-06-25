@@ -127,10 +127,6 @@ fun AlertAskDiners(
     )
 }
 
-private fun createNameList(personas: List<Persona>): List<String> {
-    return personas.map { "${it.nombre} ${it.apellido}" }
-}
-
 
 @Preview(showBackground = true)
 @Composable
