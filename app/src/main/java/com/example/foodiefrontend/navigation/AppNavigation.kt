@@ -26,6 +26,7 @@ import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertScore
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
+import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
@@ -55,13 +56,9 @@ fun AppNavigation(navController: NavHostController) {
             Log.d("AppNavigation", "Navigating to RegisterScreen")
             RegisterScreen(navController)
         }
-        composable(
-            route = "${AppScreens.HomeScreen.route}/{username}",
-            arguments = listOf(navArgument("username") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            Log.d("AppNavigation", "Navigating to HomeScreen with username: $username")
-            HomeScreen(navController, username)
+        composable(route = AppScreens.HomeScreen.route) {
+            Log.d("AppNavigation", "Navigating to HomeScreen")
+            HomeScreen(navController)
         }
         composable(AppScreens.RateRecipeScreen.route) { backStackEntry ->
             val recipeJson = backStackEntry.arguments?.getString("recipeJson")
@@ -78,7 +75,6 @@ fun AppNavigation(navController: NavHostController) {
                 )
             }
         }
-
         composable(
             route = AppScreens.RecipeScreen.route,
             arguments = listOf(navArgument("recipeJson") { type = NavType.StringType })
@@ -91,6 +87,9 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable(route = AppScreens.SuggestedRecipesScreen.route) {
             SuggestedRecipesScreen(navController)
+        }
+        composable(route = AppScreens.RecipesScreen.route) {
+            RecipesScreen(navController, userViewModel)
         }
         composable(route = AppScreens.RandomRecipesScreen.route) {
             RandomRecipesScreen(navController)

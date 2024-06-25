@@ -56,7 +56,6 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun HomeScreen(
     navController: NavController,
-    username: String,
     userViewModel: UserViewModel = viewModel(),
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -65,8 +64,10 @@ fun HomeScreen(
     val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
     val context = LocalContext.current
     val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState(null) // Observe temporaryRecipe
+    val userInfo by userViewModel.userInfo.observeAsState()
 
     LaunchedEffect(Unit) {
+        userViewModel.getUserInfo(context)
         userViewModel.getFamilyMembers(context)
         userViewModel.fetchFavoriteRecipes(context)
         userViewModel.fetchTemporaryRecipe(context)
@@ -101,7 +102,9 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Title(title = "${stringResource(R.string.hi)} $username")
+                        userInfo?.let { user ->
+                            Title(title = "${stringResource(R.string.hi)} ${user.persona.nombre}")
+                        }
 
                         Title(
                             title = stringResource(R.string.what_are_u_eating),

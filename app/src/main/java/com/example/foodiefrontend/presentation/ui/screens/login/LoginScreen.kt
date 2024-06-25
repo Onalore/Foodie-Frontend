@@ -70,14 +70,10 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
 
     LaunchedEffect(userInfo) {
         userInfo?.let {
-            val persona = it.persona
-            if (persona != null && persona.nombre != null) {
-                val username = persona.nombre
-                Log.d("LoginScreen", "Navigating to HomeScreen with username: $username (type: ${username::class.simpleName})")
-                // Navigate to HomeScreen with the user's name
-                navController.navigate("${AppScreens.HomeScreen.route}/$username")
-            } else {
-                Log.e("LoginScreen", "Persona or persona.nombre is null")
+            Log.d("LoginScreen", "Navigating to HomeScreen")
+            // Navigate to HomeScreen without passing username
+            navController.navigate(AppScreens.HomeScreen.route) {
+                popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
             }
         } ?: run {
             Log.e("LoginScreen", "User info is null")

@@ -20,9 +20,6 @@ interface RecipesService {
     @GET("recetas/random")
     fun randomRecipes(@Header("Authorization") token: String): Call<List<Recipe>>
 
-    @GET("recetas/favoritas")
-    suspend fun getFavoriteRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
-
     @GET("recetas/ver")
     suspend fun getTemporaryRecipe(@Header("Authorization") token: String): Response<TemporaryRecipeResponse>
 
@@ -34,6 +31,15 @@ interface RecipesService {
         @Header("Authorization") token: String,
         @Body ratingData: RatingData
     ): Response<Unit>
+
+    @GET("recetas/favoritas")
+    suspend fun getFavoriteRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
+
+    @GET("recetas/creadas")
+    suspend fun getCreatedRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
+
+    @GET("recetas/historial")
+    suspend fun getHistoryRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
 
     //enviado informacion comensales
     @POST("recetas/info")

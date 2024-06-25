@@ -60,6 +60,12 @@ class UserViewModel : ViewModel() {
     private val _temporaryRecipe = MutableLiveData<Recipe?>()
     val temporaryRecipe: MutableLiveData<Recipe?> get() = _temporaryRecipe
 
+    private val _createdRecipes = MutableLiveData<List<Recipe>?>()
+    val createdRecipes: LiveData<List<Recipe>?> = _createdRecipes
+
+    private val _historyRecipes = MutableLiveData<List<Recipe>?>()
+    val historyRecipes: LiveData<List<Recipe>?> = _historyRecipes
+
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
         viewModelScope.launch {
@@ -247,6 +253,7 @@ class UserViewModel : ViewModel() {
             })
         }
     }
+
     fun addFamilyMember(
         context: Context,
         nombre: String,
@@ -516,6 +523,51 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun fetchCreatedRecipes(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getCreatedRecipes("Bearer $token")
+                    if (response.isSuccessful) {
+                        _createdRecipes.postValue(response.body()?.recetas)
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching created recipes: ${response.message()}"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching created recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun fetchHistoryRecipes(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getHistoryRecipes("Bearer $token")
+                    if (response.isSuccessful) {
+                        _historyRecipes.postValue(response.body()?.recetas)
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching history recipes: ${response.message()}"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching history recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
 }
 
 
