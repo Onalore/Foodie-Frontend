@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.foodiefrontend.presentation.ui.screens.home
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,25 +30,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.navigation.AppScreens
-import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.components.Subtitle
 import com.example.foodiefrontend.presentation.ui.components.Title
-import com.example.foodiefrontend.presentation.ui.components.bottomNavigationBar.BottomNavigationBar
 import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertAskDiners
 import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesCardItem
+import com.example.foodiefrontend.viewmodel.UserViewModel
 import com.google.gson.Gson
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -57,10 +56,20 @@ import java.nio.charset.StandardCharsets
 fun HomeScreen(
     navController: NavController,
     username: String,
-    recipeInProgress: Recipe? = null
+    userViewModel: UserViewModel = viewModel(), // Add ViewModel here
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
+    val familyMembers by userViewModel.familyMembers.observeAsState(emptyList())
+    val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
+    val context = LocalContext.current
+    val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState(null) // Observe temporaryRecipe
+
+    LaunchedEffect(Unit) {
+        userViewModel.getFamilyMembers(context)
+        userViewModel.fetchFavoriteRecipes(context)
+        userViewModel.fetchTemporaryRecipe(context)
+    }
 
     if (showDialog) {
         AlertAskDiners(
@@ -68,7 +77,8 @@ fun HomeScreen(
             setShowDialog = { param ->
                 showDialog = param
             },
-            withStock = withStock
+            withStock = withStock,
+            grupoFamiliar = familyMembers // Pass it here
         )
     }
     Scaffold(
@@ -124,7 +134,7 @@ fun HomeScreen(
                         )
                     }
 
-                    if (recipeInProgress != null) {
+                    if (temporaryRecipe != null) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -138,11 +148,11 @@ fun HomeScreen(
                                     .fillMaxWidth()
                             )
                             RecipesCardItem(
-                                title = recipeInProgress.name,
-                                image = recipeInProgress.imageUrl,
+                                title = temporaryRecipe!!.name,
+                                image = temporaryRecipe!!.imageUrl,
                                 scored = false,
                                 onClick = {
-                                    val recipeJson = Gson().toJson(recipeInProgress)
+                                    val recipeJson = Gson().toJson(temporaryRecipe)
                                     val encodedRecipeJson =
                                         URLEncoder.encode(
                                             recipeJson,
@@ -167,9 +177,12 @@ fun HomeScreen(
                             .padding(start = 15.dp)
                             .fillMaxWidth()
                     )
-                    //Está de ejemplo, se debe borrar una vez que se envíe la info verdadera
-                    /* TODO */
-                    HorizontalCardList(items = SampleData.recipes)
+                    favoriteRecipes?.let {
+                        HorizontalCardList(
+                            items = it,
+                            navController = navController
+                        )
+                    }
                 }
             }
         }
@@ -177,13 +190,22 @@ fun HomeScreen(
 }
 
 @Composable
-fun HorizontalCardList(items: List<Recipe>) {
+fun HorizontalCardList(items: List<Recipe>, navController: NavController) {
     LazyRow(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            HomeCardItem(title = item.name, image = item.imageUrl, liked = item.liked)
+            HomeCardItem(title = item.name, image = item.imageUrl, liked = item.liked, onClick = {
+                val recipeJson = Gson().toJson(item)
+                val encodedRecipeJson =
+                    URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
+                Log.d(
+                    "Navigation",
+                    "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                )
+                navController.navigate(AppScreens.RecipeScreen.createRoute(encodedRecipeJson))
+            })
         }
     }
 }
@@ -193,9 +215,10 @@ fun HomeCardItem(
     title: String,
     image: String,
     liked: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
-    Box {
+    Box(modifier = Modifier.clickable(onClick = onClick)) {
         RoundedImage(
             image = image,
             modifier = Modifier
@@ -210,18 +233,6 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeContentPreview() {
-    FoodieFrontendTheme {
-        HomeScreen(
-            navController = rememberNavController(),
-            username = "Usuario",
-            recipeInProgress = SampleData.recipe
         )
     }
 }
