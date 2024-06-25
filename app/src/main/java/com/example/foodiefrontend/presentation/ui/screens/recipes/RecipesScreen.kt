@@ -31,17 +31,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.presentation.ui.screens.recipes.components.AlertFilter
+import com.example.foodiefrontend.utils.Constants
 
 @Composable
 fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
     var recipe by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
 
+    if(showDialog) {
+        AlertFilter(
+            navController = rememberNavController(),
+            setShowDialog = { showDialog = it }
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -61,7 +71,10 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
                         .weight(1f)
                         .padding(bottom = 30.dp)
                 )
-                ImageWithResource(resourceId = R.drawable.ic_filter)
+                ImageWithResource(
+                    resourceId = R.drawable.ic_filter,
+                    onClick = { showDialog = true }
+                )
             }
 
             CustomTextField(
@@ -82,15 +95,8 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            val categories = listOf(
-                "Todas" to { },
-                "Favoritas" to { },
-                "Vegetarianas" to { },
-                "Carnivoras" to { },
-                "Sin TACC" to { }
-            )
 
-            HorizontalButtonCategories(items = categories)
+            HorizontalButtonCategories(items = Constants.categories)
 
             if (recipes != null) VerticalRecipes(items = recipes)
         }
@@ -183,6 +189,7 @@ fun VerticalRecipes(items: List<Recipe>) {
 @Preview(showBackground = true)
 @Composable
 fun RecipesContentPreview() {
-
-    RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+    FoodieFrontendTheme {
+        RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+    }
 }

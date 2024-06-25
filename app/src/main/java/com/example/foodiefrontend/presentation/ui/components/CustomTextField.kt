@@ -90,7 +90,7 @@ fun CustomTextField(
                         resourceId = trailingIcon,
                         modifier = Modifier
                             .padding(end = 20.dp)
-                            .width(15.dp),
+                            .width(30.dp),
                         onClick = { onClickIcon() }
                     )
                 }
