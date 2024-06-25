@@ -39,12 +39,15 @@ fun AppNavigation(navController: NavHostController) {
         startDestination = AppScreens.WelcomeScreen.route
     ) {
         composable(route = AppScreens.WelcomeScreen.route) {
+            Log.d("AppNavigation", "Navigating to WelcomeScreen")
             WelcomeScreen(navController)
         }
         composable(route = AppScreens.LoginScreen.route) {
+            Log.d("AppNavigation", "Navigating to LoginScreen")
             LoginScreen(navController)
         }
         composable(route = AppScreens.RegisterScreen.route) {
+            Log.d("AppNavigation", "Navigating to RegisterScreen")
             RegisterScreen(navController)
         }
         composable(
@@ -52,10 +55,11 @@ fun AppNavigation(navController: NavHostController) {
             arguments = listOf(navArgument("username") { type = NavType.StringType })
         ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
+            Log.d("AppNavigation", "Navigating to HomeScreen with username: $username")
             HomeScreen(navController, username)
         }
         composable(
-            route = "recipe_screen/{recipeJson}",
+            route = AppScreens.RecipeScreen.route,
             arguments = listOf(navArgument("recipeJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val encodedRecipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""

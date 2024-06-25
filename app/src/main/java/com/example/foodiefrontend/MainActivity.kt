@@ -1,6 +1,7 @@
 package com.example.foodiefrontend
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -41,15 +42,20 @@ class MainActivity : ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
 
+                    Log.d("MainActivity", "Current route: $currentRoute")
+
                     Scaffold(
                         bottomBar = {
-                            when (currentRoute) {
-                                AppScreens.HomeScreen.route,
-                                AppScreens.RecipesScreen.route,
-                                AppScreens.StockScreen.route,
-                                AppScreens.ProfileScreen.route,
-                                AppScreens.FamilyConfigScreen.route
-                                -> {
+                            when {
+                                currentRoute?.startsWith(AppScreens.HomeScreen.route) == true || currentRoute?.startsWith(
+                                    AppScreens.RecipesScreen.route
+                                ) == true || currentRoute?.startsWith(AppScreens.StockScreen.route) == true || currentRoute?.startsWith(
+                                    AppScreens.ProfileScreen.route
+                                ) == true || currentRoute?.startsWith(AppScreens.FamilyConfigScreen.route) == true -> {
+                                    Log.d(
+                                        "MainActivity",
+                                        "Displaying BottomNavigationBar for route: $currentRoute"
+                                    )
                                     BottomNavigationBar(navController = navController)
                                 }
                             }

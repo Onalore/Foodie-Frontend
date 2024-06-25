@@ -46,6 +46,7 @@ fun SuggestedRecipesScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        Log.d("SuggestedRecipesScreen", "Fetching recipes")
         viewModel.fetchRecipes(context)
     }
 
@@ -83,7 +84,7 @@ fun SuggestedRecipesScreen(
                         val encodedRecipeJson =
                             URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
                         Log.d(
-                            "Navigation",
+                            "SuggestedRecipesScreen",
                             "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
                         )
                         navController.navigate(AppScreens.RecipeScreen.createRoute(encodedRecipeJson))
@@ -99,7 +100,7 @@ fun SuggestedRecipesScreen(
             ) {
                 CustomButton(
                     onClick = {
-                        //TODO
+                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.more_options),

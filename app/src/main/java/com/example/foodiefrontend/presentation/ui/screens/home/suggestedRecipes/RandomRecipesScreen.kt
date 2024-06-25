@@ -100,6 +100,7 @@ fun RandomRecipesScreen(
                 CustomButton(
                     onClick = {
                         //TODO
+                        navController.navigate(AppScreens.RandomRecipesScreen.route)
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.more_options),
