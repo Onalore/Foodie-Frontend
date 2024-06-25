@@ -26,6 +26,11 @@ interface RecipesService {
         @Body dinersData: DinersData
     ): Call<List<Recipe>>
 
+    @POST("recetas/guardar")
+    fun saveTemporaryRecipe(
+        @Header("Authorization") token: String,
+        @Body receta: Recipe,
+    ): Call<Unit>
     @GET("recetas/ver")
     suspend fun getTemporaryRecipe(@Header("Authorization") token: String): Response<TemporaryRecipeResponse>
 
@@ -47,10 +52,4 @@ interface RecipesService {
     @GET("recetas/historial")
     suspend fun getHistoryRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
 
-    //enviado informacion comensales
-    @POST("recetas/info")
-    suspend fun sendDinersData(
-        @Header("Authorization") token: String,
-        @Body data: DinersData
-    ): Response<Unit>
 }
