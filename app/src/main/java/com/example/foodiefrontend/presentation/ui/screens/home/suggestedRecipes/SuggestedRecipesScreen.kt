@@ -1,11 +1,12 @@
-package com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes
-
-import android.util.Log
+// Import necessary packages
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.navigation.AppScreens
@@ -49,12 +55,12 @@ fun SuggestedRecipesScreen(
     val viewModel: SuggestedRecipesViewModel = viewModel()
 
     LaunchedEffect(Unit) {
-        Log.d("SuggestedRecipesScreen", "Fetching recipes")
-        viewModel.fetchRecipes(context, comensales, comida) //
+        viewModel.fetchRecipes(context, comensales, comida)
     }
 
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
+    val isLoading by viewModel.isLoading.observeAsState(initial = true)
 
     Scaffold(
         topBar = {
@@ -70,47 +76,71 @@ fun SuggestedRecipesScreen(
         ) {
             Title(title = stringResource(R.string.suggests_for_you), textAlign = TextAlign.Start)
 
-            if (error != null) {
-                Text(
-                    text = error!!,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            if (isLoading) {
+                CookingAnimation()
+            } else {
+                if (error != null) {
+                    Text(
+                        text = error!!,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
 
-            recipes.forEach { item ->
-                RecipesCardItem(
-                    title = item.name,
-                    image = item.imageUrl,
-                    onClick = {
-                        val recipeJson = Gson().toJson(item)
-                        val encodedRecipeJson =
-                            URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
-                        Log.d(
-                            "SuggestedRecipesScreen",
-                            "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
-                        )
-                        navController.navigate(AppScreens.RecipeScreen.createRoute(encodedRecipeJson))
-                    }
-                )
-            }
+                recipes.forEach { item ->
+                    RecipesCardItem(
+                        title = item.name,
+                        image = item.imageUrl,
+                        onClick = {
+                            val recipeJson = Gson().toJson(item)
+                            val encodedRecipeJson =
+                                URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
+                            navController.navigate(
+                                AppScreens.RecipeScreen.createRoute(
+                                    encodedRecipeJson
+                                )
+                            )
+                        }
+                    )
+                }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .weight(1f),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                CustomButton(
-                    onClick = {
-                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
-                    },
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    text = stringResource(R.string.more_options),
-                )
-                Spacer(modifier = Modifier.height(50.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    CustomButton(
+                        onClick = {
+                            navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        text = stringResource(R.string.more_options),
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
             }
         }
+    }
+}
+
+@Composable
+fun CookingAnimation() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.cooking_animation))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+            modifier = Modifier.size(200.dp)
+        )
     }
 }
 

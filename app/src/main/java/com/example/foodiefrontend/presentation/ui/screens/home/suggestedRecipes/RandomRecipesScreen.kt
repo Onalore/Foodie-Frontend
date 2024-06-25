@@ -1,6 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes
 
-import android.util.Log
+import CookingAnimation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -54,6 +54,7 @@ fun RandomRecipesScreen(
 
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
+    val isLoading by viewModel.isLoading.observeAsState(initial = true)
 
     Scaffold(
         topBar = {
@@ -69,46 +70,49 @@ fun RandomRecipesScreen(
         ) {
             Title(title = stringResource(R.string.suggests_for_you), textAlign = TextAlign.Start)
 
-            if (error != null) {
-                Text(
-                    text = error!!,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            if (isLoading) {
+                CookingAnimation()
+            } else {
+                if (error != null) {
+                    Text(
+                        text = error!!,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
 
-            recipes.forEach { item ->
-                RecipesCardItem(
-                    title = item.name,
-                    image = item.imageUrl,
-                    onClick = {
-                        val recipeJson = Gson().toJson(item)
-                        val encodedRecipeJson =
-                            URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
-                        Log.d(
-                            "Navigation",
-                            "Navigating to RecipeScreen with encoded recipe JSON: $encodedRecipeJson"
-                        )
-                        navController.navigate(AppScreens.RecipeScreen.createRoute(encodedRecipeJson))
-                    }
-                )
-            }
+                recipes.forEach { item ->
+                    RecipesCardItem(
+                        title = item.name,
+                        image = item.imageUrl,
+                        onClick = {
+                            val recipeJson = Gson().toJson(item)
+                            val encodedRecipeJson =
+                                URLEncoder.encode(recipeJson, StandardCharsets.UTF_8.toString())
+                            navController.navigate(
+                                AppScreens.RecipeScreen.createRoute(
+                                    encodedRecipeJson
+                                )
+                            )
+                        }
+                    )
+                }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .weight(1f),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                CustomButton(
-                    onClick = {
-                        //TODO
-                        navController.navigate(AppScreens.RandomRecipesScreen.route)
-                    },
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    text = stringResource(R.string.more_options),
-                )
-                Spacer(modifier = Modifier.height(50.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    CustomButton(
+                        onClick = {
+                            navController.navigate(AppScreens.RandomRecipesScreen.route)
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        text = stringResource(R.string.more_options),
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
             }
         }
     }
@@ -120,6 +124,7 @@ fun PreviewRandomRecipes() {
     val navController = rememberNavController()
     val comensales = listOf<Persona>()
     val comida = "Desayuno"
+
     FoodieFrontendTheme {
         RandomRecipesScreen(navController = navController, comensales = comensales, comida = comida)
     }
