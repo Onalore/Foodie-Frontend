@@ -20,9 +20,8 @@ object Constants {
     )
 
     val categories = listOf(
-        "Todas" to { },
         "Favoritas" to { },
-        "Creadas" to { },
-        "Historial" to { }
+        "Historial" to { },
+        "Creadas" to { }
     )
 }

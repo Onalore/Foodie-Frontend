@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +47,8 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
     var recipe by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
 
+    var selectedButtonIndex by remember { mutableIntStateOf(0) }
+
     if(showDialog) {
         AlertFilter(
             navController = rememberNavController(),
@@ -71,10 +74,12 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
                         .weight(1f)
                         .padding(bottom = 30.dp)
                 )
-                ImageWithResource(
-                    resourceId = R.drawable.ic_filter,
-                    onClick = { showDialog = true }
-                )
+                if (selectedButtonIndex != 2) {
+                    ImageWithResource(
+                        resourceId = R.drawable.ic_filter,
+                        onClick = { showDialog = true }
+                    )
+                }
             }
 
             CustomTextField(
@@ -96,7 +101,13 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
             horizontalAlignment = Alignment.Start
         ) {
 
-            HorizontalButtonCategories(items = Constants.categories)
+            HorizontalButtonCategories(
+                items = Constants.categories,
+                selectedButtonIndex = selectedButtonIndex,
+                setSelectedButtonIndex = { selected ->
+                    selectedButtonIndex = selected
+                }
+            )
 
             if (recipes != null) VerticalRecipes(items = recipes)
         }
@@ -141,8 +152,12 @@ fun RecipesCardItem(
 }
 
 @Composable
-fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {
-    var selectedButtonIndex by remember { mutableStateOf(0) }
+fun HorizontalButtonCategories(
+    items: List<Pair<String, () -> Unit>>,
+    selectedButtonIndex: Int,
+    setSelectedButtonIndex: (Int) -> Unit
+) {
+
     LazyRow(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -152,7 +167,7 @@ fun HorizontalButtonCategories(items: List<Pair<String, () -> Unit>>) {
                 CustomButton(
                     text = item.first,
                     onClick = {
-                        selectedButtonIndex = index
+                        setSelectedButtonIndex(index)
                         item.second()
                     },
                     containerColor = if (selectedButtonIndex == index) MaterialTheme.colorScheme.primary else Color.Transparent,
