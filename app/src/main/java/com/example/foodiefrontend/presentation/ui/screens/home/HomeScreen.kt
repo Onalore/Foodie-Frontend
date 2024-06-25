@@ -138,7 +138,7 @@ fun HomeScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(vertical = 30.dp, horizontal = 15.dp),
+                                .padding(top = 30.dp, start = 15.dp, end = 15.dp),
                             verticalArrangement = Arrangement.spacedBy(20.dp),
                             horizontalAlignment = Alignment.Start
                         ) {
@@ -174,7 +174,7 @@ fun HomeScreen(
                     Subtitle(
                         title = "Tus recetas favoritas",
                         modifier = Modifier
-                            .padding(start = 15.dp)
+                            .padding(start = 15.dp, top = 30.dp)
                             .fillMaxWidth()
                     )
                     favoriteRecipes?.let {
