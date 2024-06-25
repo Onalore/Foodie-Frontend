@@ -33,6 +33,7 @@ import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
 import com.example.foodiefrontend.utils.Constants
+import com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel
 import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @Composable
@@ -40,8 +41,9 @@ fun AlertAskDiners(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
     withStock: Boolean,
-    grupoFamiliar: List<Persona>, // Pass the user's family group here
-    userViewModel: UserViewModel = viewModel()
+    grupoFamiliar: List<Persona>,
+    userViewModel: UserViewModel = viewModel(),
+    suggestedRecipesViewModel: SuggestedRecipesViewModel = viewModel()
 ) {
     var comensales by remember { mutableStateOf(emptyList<Persona>()) }
     var comida by remember { mutableStateOf("") }
@@ -109,14 +111,22 @@ fun AlertAskDiners(
             CustomButton(
                 onClick = {
                     Log.d("AlertAskDiners", "Confirm button clicked")
-                    userViewModel.sendSelectedData(context, comensales, comida)
+                    suggestedRecipesViewModel.fetchRecipes(context, comensales, comida)
                     setShowDialog(false)
                     if (withStock) {
-                        Log.d("AlertAskDiners", "Navigating to SuggestedRecipesScreen")
-                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                        navController.navigate(
+                            AppScreens.SuggestedRecipesScreen.createRoute(
+                                comensales,
+                                comida
+                            )
+                        )
                     } else {
-                        Log.d("AlertAskDiners", "Navigating to RandomRecipesScreen")
-                        navController.navigate(AppScreens.RandomRecipesScreen.route)
+                        navController.navigate(
+                            AppScreens.RandomRecipesScreen.createRoute(
+                                comensales,
+                                comida
+                            )
+                        )
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,

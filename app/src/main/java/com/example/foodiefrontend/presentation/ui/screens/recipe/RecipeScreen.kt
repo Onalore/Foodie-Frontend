@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
@@ -41,6 +41,7 @@ import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.screens.recipe.components.AlertGoingToCook
+import com.example.foodiefrontend.viewmodel.UserViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -50,6 +51,7 @@ fun RecipeScreen(
     price: Int? = null
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    val userViewModel: UserViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         delay(30000L) // 30 segundos de retraso
@@ -61,7 +63,9 @@ fun RecipeScreen(
             navController = rememberNavController(),
             setShowDialog = { param ->
                 showDialog = param
-            }
+            },
+            userViewModel,
+            recipe = recipe
         )
     }
 

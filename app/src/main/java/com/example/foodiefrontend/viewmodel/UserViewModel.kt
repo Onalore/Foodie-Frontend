@@ -9,10 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.AuthResponse
-import com.example.foodiefrontend.data.DinersData
+import com.example.foodiefrontend.data.FilterCriteria
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
+import com.example.foodiefrontend.data.RatingData
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.RegisterResponse
 import com.example.foodiefrontend.data.User
@@ -21,7 +22,6 @@ import com.example.foodiefrontend.service.Config
 import com.example.foodiefrontend.service.RecipesService
 import com.example.foodiefrontend.service.UserService
 import com.example.foodiefrontend.utils.dataStore
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.HttpException
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -58,6 +58,15 @@ class UserViewModel : ViewModel() {
 
     private val _temporaryRecipe = MutableLiveData<Recipe?>()
     val temporaryRecipe: MutableLiveData<Recipe?> get() = _temporaryRecipe
+
+    private val _createdRecipes = MutableLiveData<List<Recipe>?>()
+    val createdRecipes: LiveData<List<Recipe>?> = _createdRecipes
+
+    private val _historyRecipes = MutableLiveData<List<Recipe>?>()
+    val historyRecipes: LiveData<List<Recipe>?> = _historyRecipes
+
+    private val _filteredRecipes = MutableLiveData<List<Recipe>?>()
+    val filteredRecipes: LiveData<List<Recipe>?> = _filteredRecipes
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
@@ -246,6 +255,7 @@ class UserViewModel : ViewModel() {
             })
         }
     }
+
     fun addFamilyMember(
         context: Context,
         nombre: String,
@@ -375,27 +385,6 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun sendSelectedData(context: Context, comensales: List<Persona>, comida: String) {
-        viewModelScope.launch {
-            val token = getToken(context)
-            if (token != null) {
-                try {
-                    val response =
-                        apiRecipeService.sendDinersData(token, DinersData(comensales, comida))
-                    if (response.isSuccessful) {
-                        // Manejar respuesta exitosa
-                        val responseBody = response.body()
-                    } else {
-                        // Manejar respuestas de error no exitosas
-                        Log.e("API_ERROR", "Error: ${response.code()} ${response.message()}")
-                    }
-                } catch (e: HttpException) {
-                    Log.e("API_ERROR", "HttpException: ${e.message}")
-                }
-            }
-        }
-    }
-
     fun fetchFavoriteRecipes(context: Context) {
         viewModelScope.launch {
             val token = getToken(context)
@@ -463,6 +452,160 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun rateRecipe(context: Context, puntuacion: Int, favorita: Boolean) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val ratingData = RatingData(puntuacion, favorita)
+                    val response = apiRecipeService.rateRecipe("Bearer $token", ratingData)
+                    if (response.isSuccessful) {
+                        Log.d("UserViewModel", "Recipe rated successfully")
+                        fetchTemporaryRecipe(context) // Refresh temporary recipe
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error rating recipe: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error rating recipe: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun deleteTemporaryRecipe(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.deleteTemporaryRecipe("Bearer $token")
+                    if (response.isSuccessful) {
+                        Log.d("UserViewModel", "Temporary recipe deleted successfully")
+                        fetchTemporaryRecipe(context) // Refresh temporary recipe
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error deleting temporary recipe: ${response.code()} ${response.message()}"
+                        )
+                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error deleting temporary recipe: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun fetchCreatedRecipes(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getCreatedRecipes("Bearer $token")
+                    if (response.isSuccessful) {
+                        _createdRecipes.postValue(response.body()?.recetas)
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching created recipes: ${response.message()}"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching created recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun fetchHistoryRecipes(context: Context) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                try {
+                    val response = apiRecipeService.getHistoryRecipes("Bearer $token")
+                    if (response.isSuccessful) {
+                        _historyRecipes.postValue(response.body()?.recetas)
+                    } else {
+                        Log.e(
+                            "UserViewModel",
+                            "Error fetching history recipes: ${response.message()}"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error fetching history recipes: ${e.message}")
+                }
+            } else {
+                Log.e("UserViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun filterRecipes(recipes: List<Recipe>?, criteria: FilterCriteria) {
+        if (recipes == null) return
+
+        Log.d("UserViewModel", "Filter criteria: $criteria")
+        Log.d("UserViewModel", "Recipes before filtering: ${recipes.size}")
+
+        recipes.forEach { recipe ->
+            Log.d("UserViewModel", "Recipe: ${recipe.name}, Rating: ${recipe.rating}")
+        }
+
+        val filtered = recipes.filter { recipe ->
+            criteria.minRating?.let { minRating ->
+                recipe.rating >= minRating
+            } ?: true
+        }
+
+        Log.d("UserViewModel", "Recipes after filtering: ${filtered.size}")
+        _filteredRecipes.postValue(filtered)
+    }
+
+    fun clearFilteredRecipes() {
+        _filteredRecipes.postValue(null)
+        Log.d("UserViewModel", "Filtered recipes cleared")
+    }
+
+    fun saveTemporaryRecipe(context: Context, recipe: Recipe, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                apiRecipeService.saveTemporaryRecipe("Bearer $token", recipe)
+                    .enqueue(object : Callback<Unit> {
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            if (response.isSuccessful) {
+                                Log.d("UserViewModel", "Temporary recipe saved successfully")
+                                onResult(true)
+                            } else {
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error saving temporary recipe: ${response.message()}"
+                                )
+                                onResult(false)
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            Log.e("UserViewModel", "Error saving temporary recipe: ${t.message}")
+                            onResult(false)
+                        }
+                    })
+            } else {
+                Log.e("UserViewModel", "Token not found")
+                onResult(false)
+            }
+        }
+    }
+
 
 }
 

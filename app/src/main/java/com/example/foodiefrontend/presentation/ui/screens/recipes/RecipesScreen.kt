@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipes
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,14 +27,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
@@ -40,21 +45,41 @@ import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
 import com.example.foodiefrontend.presentation.ui.components.Title
 import com.example.foodiefrontend.presentation.ui.screens.recipes.components.AlertFilter
-import com.example.foodiefrontend.utils.Constants
+import com.example.foodiefrontend.viewmodel.UserViewModel
+import com.google.gson.Gson
 
 @Composable
-fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
+fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
     var recipe by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-
     var selectedButtonIndex by remember { mutableIntStateOf(0) }
 
-    if(showDialog) {
+    val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState()
+    val createdRecipes by userViewModel.createdRecipes.observeAsState()
+    val historyRecipes by userViewModel.historyRecipes.observeAsState()
+    val filteredRecipes by userViewModel.filteredRecipes.observeAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        userViewModel.fetchFavoriteRecipes(context)
+        userViewModel.fetchCreatedRecipes(context)
+        userViewModel.fetchHistoryRecipes(context)
+    }
+
+    if (showDialog) {
         AlertFilter(
             navController = rememberNavController(),
-            setShowDialog = { showDialog = it }
+            setShowDialog = { showDialog = it },
+            applyFilter = { criteria ->
+                Log.d("RecipesScreen", "Applying filter: $criteria")
+                when (selectedButtonIndex) {
+                    0 -> userViewModel.filterRecipes(favoriteRecipes, criteria)
+                    2 -> userViewModel.filterRecipes(historyRecipes, criteria)
+                }
+            }
         )
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -74,7 +99,7 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
                         .weight(1f)
                         .padding(bottom = 30.dp)
                 )
-                if (selectedButtonIndex != 2) {
+                if (selectedButtonIndex != 1) { // Mostrar filtro solo en Favoritas e Historial
                     ImageWithResource(
                         resourceId = R.drawable.ic_filter,
                         onClick = { showDialog = true }
@@ -100,19 +125,65 @@ fun RecipesScreen(navController: NavController, recipes: List<Recipe>? = null) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.Start
         ) {
-
             HorizontalButtonCategories(
-                items = Constants.categories,
+                items = listOf(
+                    "Favoritas" to {
+                        userViewModel.fetchFavoriteRecipes(context)
+                        userViewModel.clearFilteredRecipes() // Restablecer filtro
+                    },
+                    "Creadas" to { userViewModel.fetchCreatedRecipes(context) },
+                    "Historial" to {
+                        userViewModel.fetchHistoryRecipes(context)
+                        userViewModel.clearFilteredRecipes() // Restablecer filtro
+                    }
+                ),
                 selectedButtonIndex = selectedButtonIndex,
                 setSelectedButtonIndex = { selected ->
                     selectedButtonIndex = selected
                 }
             )
 
-            if (recipes != null) VerticalRecipes(items = recipes)
+            when (selectedButtonIndex) {
+                0 -> filteredRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying filtered favorite recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                } ?: favoriteRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying favorite recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                }
+
+                1 -> createdRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying created recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                }
+
+                2 -> filteredRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying filtered history recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                } ?: historyRecipes?.let {
+                    Log.d("RecipesScreen", "Displaying created recipes: ${it.size}")
+                    VerticalRecipes(
+                        items = it,
+                        navController = navController
+                    )
+                }
+            }
         }
     }
 }
+
 
 @Composable
 fun RecipesCardItem(
@@ -157,7 +228,6 @@ fun HorizontalButtonCategories(
     selectedButtonIndex: Int,
     setSelectedButtonIndex: (Int) -> Unit
 ) {
-
     LazyRow(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -182,7 +252,7 @@ fun HorizontalButtonCategories(
 }
 
 @Composable
-fun VerticalRecipes(items: List<Recipe>) {
+fun VerticalRecipes(items: List<Recipe>, navController: NavController) {
     var selectedButtonIndex by remember { mutableStateOf(0) }
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
@@ -194,17 +264,25 @@ fun VerticalRecipes(items: List<Recipe>) {
                     title = item.name,
                     initialRating = item.rating,
                     image = item.imageUrl,
-                    liked = item.liked
+                    liked = item.liked,
+                    onClick = {
+                        val recipeJson = Uri.encode(Gson().toJson(item))
+                        val route = AppScreens.RecipeScreen.createRoute(recipeJson)
+                        navController.navigate(route)
+                    }
                 )
             }
         }
     }
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun RecipesContentPreview() {
     FoodieFrontendTheme {
-        RecipesScreen(navController = rememberNavController(), SampleData.recipes)
+        val navController = rememberNavController()
+        val userViewModel: UserViewModel = viewModel()
+        RecipesScreen(navController = navController, userViewModel = userViewModel)
     }
 }

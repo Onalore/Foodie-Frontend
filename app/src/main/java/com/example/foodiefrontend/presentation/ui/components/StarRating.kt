@@ -60,8 +60,7 @@ private fun Star(
 
     ImageWithResource(
         resourceId = starIcon,
-        modifier = Modifier.size(width)
-            .clickable(onClick = { onClick() }),
+        onClick = { onClick() },
         colorFilter = ColorFilter.tint(Color(0xFFE8BB66))
     )
 }

@@ -51,7 +51,7 @@ fun BottomNavigationBar(
                     Log.d("BottomNavigationBar", "Navigating to: ${item.route}")
 
                     if (item.route == AppScreens.HomeScreen.route) {
-                        navController.navigate("${AppScreens.HomeScreen.route}/") {
+                        navController.navigate(AppScreens.HomeScreen.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
