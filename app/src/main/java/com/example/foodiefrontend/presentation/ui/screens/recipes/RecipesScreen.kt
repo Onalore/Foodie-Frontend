@@ -217,7 +217,8 @@ fun RecipesCardItem(
                 .height(120.dp),
             punctuation = false,
             initialRating = initialRating ?: 0,
-            scored = scored
+            scored = scored,
+            onClickScore = { onClick() }
         )
     }
 }
