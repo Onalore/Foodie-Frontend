@@ -1,6 +1,5 @@
 package com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes
 
-import CookingAnimation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.navigation.AppScreens
@@ -47,14 +50,16 @@ fun RandomRecipesScreen(
 ) {
     val context = LocalContext.current
     val viewModel: SuggestedRecipesViewModel = viewModel()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchRandomRecipes(context, comensales, comida)
-    }
-
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(initial = true)
+
+    // Mostrar animación de carga hasta que las recetas se carguen
+    LaunchedEffect(Unit) {
+        if (recipes.isEmpty()) {
+            viewModel.fetchRandomRecipes(context, comensales, comida)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -106,7 +111,11 @@ fun RandomRecipesScreen(
                 ) {
                     CustomButton(
                         onClick = {
-                            navController.navigate(AppScreens.RandomRecipesScreen.route)
+                            viewModel.fetchRandomRecipes(
+                                context,
+                                comensales,
+                                comida
+                            ) // Se obtienen nuevas recetas al hacer clic
                         },
                         containerColor = MaterialTheme.colorScheme.secondary,
                         text = stringResource(R.string.more_options),
@@ -116,6 +125,15 @@ fun RandomRecipesScreen(
             }
         }
     }
+}
+
+@Composable
+fun CookingAnimation() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.cooking_animation))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
 }
 
 @Preview(showBackground = true)
