@@ -71,8 +71,8 @@ fun AlertIngredientScanned(
     val addProductResult by viewModel.addProductResult.observeAsState()
 
     var shortageAlert by remember { mutableStateOf(false) }
-    var quantity by remember { mutableStateOf(productType?.quantity) }
-    var unit by remember { mutableStateOf(productType?.unit) }
+    var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
+    var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
     var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
 
     AlertDialog(
@@ -134,10 +134,10 @@ fun AlertIngredientScanned(
                                 .padding(start = 40.dp)
                         ) {
                             IngredientQuantity(
-                                quantity = quantity,
+                                quantity = quantity.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
+                                onDecrement = { if (quantity > 0) quantity-- },
+                                onIncrement = { quantity++ }
                             )
                             Text(
                                 text = productType?.unitMesure?.let {
@@ -159,10 +159,10 @@ fun AlertIngredientScanned(
                                 .padding(start = 40.dp)
                         ) {
                             IngredientQuantity(
-                                quantity = unit,
+                                quantity = unit.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
+                                onDecrement = { if (unit > 0) unit-- },
+                                onIncrement = { unit++ }
                             )
                             Text(
                                 text = "u.",
@@ -203,8 +203,10 @@ fun AlertIngredientScanned(
                             IngredientQuantity(
                                 quantity = alertaEscasez.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ },
+                                onDecrement = {
+                                    if (alertaEscasez!! > 0) alertaEscasez = alertaEscasez!! - 1
+                                },
+                                onIncrement = { alertaEscasez = alertaEscasez!! + 1 },
                                 available = shortageAlert
                             )
                             Text(
