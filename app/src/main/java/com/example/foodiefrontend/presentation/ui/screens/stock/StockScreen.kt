@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -77,14 +75,13 @@ fun StockScreen(
         viewModel.getUserStock(context)
     }
 
-    if(showManualDialog && ingredientSelected != null) {
+    if (showManualDialog && ingredientSelected != null) {
         AlertIngredientManual(
             navController = navController,
-            setShowDialog = {showManualDialog = it},
+            setShowDialog = { showManualDialog = it },
             productType = ingredientSelected
         )
-    }
-    else if (showDialog && codeEan != null) {
+    } else if (showDialog && codeEan != null) {
         AlertIngredientScanned(
             navController = navController,
             setShowDialog = { param ->
@@ -204,6 +201,18 @@ fun IngredientCard(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "${ingredient.quantity} ${ingredient.unitMesure}",
+                    fontSize = 16.sp
+                )
+            }
             Image(
                 painter = if (ingredient.imageUrl.isNotEmpty()) {
                     rememberAsyncImagePainter(ingredient.imageUrl)
@@ -230,10 +239,10 @@ fun Preview() {
 
     FoodieFrontendTheme {
 
-        if(showManualDialog && ingredientSelected != null) {
+        if (showManualDialog && ingredientSelected != null) {
             AlertIngredientManual(
                 navController = rememberNavController(),
-                setShowDialog = {showManualDialog = it},
+                setShowDialog = { showManualDialog = it },
                 productType = ingredientSelected
             )
         }
@@ -312,7 +321,8 @@ fun Preview() {
                                         setIngredientScan = {
                                             ingredientSelected = ingredient
                                         }
-                                    )                                }
+                                    )
+                                }
                             }
                         }
                     }
