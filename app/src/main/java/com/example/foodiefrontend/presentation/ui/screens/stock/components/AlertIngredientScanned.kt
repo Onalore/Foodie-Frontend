@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,14 +39,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Ingredient
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
@@ -143,7 +140,12 @@ fun AlertIngredientScanned(
                                 onIncrement = { /*TODO*/ }
                             )
                             Text(
-                                text = productType!!.unitMesure,
+                                text = productType?.unitMesure?.let {
+                                    if (it.length >= 2) it.substring(
+                                        0,
+                                        2
+                                    ) else ""
+                                } ?: "",
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -206,7 +208,12 @@ fun AlertIngredientScanned(
                                 available = shortageAlert
                             )
                             Text(
-                                text = productType!!.unitMesure,
+                                text = productType?.unitMesure?.let {
+                                    if (it.length >= 2) it.substring(
+                                        0,
+                                        2
+                                    ) else ""
+                                } ?: "",
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -380,7 +387,12 @@ private fun Preview() {
                                         onIncrement = { /*TODO*/ }
                                     )
                                     Text(
-                                        text = productType.unitMesure,
+                                        text = productType?.unitMesure?.let {
+                                            if (it.length >= 2) it.substring(
+                                                0,
+                                                2
+                                            ) else ""
+                                        } ?: "",
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -443,7 +455,12 @@ private fun Preview() {
                                         available = shortageAlert
                                     )
                                     Text(
-                                        text = productType.unitMesure,
+                                        text = productType?.unitMesure?.let {
+                                            if (it.length >= 2) it.substring(
+                                                0,
+                                                2
+                                            ) else ""
+                                        } ?: "",
                                         textAlign = TextAlign.Center
                                     )
                                 }
