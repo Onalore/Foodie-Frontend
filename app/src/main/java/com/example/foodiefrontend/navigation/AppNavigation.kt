@@ -28,6 +28,7 @@ import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
+import com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe.NewRecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
@@ -118,6 +119,9 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable(route = AppScreens.RecipesScreen.route) {
             RecipesScreen(navController, userViewModel)
+        }
+        composable(AppScreens.NewRecipeScreen.route) {
+            NewRecipeScreen(navController, userViewModel)
         }
         composable(route = AppScreens.StockScreen.route) {
             StockScreen(navController)

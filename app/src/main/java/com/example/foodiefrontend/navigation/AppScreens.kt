@@ -20,6 +20,8 @@ sealed class AppScreens(val route: String) {
         fun createRoute(recipeJson: String) = "recipe_screen/$recipeJson"
     }
 
+    object NewRecipeScreen : AppScreens("new_recipe_screen")
+
     object SuggestedRecipesScreen : AppScreens("suggested_recipes_screen/{comensales}/{comida}") {
         fun createRoute(comensales: List<Persona>, comida: String): String {
             val encodedComensales =

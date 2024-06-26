@@ -606,7 +606,38 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun createRecipe(context: Context, recipe: Recipe, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val token = getToken(context)
+            if (token != null) {
+                val recipeJson = Gson().toJson(recipe)
+                Log.d("UserViewModel", "Recipe JSON: $recipeJson")
+                apiRecipeService.createRecipe("Bearer $token", recipe)
+                    .enqueue(object : Callback<Unit> {
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            if (response.isSuccessful) {
+                                Log.d("UserViewModel", "Recipe created successfully")
+                                onResult(true)
+                            } else {
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error creating recipe: ${response.message()}"
+                                )
+                                onResult(false)
+                            }
+                        }
 
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            Log.e("UserViewModel", "Error creating recipe: ${t.message}")
+                            onResult(false)
+                        }
+                    })
+            } else {
+                Log.e("UserViewModel", "Token not found")
+                onResult(false)
+            }
+        }
+    }
 }
 
 
