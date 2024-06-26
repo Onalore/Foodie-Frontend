@@ -80,7 +80,7 @@ fun RecipeScreen(
             CustomToolbar(
                 navController = navController,
                 title = "",
-                onClick = { showDialog = true }
+                onClick = { navController.popBackStack() }
             )
         }
     ) { innerPadding ->
