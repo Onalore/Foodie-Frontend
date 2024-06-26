@@ -9,5 +9,7 @@ data class Recipe(
     @SerializedName("liked") val liked: Boolean = false,
     @SerializedName("ingredients") val ingredients: List<Ingredient> = listOf(),
     @SerializedName("steps") val preparation: List<String> = listOf(),
-    @SerializedName("timeOfPrep") val timeOfPrep: Int = 0
+    @SerializedName("timeOfPrep") val timeOfPrep: Int = 0,
+    @SerializedName("costoEstimado") val price: Double = 0.0,
+    @SerializedName("usaStock") val usaStock: Boolean = false,
 )

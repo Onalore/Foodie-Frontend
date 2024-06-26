@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipe
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,13 +48,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun RecipeScreen(
     navController: NavController,
-    recipe: Recipe,
-    price: Int? = null
+    recipe: Recipe
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val userViewModel: UserViewModel = viewModel()
 
     LaunchedEffect(Unit) {
+        Log.d("RecipeScreen: ", recipe.toString())
         delay(30000L) // 30 segundos de retraso
         showDialog = true
     }
@@ -118,7 +119,7 @@ fun RecipeScreen(
         }
 
         item {
-            if (price != null) {
+            if (!recipe.usaStock && recipe.price > 0) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -142,7 +143,7 @@ fun RecipeScreen(
                             )
                         )
                         Text(
-                            text = "$ $price",
+                            text = "$ ${recipe.price}",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -244,8 +245,7 @@ private fun Preview() {
     FoodieFrontendTheme {
         RecipeScreen(
             rememberNavController(),
-            recipe = recipe,
-            price = 490
+            recipe = recipe
         )
     }
 }

@@ -21,14 +21,19 @@ class SuggestedRecipesViewModel : ViewModel() {
     private val _recipes = MutableLiveData<List<Recipe>>()
     val recipes: LiveData<List<Recipe>> get() = _recipes
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
     private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    init {
+        _isLoading.value = false
+    }
 
     fun fetchRecipes(context: Context, comensales: List<Persona>, comida: String) {
         _isLoading.value = true
+        _error.value = null
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
@@ -58,13 +63,15 @@ class SuggestedRecipesViewModel : ViewModel() {
                 Log.d("SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
                 _error.postValue("Error de excepción: ${e.message}")
             } finally {
-                _isLoading.postValue(false)
+                _isLoading.value = false
             }
         }
     }
 
     fun fetchRandomRecipes(context: Context, comensales: List<Persona>, comida: String) {
         _isLoading.value = true
+        _error.value = null
+
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
@@ -94,7 +101,7 @@ class SuggestedRecipesViewModel : ViewModel() {
                 Log.d("SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
                 _error.postValue("Error de excepción: ${e.message}")
             } finally {
-                _isLoading.postValue(false)
+                _isLoading.value = false
             }
         }
     }

@@ -53,14 +53,16 @@ fun SuggestedRecipesScreen(
 ) {
     val context = LocalContext.current
     val viewModel: SuggestedRecipesViewModel = viewModel()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchRecipes(context, comensales, comida)
-    }
-
     val recipes by viewModel.recipes.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(initial = true)
+
+    // Mostrar animación de carga hasta que las recetas se carguen
+    LaunchedEffect(Unit) {
+        if (recipes.isEmpty()) {
+            viewModel.fetchRecipes(context, comensales, comida)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -112,7 +114,11 @@ fun SuggestedRecipesScreen(
                 ) {
                     CustomButton(
                         onClick = {
-                            navController.navigate(AppScreens.SuggestedRecipesScreen.route)
+                            viewModel.fetchRecipes(
+                                context,
+                                comensales,
+                                comida
+                            ) // Se obtienen nuevas recetas al hacer clic
                         },
                         containerColor = MaterialTheme.colorScheme.secondary,
                         text = stringResource(R.string.more_options),

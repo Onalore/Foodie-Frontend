@@ -72,7 +72,6 @@ fun AlertGoingToCook(
             CustomButton(
                 onClick = {
                     setShowDialog(false)
-                    setShowDialog(false)
                     viewModel.saveTemporaryRecipe(context, recipe) { success ->
                         Log.d("AlertGoingToCook: ", success.toString())
                         if (success) {
@@ -92,6 +91,7 @@ fun AlertGoingToCook(
             CustomButton(
                 onClick = {
                     navController.navigateUp()
+                    setShowDialog(false)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 text = stringResource(R.string.keep_looking),
