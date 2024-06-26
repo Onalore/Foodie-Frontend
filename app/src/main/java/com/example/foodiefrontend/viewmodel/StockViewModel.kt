@@ -51,7 +51,7 @@ class StockViewModel : ViewModel() {
                     val ingredient = eanResponse?.let {
                         Ingredient(
                             description = it.tipo ?: "",
-                            unit = it.unidad ?: "",
+                            unitMesure = it.unidadMedida ?: "",
                             imageUrl = it.imageUrl ?: ""
                         )
                     }
