@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.StockService
@@ -34,6 +35,12 @@ class StockViewModel : ViewModel() {
     private val _stockResult = MutableLiveData<List<Ingredient>>()
     val stockResult: LiveData<List<Ingredient>> get() = _stockResult
 
+    private val _confirmationResult = MutableLiveData<Boolean>()
+    val confirmationResult: LiveData<Boolean> get() = _confirmationResult
+    private val _tipoProducto = MutableLiveData<EanResponse?>()
+    val tipoProducto: LiveData<EanResponse?> get() = _tipoProducto
+
+
     fun findProductByEan(ean: String) {
         viewModelScope.launch {
             try {
@@ -60,28 +67,27 @@ class StockViewModel : ViewModel() {
         }
     }
 
-    fun addProductByEan(ean: String, cantidad: Int, context: Context) {
+    fun obtenerTipoProductoPorEAN(ean: String) {
         viewModelScope.launch {
             try {
-                val token = getToken(context)
-                Log.d("StockViewModel", "Token obtained for addProductByEan: $token")
-                val requestBody = mapOf("ean" to ean, "cantidad" to cantidad)
-                val response =
-                    stockService.addProductByEan(requestBody, "Bearer $token").awaitResponse()
-                if (!response.isSuccessful) {
-                    _error.value = "Error al agregar el producto: ${response.message()}"
-                    _addProductResult.value = false
+                Log.d("StockViewModel", "Obteniendo tipo de producto por EAN: $ean")
+                val response = stockService.obtenerTipoProductoPorEAN(ean).awaitResponse()
+                if (response.isSuccessful) {
+                    _tipoProducto.postValue(response.body())
                 } else {
-                    _addProductResult.value = true
-                    getUserStock(context) // Refresh stock ingredients if needed
+                    Log.d(
+                        "StockViewModel",
+                        "Error al obtener tipo de producto: ${response.message()}"
+                    )
+                    _error.postValue("No se pudo obtener el tipo de producto: ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.d("StockViewModel", "Exception adding product: $e")
-                _error.value = "Error de excepción: ${e.message}"
-                _addProductResult.value = false
+                Log.d("StockViewModel", "Exception al obtener tipo de producto: $e")
+                _error.postValue("Error de excepción: ${e.message}")
             }
         }
     }
+
 
     fun getUserStock(context: Context) {
         viewModelScope.launch {
@@ -151,7 +157,26 @@ class StockViewModel : ViewModel() {
         }
     }
 
-
+    fun confirmUser(eanRequest: Map<String, Any>, context: Context) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                Log.d("StockViewModel", "Token obtained for confirmUser: $token")
+                val response =
+                    stockService.confirmation(eanRequest, "Bearer $token").awaitResponse()
+                if (response.isSuccessful) {
+                    _confirmationResult.value = true
+                    Log.d("StockViewModel", "User confirmation successful")
+                } else {
+                    _confirmationResult.value = false
+                    Log.e("StockViewModel", "Error confirming user: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _confirmationResult.value = false
+                Log.e("StockViewModel", "Exception confirming user: $e")
+            }
+        }
+    }
     private suspend fun getToken(context: Context): String? {
         val token = context.dataStore.data.first()[stringPreferencesKey("auth_token")]
         Log.d("StockViewModel", "Retrieved token: $token")

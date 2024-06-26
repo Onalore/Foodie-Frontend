@@ -31,6 +31,7 @@ import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe.NewRecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 import com.example.foodiefrontend.viewmodel.UserViewModel
 import com.google.gson.Gson
@@ -136,10 +137,18 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController, userViewModel, context)
         }
-        composable(route = AppScreens.CameraScreen.route) {
-            CameraScreen(navController) { codeEan ->
-                navController.navigate("stock_screen/$codeEan")
+        composable("camera_screen") {
+            CameraScreen(navController) { ean ->
+                navController.navigate("alertIngredientScanned/$ean")
             }
+        }
+        composable("alertIngredientScanned/{ean}") { backStackEntry ->
+            val ean = backStackEntry.arguments?.getString("ean") ?: ""
+            AlertIngredientScanned(
+                navController,
+                setShowDialog = { /* Implementar lógica */ },
+                codeEan = ean
+            )
         }
         composable(route = AppScreens.FamilyConfigScreen.route) {
             FamilyConfigScreen(navController, userViewModel)

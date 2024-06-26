@@ -16,9 +16,14 @@ interface StockService {
     @GET("stock")
     fun getUserStock(@Header("Authorization") token: String): Call<List<IngredientResponse>>
 
-    @POST("ean")
-    fun addProductByEan(@Body eanRequest: Map<String, Any>, s: String): Call<Void>
+    @GET("ean/{ean}")
+    fun obtenerTipoProductoPorEAN(@Path("ean") ean: String): Call<EanResponse>
 
+    @POST("confirmation")
+    fun confirmation(
+        @Body eanRequest: Map<String, Any>,
+        @Header("Authorization") token: String
+    ): Call<Void>
     @POST("stock/manual")
     fun addProductByName(
         @Body productRequest: Map<String, Any>,
