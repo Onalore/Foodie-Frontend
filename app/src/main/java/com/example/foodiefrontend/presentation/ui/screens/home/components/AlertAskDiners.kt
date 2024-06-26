@@ -34,7 +34,6 @@ import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
 import com.example.foodiefrontend.utils.Constants
 import com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel
-import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @Composable
 fun AlertAskDiners(
@@ -42,11 +41,11 @@ fun AlertAskDiners(
     setShowDialog: (Boolean) -> Unit,
     withStock: Boolean,
     grupoFamiliar: List<Persona>,
-    userViewModel: UserViewModel = viewModel(),
     suggestedRecipesViewModel: SuggestedRecipesViewModel = viewModel()
 ) {
     var comensales by remember { mutableStateOf(emptyList<Persona>()) }
     var comida by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     AlertDialog(
@@ -95,6 +94,14 @@ fun AlertAskDiners(
                     label = stringResource(R.string.select_meal),
                     items = Constants.comidas
                 )
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         },
         dismissButton = {
@@ -111,22 +118,32 @@ fun AlertAskDiners(
             CustomButton(
                 onClick = {
                     Log.d("AlertAskDiners", "Confirm button clicked")
-                    suggestedRecipesViewModel.fetchRecipes(context, comensales, comida)
-                    setShowDialog(false)
-                    if (withStock) {
-                        navController.navigate(
-                            AppScreens.SuggestedRecipesScreen.createRoute(
-                                comensales,
-                                comida
-                            )
-                        )
+                    if (comida.isEmpty()) {
+                        errorMessage = "Por favor, selecciona una comida."
                     } else {
-                        navController.navigate(
-                            AppScreens.RandomRecipesScreen.createRoute(
+                        setShowDialog(false)
+                        errorMessage = ""
+                        if (withStock) {
+                            suggestedRecipesViewModel.fetchRecipes(context, comensales, comida)
+                            navController.navigate(
+                                AppScreens.SuggestedRecipesScreen.createRoute(
+                                    comensales,
+                                    comida
+                                )
+                            )
+                        } else {
+                            suggestedRecipesViewModel.fetchRandomRecipes(
+                                context,
                                 comensales,
                                 comida
                             )
-                        )
+                            navController.navigate(
+                                AppScreens.RandomRecipesScreen.createRoute(
+                                    comensales,
+                                    comida
+                                )
+                            )
+                        }
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
@@ -136,7 +153,6 @@ fun AlertAskDiners(
         }
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable
