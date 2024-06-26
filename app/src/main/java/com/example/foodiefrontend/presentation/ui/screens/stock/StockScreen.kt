@@ -141,7 +141,8 @@ fun StockScreen(
                     IngredientCard(
                         ingredient = ingredient,
                         onIncrement = { /* Implement increment action */ },
-                        onDecrement = { /* Implement decrement action */ }
+                        onDecrement = { /* Implement decrement action */ },
+                        modify = false
                     )
                 }
             }
