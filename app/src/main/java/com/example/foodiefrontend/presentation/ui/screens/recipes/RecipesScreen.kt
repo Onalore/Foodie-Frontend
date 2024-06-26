@@ -49,6 +49,7 @@ import com.example.foodiefrontend.presentation.ui.screens.recipes.components.Ale
 import com.example.foodiefrontend.viewmodel.UserViewModel
 import com.google.gson.Gson
 
+
 @Composable
 fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
     var recipe by remember { mutableStateOf("") }
@@ -108,7 +109,7 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
                 } else {
                     ImageWithResource(
                         resourceId = R.drawable.ic_plus,
-                        onClick = { showDialog = true },
+                        onClick = { navController.navigate(AppScreens.NewRecipeScreen.route) },
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                     )
                 }
@@ -195,7 +196,7 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
 @Composable
 fun RecipesCardItem(
     title: String,
-    image: String,
+    image: String?,
     liked: Boolean = false,
     initialRating: Int? = null,
     modifier: Modifier = Modifier,
@@ -208,13 +209,15 @@ fun RecipesCardItem(
             onClick()
         }
     ) {
-        RoundedImage(
-            image = image,
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .width(200.dp)
-                .height(150.dp)
-        )
+        if (image != null) {
+            RoundedImage(
+                image = image,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .width(200.dp)
+                    .height(150.dp)
+            )
+        }
 
         RecipeDescription(
             name = title,

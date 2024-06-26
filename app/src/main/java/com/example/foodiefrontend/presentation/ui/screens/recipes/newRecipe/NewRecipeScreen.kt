@@ -1,10 +1,11 @@
 package com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -16,29 +17,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Persona
+import com.example.foodiefrontend.data.Ingredient
+import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.CustomToolbar
 import com.example.foodiefrontend.presentation.ui.components.Title
 import com.example.foodiefrontend.presentation.ui.screens.recipes.components.AlertCancelCreateRecipe
+import com.example.foodiefrontend.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewRecipeScreen(navController: NavController) {
+fun NewRecipeScreen(navController: NavController, userViewModel: UserViewModel) {
     var showDialog by remember { mutableStateOf(false) }
     var nombre by remember { mutableStateOf("") }
     var ingredientes by remember { mutableStateOf("") }
     var preparacion by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     if (showDialog) {
         AlertCancelCreateRecipe(
@@ -98,7 +103,49 @@ fun NewRecipeScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.weight(1f))
             CustomButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    if (nombre.isNotBlank() && ingredientes.isNotBlank() && preparacion.isNotBlank()) {
+                        val ingredientesList = ingredientes.split("\n").mapNotNull {
+                            val parts = it.split(",").map { part -> part.trim() }
+                            if (parts.size == 3) {
+                                Ingredient(
+                                    description = parts[0],
+                                    quantity = parts[1],
+                                    unit = parts[2]
+                                )
+                            } else null
+                        }
+
+                        val receta = Recipe(
+                            name = nombre,
+                            ingredients = ingredientesList,
+                            preparation = preparacion.split("\n"),
+                        )
+                        Log.d("NewRecipeScreen", "Receta creada: $receta")
+                        userViewModel.createRecipe(context, receta) { success ->
+                            if (success) {
+                                Toast.makeText(
+                                    context,
+                                    "Receta creada exitosamente",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Error al crear la receta",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Por favor completa todos los campos",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 text = stringResource(R.string.add_recipe)
             )
@@ -106,15 +153,16 @@ fun NewRecipeScreen(navController: NavController) {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
     val navController = rememberNavController()
+    val userViewModel: UserViewModel = viewModel()
 
     FoodieFrontendTheme {
         NewRecipeScreen(
-            navController = navController
+            navController = navController,
+            userViewModel = userViewModel
         )
     }
 }

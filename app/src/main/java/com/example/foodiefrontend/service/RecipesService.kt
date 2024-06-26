@@ -52,4 +52,9 @@ interface RecipesService {
     @GET("recetas/historial")
     suspend fun getHistoryRecipes(@Header("Authorization") token: String): Response<FavoriteRecipesResponse>
 
+    @POST("recetas/custom")
+    fun createRecipe(
+        @Header("Authorization") token: String,
+        @Body receta: Recipe
+    ): Call<Unit>
 }
