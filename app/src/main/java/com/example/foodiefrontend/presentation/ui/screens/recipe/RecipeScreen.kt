@@ -166,7 +166,7 @@ fun RecipeScreen(
                 ) {
                     // Ingredients section
                     Text(
-                        text = "Ingredientes",
+                        text = stringResource(R.string.ingredients),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(15.dp))
@@ -200,7 +200,7 @@ fun RecipeScreen(
                         .padding(20.dp),
                 ) {
                     Text(
-                        text = "Preparación",
+                        text = stringResource(R.string.preparation),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(15.dp))

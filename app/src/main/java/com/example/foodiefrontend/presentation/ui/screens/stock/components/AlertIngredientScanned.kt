@@ -2,13 +2,19 @@ package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,11 +32,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Ingredient
+import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
@@ -82,7 +97,7 @@ fun AlertIngredientScanned(
                     }
                     productType?.imageUrl?.let {
                         Image(
-                            painter = rememberImagePainter(it),
+                            painter = rememberAsyncImagePainter(it),
                             contentDescription = null,
                             modifier = Modifier.size(128.dp)
                         )
@@ -153,3 +168,164 @@ fun AlertIngredientScanned(
         }
     }
 }
+
+
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview() {
+    var showDialog by remember { mutableStateOf(true) }
+
+    FoodieFrontendTheme {
+        @Composable
+        fun AlertIngredientScannedPreview(
+            navController: NavController,
+            setShowDialog: (Boolean) -> Unit,
+            codeEan: String,
+        ) {
+
+            val productType = SampleData.sampleIngredient
+            val error = "Producto no encontrado"
+            val addProductResult = true
+
+            AlertDialog(
+                onDismissRequest = { setShowDialog(false) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.is_this_product),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                text = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (productType != null) {
+                            Log.d("Product", "Detected Product: $productType")
+                            Text(
+                                text = productType?.description ?: "Producto desconocido",
+                                textAlign = TextAlign.Center
+                            )
+                            productType?.imageUrl?.let {
+                                Surface(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(100.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surface,
+                                                shape = RoundedCornerShape(100.dp)
+                                            )
+                                            .padding(20.dp)
+                                    ) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(it),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(80.dp)
+                                        )
+                                    }
+                                }
+                            }
+                            productType?.unit?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    IngredientQuantity(
+                                        quantity = 0.toString(),
+                                        unit = null,
+                                        onDecrement = { /*TODO*/ },
+                                        onIncrement = { /*TODO*/ }
+                                    )
+                                    Text(
+                                        text = "$it",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        } else if (error != null) {
+                            Text(
+                                text = error ?: "Error desconocido",
+                                textAlign = TextAlign.Center,
+                                color = Color.Red
+                            )
+                        } else {
+                            Text(
+                                text = "Cargando...",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                },
+                dismissButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        CustomButton(
+                            onClick = {
+                                navController.navigate("camera_screen")
+                            },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            icon = R.drawable.ic_retry,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(15.dp))
+                        CustomButton(
+                            onClick = {
+                                setShowDialog(false)
+                                if (productType != null) {
+                                    //viewModel.addProductByEan(codeEan, 1, context) // Pasa el contexto aquí
+                                }
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = R.drawable.ic_check,
+                            iconHeight = 30.dp,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                },
+                confirmButton = {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        CustomButton(
+                            onClick = {
+                                setShowDialog(false)
+                            },
+                            containerColor = Color(0xFFE8BB66),
+                            text = stringResource(R.string.enter_manually),
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            )
+
+            LaunchedEffect(addProductResult) {
+                addProductResult?.let {
+                    if (it) {
+                        Log.d("AddProduct", "Product successfully added to stock.")
+                        navController.navigate("stock_screen")
+                    } else {
+                        Log.d("AddProduct", "Failed to add product to stock.")
+                    }
+                }
+            }
+        }
+
+        AlertIngredientScannedPreview(
+            navController = rememberNavController(),
+            setShowDialog = {
+                            showDialog = false
+            },
+            codeEan = "EAN398243"
+        )
+    }
+}
+
+

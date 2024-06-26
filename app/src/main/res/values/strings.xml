@@ -55,4 +55,12 @@
     <string name="estimated_cost">Costo estimado</string>
     <string name="lets_cook">Sí ¡A cocinar!</string>
     <string name="keep_looking">No, seguir buscando</string>
+    <string name="add_recipe">Añadir receta</string>
+    <string name="create_recipe">Crear receta</string>
+    <string name="preparation">Preparación</string>
+    <string name="ingredients">Ingredientes</string>
+    <string name="keep_editing">Seguir editando</string>
+    <string name="cancel_creation">Cancelar creación</string>
+    <string name="want_to_cancel_create_recipe">¿Quieres cancelar la creación de la receta?</string>
+    <string name="if_u_go_back">Si vuelves para atrás se perderán los cambios</string>
 </resources>
