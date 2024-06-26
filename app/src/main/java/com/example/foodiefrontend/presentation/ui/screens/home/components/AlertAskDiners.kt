@@ -107,16 +107,6 @@ fun AlertAskDiners(
         dismissButton = {
             CustomButton(
                 onClick = {
-                    setShowDialog(false)
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.btn_cancel),
-                modifier = Modifier
-            )
-        },
-        confirmButton = {
-            CustomButton(
-                onClick = {
                     Log.d("AlertAskDiners", "Confirm button clicked")
                     if (comida.isEmpty()) {
                         errorMessage = "Por favor, selecciona una comida."
@@ -146,9 +136,19 @@ fun AlertAskDiners(
                         }
                     }
                 },
-                containerColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.primary,
                 text = "Generar receta",
                 contentColor = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        confirmButton = {
+            CustomButton(
+                onClick = {
+                    setShowDialog(false)
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                text = stringResource(R.string.btn_cancel),
+                modifier = Modifier
             )
         }
     )

@@ -19,6 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.navigation.AppScreens
 import com.example.foodiefrontend.presentation.ui.components.Title
+import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertModifyRestriction
 import com.example.foodiefrontend.presentation.ui.screens.profile.components.ProfileOptionItem
 import com.example.foodiefrontend.viewmodel.UserViewModel
 
@@ -41,8 +46,19 @@ fun ProfileScreen(
 ) {
     val userInfo by userViewModel.userInfo.observeAsState()
 
+    var showDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         userViewModel.getUserInfo(context)
+    }
+
+    if (showDialog) {
+        AlertModifyRestriction(
+            navController = navController,
+            setShowDialog = { param ->
+                showDialog = param
+            },
+        )
     }
 
     Column(
@@ -92,7 +108,7 @@ fun ProfileScreen(
         ProfileOptionItem(
             text = stringResource(R.string.restrictions),
             icon = Icons.AutoMirrored.Filled.ArrowForward,
-            onClick = {}
+            onClick = { showDialog = true }
         )
 
         ProfileOptionItem(
