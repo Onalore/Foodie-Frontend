@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -103,6 +104,12 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
                     ImageWithResource(
                         resourceId = R.drawable.ic_filter,
                         onClick = { showDialog = true }
+                    )
+                } else {
+                    ImageWithResource(
+                        resourceId = R.drawable.ic_plus,
+                        onClick = { showDialog = true },
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                     )
                 }
             }
@@ -217,7 +224,8 @@ fun RecipesCardItem(
                 .height(120.dp),
             punctuation = false,
             initialRating = initialRating ?: 0,
-            scored = scored
+            scored = scored,
+            onClickScore = { onClick() }
         )
     }
 }

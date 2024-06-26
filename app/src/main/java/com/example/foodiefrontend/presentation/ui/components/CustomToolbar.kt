@@ -15,13 +15,19 @@ import com.example.foodiefrontend.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomToolbar(navController: NavController, title: String) {
+fun CustomToolbar(
+    navController: NavController,
+    title: String,
+    onClick: () -> Unit = { navController.navigateUp() }
+) {
     TopAppBar(
         title = {
             Text(text = title)
         },
         navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
+            IconButton(
+                onClick = { onClick() }
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_chevron_left),
                     contentDescription = "Back",
