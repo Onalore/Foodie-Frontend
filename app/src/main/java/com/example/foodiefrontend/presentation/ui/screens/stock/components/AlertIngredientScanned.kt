@@ -73,7 +73,7 @@ fun AlertIngredientScanned(
     var shortageAlert by remember { mutableStateOf(false) }
     var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
     var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
-    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
+    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -204,9 +204,9 @@ fun AlertIngredientScanned(
                                 quantity = alertaEscasez.toString(),
                                 unit = null,
                                 onDecrement = {
-                                    if (alertaEscasez!! > 0) alertaEscasez = alertaEscasez!! - 1
+                                    if (alertaEscasez > 0) alertaEscasez--
                                 },
-                                onIncrement = { alertaEscasez = alertaEscasez!! + 1 },
+                                onIncrement = { alertaEscasez++ },
                                 available = shortageAlert
                             )
                             Text(
