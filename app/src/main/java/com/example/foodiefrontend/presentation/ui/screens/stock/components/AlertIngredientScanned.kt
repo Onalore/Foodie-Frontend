@@ -44,7 +44,6 @@ import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
-import com.example.foodiefrontend.presentation.ui.screens.profile.components.AlertScore
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @Composable
