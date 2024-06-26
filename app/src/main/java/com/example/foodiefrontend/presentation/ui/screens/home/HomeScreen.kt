@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,14 +34,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
@@ -94,11 +100,16 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.Start
             ) {
                 item {
+                    val padding = if (temporaryRecipe != null) Modifier
+                        .padding(start = 15.dp, top = 40.dp, end = 15.dp)
+                    else
+                        Modifier.padding(horizontal = 15.dp, vertical = 40.dp)
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = MaterialTheme.colorScheme.onTertiary)
-                            .padding(horizontal = 15.dp, vertical = 40.dp),
+                            .then(padding),
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start
                     ) {
@@ -119,6 +130,7 @@ fun HomeScreen(
                             icon = R.drawable.stock,
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
+                            enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
                             }
@@ -132,10 +144,34 @@ fun HomeScreen(
                             icon = R.drawable.dice,
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
+                            enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
                             }
                         )
+
+                        if (temporaryRecipe != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_info),
+                                    contentDescription = "Info Icon",
+                                    tint =  MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.width(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Puntúa la receta en proceso para generar más recetas",
+                                    color = MaterialTheme.colorScheme.primary, // Color morado del texto
+                                    fontSize = 16.sp,
+                                    lineHeight = 20.sp
+                                )
+                            }
+                        }
                     }
 
                     if (temporaryRecipe != null) {
@@ -266,5 +302,84 @@ fun HomeCardItem(
                 .width(250.dp)
                 .height(90.dp),
         )
+    }
+}
+
+
+@Preview
+@Composable
+private fun Preview () {
+    FoodieFrontendTheme {
+        val padding = if (true) Modifier
+            .padding(start = 15.dp, top = 40.dp, end = 15.dp)
+        else
+            Modifier.padding(horizontal = 15.dp, vertical = 40.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.onTertiary)
+                .then(padding),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+
+                Title(title = "${stringResource(R.string.hi)}")
+
+            Title(
+                title = stringResource(R.string.what_are_u_eating),
+                fontWeight = FontWeight.Normal
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            CustomButton(
+                text = stringResource(R.string.suggest_with_my_ingredients),
+                containerColor = MaterialTheme.colorScheme.primary,
+                icon = R.drawable.stock,
+                modifier = Modifier.height(100.dp),
+                colorIcon = ColorFilter.tint(Color.White),
+                enabled = false,
+                onClick = {
+//                    showDialog = true
+                }
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            CustomButton(
+                text = stringResource(R.string.suggest_without_my_ingredients),
+                containerColor = MaterialTheme.colorScheme.secondary,
+                icon = R.drawable.dice,
+                modifier = Modifier.height(100.dp),
+                colorIcon = ColorFilter.tint(Color.White),
+                enabled = false,
+                onClick = {
+//                    showDialog = true
+                }
+            )
+            if (true) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_info),
+                        contentDescription = "Info Icon",
+                        tint =  MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.width(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Puntúa la receta en proceso para generar más recetas",
+                        color = MaterialTheme.colorScheme.primary, // Color morado del texto
+                        fontSize = 16.sp,
+                        lineHeight = 20.sp
+                    )
+                }
+            }
+        }
+
     }
 }
