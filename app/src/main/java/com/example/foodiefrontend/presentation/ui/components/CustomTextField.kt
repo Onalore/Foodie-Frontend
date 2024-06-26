@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
@@ -37,17 +38,17 @@ fun CustomTextField(
     onClickIcon: () -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     readOnly: Boolean = false,
-    enabled: Boolean,
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
+    height: Dp = 70.dp
 ) {
     val shape = RoundedCornerShape(16.dp)
-
-
 
     Surface(
         elevation = 4.dp,
         shape = shape,
         modifier = Modifier
-            .height(70.dp)
+            .height(height)
             .fillMaxWidth()
             .then(modifier),
         onClick = { onClickIcon() }
@@ -76,7 +77,7 @@ fun CustomTextField(
                 .fillMaxWidth()
                 .then(modifier),
             shape = shape,
-            singleLine = true,
+            singleLine = singleLine,
             textStyle = TextStyle(fontSize = 18.sp),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = MaterialTheme.colorScheme.onSurface,
