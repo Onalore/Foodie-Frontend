@@ -3,11 +3,13 @@ package com.example.foodiefrontend.presentation.ui.screens.stock.components
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,9 +43,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Ingredient
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
+import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @Composable
@@ -65,42 +73,143 @@ fun AlertIngredientScanned(
     val error by viewModel.error.observeAsState()
     val addProductResult by viewModel.addProductResult.observeAsState()
 
+    var shortageAlert by remember { mutableStateOf(false) }
+    var quantity by remember { mutableStateOf(productType?.quantity) }
+    var unit by remember { mutableStateOf(productType?.unit) }
+    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
+
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
         title = {
             Text(
-                text = stringResource(R.string.is_this_product),
+                text = if (productType != null)
+                    stringResource(R.string.is_this_product)
+                else if (error != null)
+                    "Hubo un error al escanear el producto"
+                else
+                    "Procesando producto",
                 style = MaterialTheme.typography.titleLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = Color.Black,
                     fontWeight = FontWeight.Bold
                 ),
                 textAlign = TextAlign.Center,
             )
         },
         text = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = codeEan,
-                    textAlign = TextAlign.Center
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 if (productType != null) {
                     Log.d("Product", "Detected Product: $productType")
                     Text(
                         text = productType?.description ?: "Producto desconocido",
                         textAlign = TextAlign.Center
                     )
+                    productType?.imageUrl?.let {
+                        Surface(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(100.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surface,
+                                        shape = RoundedCornerShape(100.dp)
+                                    )
+                                    .padding(20.dp)
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(it),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(70.dp)
+                                )
+                            }
+                        }
+                    }
+                    productType?.quantity?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(start = 40.dp)
+                        ) {
+                            IngredientQuantity(
+                                quantity = quantity,
+                                unit = null,
+                                onDecrement = { /*TODO*/ },
+                                onIncrement = { /*TODO*/ }
+                            )
+                            Text(
+                                text = productType!!.unitMesure,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                     productType?.unit?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(start = 40.dp)
+                        ) {
+                            IngredientQuantity(
+                                quantity = unit,
+                                unit = null,
+                                onDecrement = { /*TODO*/ },
+                                onIncrement = { /*TODO*/ }
+                            )
+                            Text(
+                                text = "u.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = "Unidad: $it",
-                            textAlign = TextAlign.Center
+                            text = "Recibir alerta de escasez",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.clickable {
+                                shortageAlert = !shortageAlert
+                            },
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        ImageWithResource(
+                            resourceId = if (shortageAlert)
+                                R.drawable.ic_bell_on
+                            else
+                                R.drawable.ic_bell_off,
+                            modifier = Modifier.size(20.dp),
+                            onClick = { shortageAlert = !shortageAlert }
                         )
                     }
-                    productType?.imageUrl?.let {
-                        Image(
-                            painter = rememberAsyncImagePainter(it),
-                            contentDescription = null,
-                            modifier = Modifier.size(128.dp)
-                        )
+
+                    productType?.alertaEscasez?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(start = 40.dp)
+                        ) {
+                            IngredientQuantity(
+                                quantity = alertaEscasez.toString(),
+                                unit = null,
+                                onDecrement = { /*TODO*/ },
+                                onIncrement = { /*TODO*/ },
+                                available = shortageAlert
+                            )
+                            Text(
+                                text = productType!!.unitMesure,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 } else if (error != null) {
                     Text(
@@ -109,10 +218,7 @@ fun AlertIngredientScanned(
                         color = Color.Red
                     )
                 } else {
-                    Text(
-                        text = "Cargando...",
-                        textAlign = TextAlign.Center
-                    )
+                    CookingAnimation()
                 }
             }
         },
@@ -139,6 +245,7 @@ fun AlertIngredientScanned(
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     icon = R.drawable.ic_check,
+                    iconHeight = 30.dp,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -169,12 +276,32 @@ fun AlertIngredientScanned(
     }
 }
 
+@Composable
+fun CookingAnimation() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.ingredient))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+            modifier = Modifier.size(200.dp)
+        )
+    }
+}
 
 
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
     var showDialog by remember { mutableStateOf(true) }
+    var shortageAlert by remember { mutableStateOf(false) }
 
     FoodieFrontendTheme {
         @Composable
@@ -187,6 +314,11 @@ private fun Preview() {
             val productType = SampleData.sampleIngredient
             val error = "Producto no encontrado"
             val addProductResult = true
+
+
+            var quantity by remember { mutableStateOf(productType?.quantity) }
+            var unit by remember { mutableStateOf(productType?.unit) }
+            var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
 
             AlertDialog(
                 onDismissRequest = { setShowDialog(false) },
@@ -233,19 +365,85 @@ private fun Preview() {
                                     }
                                 }
                             }
-                            productType?.unit?.let {
+                            productType?.quantity?.let {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .padding(start = 40.dp)
                                 ) {
                                     IngredientQuantity(
-                                        quantity = 0.toString(),
+                                        quantity = quantity,
                                         unit = null,
                                         onDecrement = { /*TODO*/ },
                                         onIncrement = { /*TODO*/ }
                                     )
                                     Text(
-                                        text = "$it",
+                                        text = productType.unitMesure,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                            productType?.unit?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .padding(start = 40.dp)
+                                ) {
+                                    IngredientQuantity(
+                                        quantity = unit,
+                                        unit = null,
+                                        onDecrement = { /*TODO*/ },
+                                        onIncrement = { /*TODO*/ }
+                                    )
+                                    Text(
+                                        text = "u.",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Recibir alerta de escasez",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.clickable {
+                                        shortageAlert = !shortageAlert
+                                    },
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                ImageWithResource(
+                                    resourceId = if (shortageAlert)
+                                        R.drawable.ic_bell_on
+                                    else
+                                        R.drawable.ic_bell_off,
+                                    modifier = Modifier.size(20.dp),
+                                    onClick = { shortageAlert = !shortageAlert }
+                                )
+                            }
+
+                            productType?.alertaEscasez?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .padding(start = 40.dp)
+                                ) {
+                                    IngredientQuantity(
+                                        quantity = alertaEscasez.toString(),
+                                        unit = null,
+                                        onDecrement = { /*TODO*/ },
+                                        onIncrement = { /*TODO*/ },
+                                        available = shortageAlert
+                                    )
+                                    Text(
+                                        text = productType.unitMesure,
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -321,7 +519,7 @@ private fun Preview() {
         AlertIngredientScannedPreview(
             navController = rememberNavController(),
             setShowDialog = {
-                            showDialog = false
+                showDialog = false
             },
             codeEan = "EAN398243"
         )
