@@ -1,4 +1,4 @@
-package com.example.foodiefrontend.presentation.ui.screens.recipes.components
+package com.example.foodiefrontend.presentation.ui.screens.profile.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,14 +27,15 @@ import com.example.foodiefrontend.data.FilterCriteria
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.StarRating
+import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
+import com.example.foodiefrontend.utils.Constants
 
 @Composable
-fun AlertFilter(
+fun AlertModifyRestriction(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
-    applyFilter: (FilterCriteria) -> Unit
 ) {
-    var puntuacion by remember { mutableIntStateOf(0) }
+    var restricciones by remember { mutableStateOf(emptyList<String>()) }
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -44,16 +45,10 @@ fun AlertFilter(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Filtros",
+                    text = "Modificar restricciones",
                     textAlign = TextAlign.Center,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Puntuación",
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    color = Color.Black
                 )
             }
         },
@@ -63,23 +58,13 @@ fun AlertFilter(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    StarRating(
-                        initialRating = puntuacion,
-                        onRatingChanged = { rating ->
-                            puntuacion = rating
-                        },
-                        widthStar = 30.dp,
-                    )
-                    Text(
-                        text = "ó más",
-                        textAlign = TextAlign.Center,
-                        color = Color(0xFFE8BB66)
-                    )
-                }
+                CustomComboBox(
+                    selectedItems = restricciones,
+                    label = "Restricciones alimentarias",
+                    items = Constants.restricciones,
+                    onSelectedItemsChange = { restricciones = it },
+                    isMultiSelect = true
+                )
             }
         },
         confirmButton = {
@@ -93,8 +78,6 @@ fun AlertFilter(
         dismissButton = {
             CustomButton(
                 onClick = {
-                    val criteria = FilterCriteria(minRating = puntuacion)
-                    applyFilter(criteria)
                     setShowDialog(false)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
@@ -110,12 +93,11 @@ private fun Preview() {
     var showDialog by remember { mutableStateOf(true) }
 
     FoodieFrontendTheme {
-        AlertFilter(
+        AlertModifyRestriction(
             navController = rememberNavController(),
             setShowDialog = { param ->
                 showDialog = param
             },
-            applyFilter = {}
         )
     }
 }
