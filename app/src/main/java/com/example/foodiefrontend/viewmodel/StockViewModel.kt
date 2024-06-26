@@ -9,17 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.service.BackendApi
-import com.example.foodiefrontend.service.Config
 import com.example.foodiefrontend.service.StockService
 import com.example.foodiefrontend.utils.dataStore
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.awaitResponse
 
 class StockViewModel : ViewModel() {
@@ -51,7 +44,7 @@ class StockViewModel : ViewModel() {
                     val ingredient = eanResponse?.let {
                         Ingredient(
                             description = it.tipo ?: "",
-                            unit = it.unidad ?: "",
+                            unitMesure = it.unidadMedida ?: "",
                             imageUrl = it.imageUrl ?: ""
                         )
                     }
@@ -95,28 +88,30 @@ class StockViewModel : ViewModel() {
             val token = getToken(context)
             if (token != null) {
                 Log.d("StockViewModel", "Token obtained for getUserStock: $token")
-                val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url(Config.getBaseUrl() + "stock")
-                    .addHeader("Authorization", "Bearer $token")
-                    .build()
-
-                withContext(Dispatchers.IO) {
-                    client.newCall(request).execute().use { response ->
-                        if (response.isSuccessful) {
-                            val responseBody = response.body?.string()
-                            val listType = object : TypeToken<List<Ingredient>>() {}.type
-                            val stockIngredients: List<Ingredient> =
-                                Gson().fromJson(responseBody, listType)
-                            _stockResult.postValue(stockIngredients)
-                            _stockIngredients.postValue(stockIngredients) // Ensure stockIngredients is updated
-                            Log.d("ingredientes", stockIngredients.toString())
-                            Log.d("StockViewModel", "Stock fetched successfully")
-                        } else {
-                            Log.e("StockViewModel", "Error fetching stock: ${response.message}")
-                        }
+                val response = stockService.getUserStock("Bearer $token").awaitResponse()
+                if (response.isSuccessful) {
+                    val stockIngredients = response.body()
+                    val ingredients = mutableListOf<Ingredient>()
+                    stockIngredients?.forEach { ingredientResponse ->
+                        ingredients.add(
+                            Ingredient(
+                                id = ingredientResponse.id,
+                                description = ingredientResponse.id,
+                                quantity = ingredientResponse.cantidad.toString(),
+                                unit = ingredientResponse.unidad,
+                                unitMesure = ingredientResponse.unidadMedida,
+                                imageUrl = ingredientResponse.imageUrl,
+                                alertaEscasez = 0
+                            )
+                        )
                     }
+                    _stockIngredients.postValue(ingredients)
+                    Log.d("ingredientes", stockIngredients.toString())
+                    Log.d("StockViewModel", "Stock fetched successfully")
+                } else {
+                    Log.e("StockViewModel", "Error fetching stock: ${response.message()}")
                 }
+
             } else {
                 Log.e("StockViewModel", "Token not found")
             }
