@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,18 +19,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -41,27 +41,25 @@ import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
+import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @Composable
 fun AlertIngredientManual(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
-    productType: Ingredient
+    productType: Ingredient,
+    stockViewModel: StockViewModel = viewModel()
 ) {
-
-    var shortageAlert by remember { mutableStateOf(false) }
-    var quantity by remember { mutableStateOf(productType?.quantity) }
-    var unit by remember { mutableStateOf(productType?.unit) }
-    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
+    var quantity by remember { mutableStateOf(productType.quantity.toIntOrNull() ?: 0) }
+    var unit by remember { mutableStateOf(productType.unit.toIntOrNull() ?: 0) }
+    var alertaEscasez by remember { mutableStateOf(productType.alertaEscasez) }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
         title = {
             Text(
-                text = if (productType != null)
-                    "Agregar producto"
-                else
-                    "Procesando producto",
+                text = "Agregar producto",
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = Color.Black,
                     fontWeight = FontWeight.Bold
@@ -75,159 +73,129 @@ fun AlertIngredientManual(
                 verticalArrangement = Arrangement.spacedBy(15.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (productType != null) {
-                    Log.d("Product", "Detected Product: $productType")
+                Log.d("Product", "Detected Product: $productType")
+                Text(
+                    text = productType.description,
+                    textAlign = TextAlign.Center
+                )
+                productType.imageUrl?.let {
+                    Surface(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(100.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(100.dp)
+                                )
+                                .padding(20.dp)
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(it),
+                                contentDescription = null,
+                                modifier = Modifier.size(70.dp)
+                            )
+                        }
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(start = 40.dp)
+                ) {
+                    IngredientQuantity(
+                        quantity = quantity.toString(),
+                        unit = null,
+                        onDecrement = { if (quantity > 0) quantity-- },
+                        onIncrement = { quantity++ }
+                    )
                     Text(
-                        text = productType?.description ?: "Producto desconocido",
+                        text = productType.unitMesure,
                         textAlign = TextAlign.Center
                     )
-                    productType?.imageUrl?.let {
-                        Surface(
-                            elevation = 4.dp,
-                            shape = RoundedCornerShape(100.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surface,
-                                        shape = RoundedCornerShape(100.dp)
-                                    )
-                                    .padding(20.dp)
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(it),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(70.dp)
-                                )
-                            }
-                        }
-                    }
-                    productType?.quantity?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .width(200.dp)
-                                .padding(start = 40.dp)
-                        ) {
-                            IngredientQuantity(
-                                quantity = quantity,
-                                unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
-                            )
-                            Text(
-                                text = productType!!.unitMesure,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                    productType?.unit?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .width(200.dp)
-                                .padding(start = 40.dp)
-                        ) {
-                            IngredientQuantity(
-                                quantity = unit,
-                                unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
-                            )
-                            Text(
-                                text = "u.",
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Recibir alerta de escasez",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.clickable {
-                                shortageAlert = !shortageAlert
-                            },
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        ImageWithResource(
-                            resourceId = if (shortageAlert)
-                                R.drawable.ic_bell_on
-                            else
-                                R.drawable.ic_bell_off,
-                            modifier = Modifier.size(20.dp),
-                            onClick = { shortageAlert = !shortageAlert }
-                        )
-                    }
-
-                    productType?.alertaEscasez?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .width(200.dp)
-                                .padding(start = 40.dp)
-                        ) {
-                            IngredientQuantity(
-                                quantity = alertaEscasez.toString(),
-                                unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ },
-                                available = shortageAlert
-                            )
-                            Text(
-                                text = productType!!.unitMesure,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                } else {
-                    CookingAnimation()
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(start = 40.dp)
+                ) {
+                    IngredientQuantity(
+                        quantity = unit.toString(),
+                        unit = null,
+                        onDecrement = { if (unit > 0) unit-- },
+                        onIncrement = { unit++ }
+                    )
+                    Text(
+                        text = "u.",
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Recibir alerta de escasez",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.clickable {
+                            alertaEscasez = if (alertaEscasez > 0) 0 else 1
+                        },
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    ImageWithResource(
+                        resourceId = if (alertaEscasez > 0)
+                            R.drawable.ic_bell_on
+                        else
+                            R.drawable.ic_bell_off,
+                        modifier = Modifier.size(20.dp),
+                        onClick = { alertaEscasez = if (alertaEscasez > 0) 0 else 1 }
+                    )
                 }
             }
         },
         dismissButton = {
             CustomButton(
-                onClick = {
-                    setShowDialog(false)
-                },
+                onClick = { setShowDialog(false) },
                 containerColor = MaterialTheme.colorScheme.primary,
-                text = "Añadir producto a mi stock",
+                text = "Cancelar",
                 iconHeight = 30.dp,
             )
         },
         confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                CustomButton(
-                    onClick = {
-                        setShowDialog(false)
-                    },
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    text = stringResource(R.string.btn_cancel),
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            CustomButton(
+                onClick = {
+                    stockViewModel.addProductByName(
+                        context = context,
+                        nombreProducto = productType.description,
+                        cantidad = quantity,
+                        unidad = unit,
+                        alertaEscasez = alertaEscasez
+                    )
+                    setShowDialog(false)
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                text = stringResource(R.string.add_product),
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         }
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
+private fun PreviewAlertIngredientManual() {
     var showDialog by remember { mutableStateOf(true) }
-    var shortageAlert by remember { mutableStateOf(false) }
 
     FoodieFrontendTheme {
         AlertIngredientManual(
             navController = rememberNavController(),
             productType = SampleData.sampleIngredient,
-            setShowDialog = {
-                showDialog = it
-            }
+            setShowDialog = { showDialog = it }
         )
     }
 }

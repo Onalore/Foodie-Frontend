@@ -19,4 +19,9 @@ interface StockService {
     @POST("ean")
     fun addProductByEan(@Body eanRequest: Map<String, Any>, s: String): Call<Void>
 
+    @POST("stock/manual")
+    fun addProductByName(
+        @Body productRequest: Map<String, Any>,
+        @Header("Authorization") token: String
+    ): Call<Void>
 }

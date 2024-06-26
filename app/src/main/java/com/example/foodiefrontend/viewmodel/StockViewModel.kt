@@ -118,6 +118,40 @@ class StockViewModel : ViewModel() {
         }
     }
 
+    fun addProductByName(
+        context: Context,
+        nombreProducto: String,
+        cantidad: Int,
+        unidad: Int,
+        alertaEscasez: Int
+    ) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                Log.d("StockViewModel", "Token obtained for addProductByName: $token")
+                val requestBody = mapOf(
+                    "nombreProducto" to nombreProducto,
+                    "cantidad" to cantidad,
+                    "unidad" to unidad,
+                    "alerta" to alertaEscasez
+                )
+                val response =
+                    stockService.addProductByName(requestBody, "Bearer $token").awaitResponse()
+                if (response.isSuccessful) {
+                    _addProductResult.value = true
+                    getUserStock(context) // Refresh stock ingredients if needed
+                } else {
+                    _addProductResult.value = false
+                    Log.e("StockViewModel", "Error adding product by name: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("StockViewModel", "Exception adding product by name: $e")
+                _addProductResult.value = false
+            }
+        }
+    }
+
+
     private suspend fun getToken(context: Context): String? {
         val token = context.dataStore.data.first()[stringPreferencesKey("auth_token")]
         Log.d("StockViewModel", "Retrieved token: $token")
