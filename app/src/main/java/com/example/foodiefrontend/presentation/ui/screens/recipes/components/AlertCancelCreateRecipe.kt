@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,7 +73,7 @@ fun AlertCancelCreateRecipe(
                 .padding(bottom = 20.dp)) {
                 CustomButton(
                     onClick = {
-//                        navController.navigate(AppScreens.RecipesScreen.route)
+                        navController.navigate(AppScreens.RecipesScreen.route)
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.cancel_creation),

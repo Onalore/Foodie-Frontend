@@ -139,8 +139,8 @@ fun CookingAnimation() {
     )
 
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
     ) {
         LottieAnimation(
             composition = composition,
