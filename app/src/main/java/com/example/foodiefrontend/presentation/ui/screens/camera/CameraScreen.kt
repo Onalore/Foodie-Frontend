@@ -105,9 +105,10 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
                                     imageProxy,
                                     navigateToScreen,
                                     isBarcodeProcessed
-                                ) {
+                                ) { rawValue ->
                                     isBarcodeProcessed = true
-                                    stockViewModel.addProductByEan(it, 1, context) // Aquí se agrega el producto escaneado con cantidad 1
+                                    stockViewModel.obtenerTipoProductoPorEAN(rawValue)
+                                    navController.navigate("alertIngredientScanned/$rawValue")
                                 }
                             }
                         }
@@ -204,15 +205,11 @@ private fun processImageProxy(
                         Barcode.TYPE_PRODUCT -> {
                             val rawValue = barcode.rawValue
 
-                            val buzzerInstance = AndroidBuzzer()
-                            // buzzerInstance.beep()
-
                             Log.d("Barcode", "Detected EAN: $rawValue")
-
-                            navigateToScreen(rawValue)
 
                             if (rawValue != null) {
                                 onBarcodeProcessed(rawValue)
+                                navigateToScreen(rawValue)
                             }
 
                             // Cierra cámara

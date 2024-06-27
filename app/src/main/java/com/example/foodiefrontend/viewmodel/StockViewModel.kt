@@ -7,7 +7,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
+import com.example.foodiefrontend.data.StockConfirmationRequest
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.StockService
 import com.example.foodiefrontend.utils.dataStore
@@ -33,6 +35,12 @@ class StockViewModel : ViewModel() {
 
     private val _stockResult = MutableLiveData<List<Ingredient>>()
     val stockResult: LiveData<List<Ingredient>> get() = _stockResult
+
+    private val _confirmationResult = MutableLiveData<Boolean>()
+    val confirmationResult: LiveData<Boolean> get() = _confirmationResult
+    private val _tipoProducto = MutableLiveData<EanResponse?>()
+    val tipoProducto: LiveData<EanResponse?> get() = _tipoProducto
+
 
     fun findProductByEan(ean: String) {
         viewModelScope.launch {
@@ -60,28 +68,27 @@ class StockViewModel : ViewModel() {
         }
     }
 
-    fun addProductByEan(ean: String, cantidad: Int, context: Context) {
+    fun obtenerTipoProductoPorEAN(ean: String) {
         viewModelScope.launch {
             try {
-                val token = getToken(context)
-                Log.d("StockViewModel", "Token obtained for addProductByEan: $token")
-                val requestBody = mapOf("ean" to ean, "cantidad" to cantidad)
-                val response =
-                    stockService.addProductByEan(requestBody, "Bearer $token").awaitResponse()
-                if (!response.isSuccessful) {
-                    _error.value = "Error al agregar el producto: ${response.message()}"
-                    _addProductResult.value = false
+                Log.d("StockViewModel", "Obteniendo tipo de producto por EAN: $ean")
+                val response = stockService.obtenerTipoProductoPorEAN(ean).awaitResponse()
+                if (response.isSuccessful) {
+                    _tipoProducto.postValue(response.body())
                 } else {
-                    _addProductResult.value = true
-                    getUserStock(context) // Refresh stock ingredients if needed
+                    Log.d(
+                        "StockViewModel",
+                        "Error al obtener tipo de producto: ${response.message()}"
+                    )
+                    _error.postValue("No se pudo obtener el tipo de producto: ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.d("StockViewModel", "Exception adding product: $e")
-                _error.value = "Error de excepción: ${e.message}"
-                _addProductResult.value = false
+                Log.d("StockViewModel", "Exception al obtener tipo de producto: $e")
+                _error.postValue("Error de excepción: ${e.message}")
             }
         }
     }
+
 
     fun getUserStock(context: Context) {
         viewModelScope.launch {
@@ -114,6 +121,72 @@ class StockViewModel : ViewModel() {
 
             } else {
                 Log.e("StockViewModel", "Token not found")
+            }
+        }
+    }
+
+    fun addProductByName(
+        context: Context,
+        nombreProducto: String,
+        cantidad: Int,
+        unidad: Int,
+        alertaEscasez: Int
+    ) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                Log.d("StockViewModel", "Token obtained for addProductByName: $token")
+                val requestBody = mapOf(
+                    "nombreProducto" to nombreProducto,
+                    "cantidad" to cantidad,
+                    "unidad" to unidad,
+                    "alerta" to alertaEscasez
+                )
+                val response =
+                    stockService.addProductByName(requestBody, "Bearer $token").awaitResponse()
+                if (response.isSuccessful) {
+                    _addProductResult.value = true
+                    getUserStock(context) // Refresh stock ingredients if needed
+                } else {
+                    _addProductResult.value = false
+                    Log.e("StockViewModel", "Error adding product by name: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("StockViewModel", "Exception adding product by name: $e")
+                _addProductResult.value = false
+            }
+        }
+    }
+
+    fun confirmUser(
+        context: Context,
+        codean: String,
+        description: String,
+        quantity: Int,
+        unit: String,
+        shortageAlert: Int,
+        unitMesure: String
+    ) {
+        val stockConfirmationRequest = StockConfirmationRequest(
+            codean, description, quantity, unit, shortageAlert, unitMesure
+        )
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                Log.d("StockViewModel", "Token obtained for confirmUser: $token")
+                val response =
+                    stockService.confirmation("Bearer $token", stockConfirmationRequest)
+                        .awaitResponse()
+                if (response.isSuccessful) {
+                    _confirmationResult.value = true
+                    Log.d("StockViewModel", "User confirmation successful")
+                } else {
+                    _confirmationResult.value = false
+                    Log.e("StockViewModel", "Error confirming user: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _confirmationResult.value = false
+                Log.e("StockViewModel", "Exception confirming user: $e")
             }
         }
     }

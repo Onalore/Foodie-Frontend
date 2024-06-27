@@ -148,6 +148,7 @@ fun HomeScreen(
                             enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
+                                withStock = false
                             }
                         )
 
@@ -161,7 +162,7 @@ fun HomeScreen(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_info),
                                     contentDescription = "Info Icon",
-                                    tint =  MaterialTheme.colorScheme.primary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.width(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -321,7 +322,7 @@ fun HomeCardItem(
 
 @Preview
 @Composable
-private fun Preview () {
+private fun Preview() {
     FoodieFrontendTheme {
         val userViewModel: UserViewModel = viewModel()
        HomeScreen(navController = rememberNavController(), userViewModel = userViewModel)

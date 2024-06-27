@@ -2,6 +2,7 @@ package com.example.foodiefrontend.service
 
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.IngredientResponse
+import com.example.foodiefrontend.data.StockConfirmationRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,7 +17,18 @@ interface StockService {
     @GET("stock")
     fun getUserStock(@Header("Authorization") token: String): Call<List<IngredientResponse>>
 
-    @POST("ean")
-    fun addProductByEan(@Body eanRequest: Map<String, Any>, s: String): Call<Void>
+    @GET("ean/{ean}")
+    fun obtenerTipoProductoPorEAN(@Path("ean") ean: String): Call<EanResponse>
 
+    @POST("stock/confirmation")
+    fun confirmation(
+        @Header("Authorization") token: String,
+        @Body stockConfirmationRequest: StockConfirmationRequest
+    ): Call<Void>
+
+    @POST("stock/manual")
+    fun addProductByName(
+        @Body productRequest: Map<String, Any>,
+        @Header("Authorization") token: String
+    ): Call<Void>
 }

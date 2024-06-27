@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,20 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.SampleData
-import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.CookingAnimation
@@ -69,12 +59,12 @@ fun AlertIngredientScanned(
 
     val productType by viewModel.productType.observeAsState()
     val error by viewModel.error.observeAsState()
-    val addProductResult by viewModel.addProductResult.observeAsState()
+    val confirmationResult by viewModel.confirmationResult.observeAsState()
 
     var shortageAlert by remember { mutableStateOf(false) }
-    var quantity by remember { mutableStateOf(productType?.quantity) }
-    var unit by remember { mutableStateOf(productType?.unit) }
-    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
+    var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
+    var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
+    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -135,10 +125,10 @@ fun AlertIngredientScanned(
                                 .padding(start = 40.dp)
                         ) {
                             IngredientQuantity(
-                                quantity = quantity,
+                                quantity = quantity.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
+                                onDecrement = { if (quantity > 0) quantity-- },
+                                onIncrement = { quantity++ }
                             )
                             Text(
                                 text = productType?.unitMesure?.let {
@@ -160,10 +150,10 @@ fun AlertIngredientScanned(
                                 .padding(start = 40.dp)
                         ) {
                             IngredientQuantity(
-                                quantity = unit,
+                                quantity = unit.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ }
+                                onDecrement = { if (unit > 0) unit-- },
+                                onIncrement = { unit++ }
                             )
                             Text(
                                 text = "u.",
@@ -204,8 +194,10 @@ fun AlertIngredientScanned(
                             IngredientQuantity(
                                 quantity = alertaEscasez.toString(),
                                 unit = null,
-                                onDecrement = { /*TODO*/ },
-                                onIncrement = { /*TODO*/ },
+                                onDecrement = {
+                                    if (alertaEscasez > 0) alertaEscasez--
+                                },
+                                onIncrement = { alertaEscasez++ },
                                 available = shortageAlert
                             )
                             Text(
@@ -248,7 +240,23 @@ fun AlertIngredientScanned(
                     onClick = {
                         setShowDialog(false)
                         if (productType != null) {
-                            viewModel.addProductByEan(codeEan, 1, context) // Pasa el contexto aquí
+                            val stockConfirmationRequest = mapOf(
+                                "ean" to codeEan,
+                                "tipoProducto" to productType!!.description,
+                                "cantidad" to quantity,
+                                "unidad" to unit,
+                                "alerta" to alertaEscasez,
+                                "unidadMedida" to productType!!.unitMesure
+                            )
+                            viewModel.confirmUser(
+                                context,
+                                codeEan,
+                                productType!!.description,
+                                quantity,
+                                unit.toString(),
+                                alertaEscasez,
+                                productType!!.unitMesure
+                            )
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
@@ -272,20 +280,20 @@ fun AlertIngredientScanned(
         }
     )
 
-    LaunchedEffect(addProductResult) {
-        addProductResult?.let {
+    LaunchedEffect(confirmationResult) {
+        confirmationResult?.let {
             if (it) {
-                Log.d("AddProduct", "Product successfully added to stock.")
+                Log.d("ConfirmUser", "User confirmation successful.")
                 navController.navigate("stock_screen")
             } else {
-                Log.d("AddProduct", "Failed to add product to stock.")
+                Log.d("ConfirmUser", "Failed to confirm user.")
             }
         }
     }
 }
 
 
-
+/*
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
@@ -299,15 +307,13 @@ private fun Preview() {
             setShowDialog: (Boolean) -> Unit,
             codeEan: String,
         ) {
-
             val productType = SampleData.sampleIngredient
             val error = "Producto no encontrado"
             val addProductResult = true
 
-
-            var quantity by remember { mutableStateOf(productType?.quantity) }
-            var unit by remember { mutableStateOf(productType?.unit) }
-            var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez) }
+            var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
+            var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
+            var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
 
             AlertDialog(
                 onDismissRequest = { setShowDialog(false) },
@@ -363,10 +369,10 @@ private fun Preview() {
                                         .padding(start = 40.dp)
                                 ) {
                                     IngredientQuantity(
-                                        quantity = quantity,
+                                        quantity = quantity.toString(),
                                         unit = null,
-                                        onDecrement = { /*TODO*/ },
-                                        onIncrement = { /*TODO*/ }
+                                        onDecrement = { if (quantity > 0) quantity-- },
+                                        onIncrement = { quantity++ }
                                     )
                                     Text(
                                         text = productType?.unitMesure?.let {
@@ -388,10 +394,10 @@ private fun Preview() {
                                         .padding(start = 40.dp)
                                 ) {
                                     IngredientQuantity(
-                                        quantity = unit,
+                                        quantity = unit.toString(),
                                         unit = null,
-                                        onDecrement = { /*TODO*/ },
-                                        onIncrement = { /*TODO*/ }
+                                        onDecrement = { if (unit > 0) unit-- },
+                                        onIncrement = { unit++ }
                                     )
                                     Text(
                                         text = "u.",
@@ -432,8 +438,10 @@ private fun Preview() {
                                     IngredientQuantity(
                                         quantity = alertaEscasez.toString(),
                                         unit = null,
-                                        onDecrement = { /*TODO*/ },
-                                        onIncrement = { /*TODO*/ },
+                                        onDecrement = {
+                                            if (alertaEscasez > 0) alertaEscasez--
+                                        },
+                                        onIncrement = { alertaEscasez++ },
                                         available = shortageAlert
                                     )
                                     Text(
@@ -479,7 +487,15 @@ private fun Preview() {
                             onClick = {
                                 setShowDialog(false)
                                 if (productType != null) {
-                                    //viewModel.addProductByEan(codeEan, 1, context) // Pasa el contexto aquí
+                                    val eanRequest = mapOf(
+                                        "ean" to codeEan,
+                                        "tipoProducto" to productType.description,
+                                        "cantidad" to quantity,
+                                        "unidad" to unit,
+                                        "alerta" to shortageAlert,
+                                        "unidadMedida" to productType.unitMesure
+                                    )
+                                    viewModel.confirmUser(eanRequest, context)
                                 }
                             },
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -524,5 +540,4 @@ private fun Preview() {
         )
     }
 }
-
-
+*/
