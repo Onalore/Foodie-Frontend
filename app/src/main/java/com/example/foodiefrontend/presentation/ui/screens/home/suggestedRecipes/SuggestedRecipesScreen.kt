@@ -1,4 +1,6 @@
 // Import necessary packages
+import android.annotation.SuppressLint
+import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,10 +78,25 @@ fun SuggestedRecipesScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Title(title = stringResource(R.string.suggests_for_you), textAlign = TextAlign.Start)
+            if (isLoading) {
+                Title(
+                    title = "Cargando recetas personalizadas para vos",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+
+            } else {
+                Title(title = stringResource(R.string.suggests_for_you), textAlign = TextAlign.Start)
+            }
 
             if (isLoading) {
-                CookingAnimation()
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CookingAnimation()
+                }
             } else {
                 if (error != null) {
                     Text(
@@ -130,24 +147,22 @@ fun SuggestedRecipesScreen(
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun CookingAnimation() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.cooking_animation))
+fun CookingAnimation(
+    animation: Int = R.raw.cooking_animation
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animation))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever
     )
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
         LottieAnimation(
             composition = composition,
             progress = progress,
             modifier = Modifier.size(200.dp)
         )
-    }
 }
 
 @Preview(showBackground = true)
@@ -163,5 +178,14 @@ fun PreviewSuggestedRecipes() {
             comensales = comensales,
             comida = comida
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewAnimation() {
+
+    FoodieFrontendTheme {
+        CookingAnimation()
     }
 }

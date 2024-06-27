@@ -45,6 +45,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
+import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.CookingAnimation
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @Composable
@@ -289,25 +290,6 @@ fun AlertIngredientScanned(
     }
 }
 
-@Composable
-fun CookingAnimation() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.ingredient))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = LottieConstants.IterateForever
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = progress,
-            modifier = Modifier.size(200.dp)
-        )
-    }
-}
 
 /*
 @Preview(showBackground = true)

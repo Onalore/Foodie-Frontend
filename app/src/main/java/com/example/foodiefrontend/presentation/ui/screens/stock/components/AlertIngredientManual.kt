@@ -42,6 +42,7 @@ import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.viewmodel.StockViewModel
+import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.CookingAnimation
 
 @Composable
 fun AlertIngredientManual(
