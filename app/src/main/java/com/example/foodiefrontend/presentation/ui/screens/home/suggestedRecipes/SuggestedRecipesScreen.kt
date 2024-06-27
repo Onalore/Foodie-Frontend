@@ -1,5 +1,6 @@
 // Import necessary packages
 import android.annotation.SuppressLint
+import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -148,8 +149,10 @@ fun SuggestedRecipesScreen(
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun CookingAnimation() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.cooking_pad))
+fun CookingAnimation(
+    animation: Int = R.raw.cooking_animation
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animation))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever
