@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
+import com.example.foodiefrontend.data.StockConfirmationRequest
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.StockService
 import com.example.foodiefrontend.utils.dataStore
@@ -157,13 +158,25 @@ class StockViewModel : ViewModel() {
         }
     }
 
-    fun confirmUser(eanRequest: Map<String, Any>, context: Context) {
+    fun confirmUser(
+        context: Context,
+        codean: String,
+        description: String,
+        quantity: Int,
+        unit: String,
+        shortageAlert: Int,
+        unitMesure: String
+    ) {
+        val stockConfirmationRequest = StockConfirmationRequest(
+            codean, description, quantity, unit, shortageAlert, unitMesure
+        )
         viewModelScope.launch {
             try {
                 val token = getToken(context)
                 Log.d("StockViewModel", "Token obtained for confirmUser: $token")
                 val response =
-                    stockService.confirmation(eanRequest, "Bearer $token").awaitResponse()
+                    stockService.confirmation("Bearer $token", stockConfirmationRequest)
+                        .awaitResponse()
                 if (response.isSuccessful) {
                     _confirmationResult.value = true
                     Log.d("StockViewModel", "User confirmation successful")
@@ -177,6 +190,7 @@ class StockViewModel : ViewModel() {
             }
         }
     }
+
     private suspend fun getToken(context: Context): String? {
         val token = context.dataStore.data.first()[stringPreferencesKey("auth_token")]
         Log.d("StockViewModel", "Retrieved token: $token")

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,11 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
@@ -246,15 +240,23 @@ fun AlertIngredientScanned(
                     onClick = {
                         setShowDialog(false)
                         if (productType != null) {
-                            val eanRequest = mapOf(
+                            val stockConfirmationRequest = mapOf(
                                 "ean" to codeEan,
                                 "tipoProducto" to productType!!.description,
                                 "cantidad" to quantity,
                                 "unidad" to unit,
-                                "alerta" to shortageAlert,
+                                "alerta" to alertaEscasez,
                                 "unidadMedida" to productType!!.unitMesure
                             )
-                            viewModel.confirmUser(eanRequest, context)
+                            viewModel.confirmUser(
+                                context,
+                                codeEan,
+                                productType!!.description,
+                                quantity,
+                                unit.toString(),
+                                alertaEscasez,
+                                productType!!.unitMesure
+                            )
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
