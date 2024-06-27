@@ -163,7 +163,7 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel = view
                                         restricciones
                                     ) { response ->
                                         if (response != null) {
-                                            navController.navigate(AppScreens.LoginScreen.route)
+                                            navController.navigate(AppScreens.SuccessfulRegisterScreen.route)
                                         } else {
                                             showError = true
                                         }

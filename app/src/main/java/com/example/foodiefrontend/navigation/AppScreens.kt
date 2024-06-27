@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets
 sealed class AppScreens(val route: String) {
 
     object WelcomeScreen : AppScreens("welcome_screen")
+    object SuccessfulRegisterScreen : AppScreens("successful_login_screen")
     object LoginScreen : AppScreens("login_screen")
     object RegisterScreen : AppScreens("register_screen")
     object HomeScreen : AppScreens("home_screen")

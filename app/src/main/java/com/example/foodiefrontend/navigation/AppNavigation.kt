@@ -30,6 +30,7 @@ import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe.NewRecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
+import com.example.foodiefrontend.presentation.ui.screens.register.SuccessfulRegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 import com.example.foodiefrontend.viewmodel.UserViewModel
@@ -53,6 +54,10 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.LoginScreen.route) {
             Log.d("AppNavigation", "Navigating to LoginScreen")
             LoginScreen(navController)
+        }
+        composable(route = AppScreens.SuccessfulRegisterScreen.route) {
+            Log.d("AppNavigation", "Navigating to SuccessfulRegisterScreen")
+            SuccessfulRegisterScreen(navController)
         }
         composable(route = AppScreens.RegisterScreen.route) {
             Log.d("AppNavigation", "Navigating to RegisterScreen")

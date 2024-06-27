@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.navigation.AppScreens
@@ -190,7 +191,6 @@ fun HomeScreen(
                             RecipesCardItem(
                                 title = temporaryRecipe!!.name,
                                 image = temporaryRecipe!!.imageUrl,
-                                scored = false,
                                 onClick = {
                                     val recipeJson = Gson().toJson(temporaryRecipe)
                                     val encodedRecipeJson =
@@ -209,34 +209,43 @@ fun HomeScreen(
                                     )
                                 }
                             )
-                            Text(
+
+                            CustomButton(
+                                onClick = {
+                                    Log.d("HomeScreen", "Puntuar text clicked")
+                                    val recipeJson = Gson().toJson(temporaryRecipe)
+                                    val encodedRecipeJson =
+                                        URLEncoder.encode(
+                                            recipeJson,
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                    Log.d(
+                                        "HomeScreen",
+                                        "Navigating to RateRecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                                    )
+                                    navController.navigate(
+                                        AppScreens.RateRecipeScreen.createRoute(
+                                            encodedRecipeJson
+                                        )
+                                    )
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
                                 text = "Puntuar",
-                                modifier = Modifier
-                                    .clickable {
-                                        Log.d("HomeScreen", "Puntuar text clicked")
-                                        val recipeJson = Gson().toJson(temporaryRecipe)
-                                        val encodedRecipeJson =
-                                            URLEncoder.encode(
-                                                recipeJson,
-                                                StandardCharsets.UTF_8.toString()
-                                            )
-                                        Log.d(
-                                            "HomeScreen",
-                                            "Navigating to RateRecipeScreen with encoded recipe JSON: $encodedRecipeJson"
-                                        )
-                                        navController.navigate(
-                                            AppScreens.RateRecipeScreen.createRoute(
-                                                encodedRecipeJson
-                                            )
-                                        )
-                                    }
-                                    .padding(8.dp)
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                color = Color.White,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                modifier = Modifier.padding(horizontal = 15.dp)
+
                             )
+//                            Text(
+//                                text = "Puntuar",
+//                                modifier = Modifier
+//                                    .clickable {
+//                                    }
+//                                    .padding(8.dp)
+//                                    .background(MaterialTheme.colorScheme.primary)
+//                                    .fillMaxWidth()
+//                                    .padding(8.dp),
+//                                color = Color.White,
+//                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+//                            )
                         }
                     }
                     Subtitle(
@@ -310,76 +319,7 @@ fun HomeCardItem(
 @Composable
 private fun Preview () {
     FoodieFrontendTheme {
-        val padding = if (true) Modifier
-            .padding(start = 15.dp, top = 40.dp, end = 15.dp)
-        else
-            Modifier.padding(horizontal = 15.dp, vertical = 40.dp)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.onTertiary)
-                .then(padding),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-
-                Title(title = "${stringResource(R.string.hi)}")
-
-            Title(
-                title = stringResource(R.string.what_are_u_eating),
-                fontWeight = FontWeight.Normal
-            )
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            CustomButton(
-                text = stringResource(R.string.suggest_with_my_ingredients),
-                containerColor = MaterialTheme.colorScheme.primary,
-                icon = R.drawable.stock,
-                modifier = Modifier.height(100.dp),
-                colorIcon = ColorFilter.tint(Color.White),
-                enabled = false,
-                onClick = {
-//                    showDialog = true
-                }
-            )
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            CustomButton(
-                text = stringResource(R.string.suggest_without_my_ingredients),
-                containerColor = MaterialTheme.colorScheme.secondary,
-                icon = R.drawable.dice,
-                modifier = Modifier.height(100.dp),
-                colorIcon = ColorFilter.tint(Color.White),
-                enabled = false,
-                onClick = {
-//                    showDialog = true
-                }
-            )
-            if (true) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_info),
-                        contentDescription = "Info Icon",
-                        tint =  MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.width(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Puntúa la receta en proceso para generar más recetas",
-                        color = MaterialTheme.colorScheme.primary, // Color morado del texto
-                        fontSize = 16.sp,
-                        lineHeight = 20.sp
-                    )
-                }
-            }
-        }
-
+        val userViewModel: UserViewModel = viewModel()
+       HomeScreen(navController = rememberNavController(), userViewModel = userViewModel)
     }
 }
