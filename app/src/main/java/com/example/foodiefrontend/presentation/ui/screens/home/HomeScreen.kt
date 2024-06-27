@@ -79,7 +79,7 @@ fun HomeScreen(
         userViewModel.fetchFavoriteRecipes(context)
         userViewModel.fetchTemporaryRecipe(context)
     }
-
+    Log.d("HomeScreen-------- ", temporaryRecipe.toString())
     if (showDialog) {
         AlertAskDiners(
             navController = navController,

@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.home.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,16 +22,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
-import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.navigation.AppScreens
-import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.StarRating
@@ -49,6 +46,8 @@ fun AlertScore(
     var isFavorite by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val decodedRecipeName = URLDecoder.decode(recipe.name, StandardCharsets.UTF_8.toString())
+
+    Log.d("AlertScore", "Displaying AlertScore for recipe: $recipe")
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -76,12 +75,11 @@ fun AlertScore(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StarRating (
+                StarRating(
                     initialRating = puntuacion,
                     onRatingChanged = { rating ->
                         puntuacion = rating
                     },
-
                     widthStar = 40.dp,
                 )
                 Row(
@@ -93,6 +91,7 @@ fun AlertScore(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.clickable {
                             isFavorite = !isFavorite
+                            Log.d("AlertScore", "Favorite toggled: $isFavorite")
                         },
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -102,7 +101,10 @@ fun AlertScore(
                         else
                             R.drawable.ic_heart_outline,
                         modifier = Modifier.size(20.dp),
-                        onClick = { isFavorite = !isFavorite }
+                        onClick = {
+                            isFavorite = !isFavorite
+                            Log.d("AlertScore", "Favorite toggled: $isFavorite")
+                        }
                     )
                 }
             }
@@ -110,8 +112,9 @@ fun AlertScore(
         dismissButton = {
             CustomButton(
                 onClick = {
-                    userViewModel.rateRecipe(context, puntuacion, isFavorite)
-                    navController.navigate(AppScreens.HomeScreen.route)
+                    userViewModel.rateRecipe(context, puntuacion, isFavorite) {
+                        navController.popBackStack()
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 text = stringResource(R.string.send_score),
@@ -121,6 +124,7 @@ fun AlertScore(
         confirmButton = {
             CustomButton(
                 onClick = {
+                    Log.d("AlertScore", "Recipe doesn't happen button clicked")
                     userViewModel.deleteTemporaryRecipe(context)
                     navController.navigate(AppScreens.HomeScreen.route)
                 },
@@ -130,21 +134,4 @@ fun AlertScore(
             )
         }
     )
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-    var showDialog by remember { mutableStateOf(true) }
-
-    FoodieFrontendTheme {
-        AlertScore(
-            navController = rememberNavController(),
-            setShowDialog = { param ->
-                showDialog = param
-            },
-            recipe = SampleData.recipe
-        )
-    }
 }
