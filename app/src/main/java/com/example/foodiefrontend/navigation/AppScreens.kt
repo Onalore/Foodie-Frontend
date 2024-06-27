@@ -15,6 +15,7 @@ sealed class AppScreens(val route: String) {
     object RateRecipeScreen : AppScreens("rate_recipe/{recipeJson}") {
         fun createRoute(recipeJson: String) = "rate_recipe/$recipeJson"
     }
+
     object RecipesScreen : AppScreens("recipes_screen")
     object RecipeScreen : AppScreens("recipe_screen/{recipeJson}") {
         fun createRoute(recipeJson: String) = "recipe_screen/$recipeJson"
@@ -31,7 +32,7 @@ sealed class AppScreens(val route: String) {
         }
     }
 
-    object RandomRecipesScreen : AppScreens("suggested_recipes_screen/{comensales}/{comida}") {
+    object RandomRecipesScreen : AppScreens("random_recipes_screen/{comensales}/{comida}") {
         fun createRoute(comensales: List<Persona>, comida: String): String {
             val encodedComensales =
                 URLEncoder.encode(Gson().toJson(comensales), StandardCharsets.UTF_8.toString())
@@ -39,8 +40,10 @@ sealed class AppScreens(val route: String) {
             return "random_recipes_screen/$encodedComensales/$encodedComida"
         }
     }
+
     object StockScreen : AppScreens("stock_screen") {
-        fun createRoute(codeEan: String?) = if (codeEan != null) "stock_screen/$codeEan" else "stock_screen"
+        fun createRoute(codeEan: String?) =
+            if (codeEan != null) "stock_screen/$codeEan" else "stock_screen"
     }
 
     object ProfileScreen : AppScreens("profile_screen")

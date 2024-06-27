@@ -147,6 +147,7 @@ fun HomeScreen(
                             enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
+                                withStock = false
                             }
                         )
 
@@ -160,7 +161,7 @@ fun HomeScreen(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_info),
                                     contentDescription = "Info Icon",
-                                    tint =  MaterialTheme.colorScheme.primary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.width(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -308,7 +309,7 @@ fun HomeCardItem(
 
 @Preview
 @Composable
-private fun Preview () {
+private fun Preview() {
     FoodieFrontendTheme {
         val padding = if (true) Modifier
             .padding(start = 15.dp, top = 40.dp, end = 15.dp)
@@ -323,7 +324,7 @@ private fun Preview () {
             horizontalAlignment = Alignment.Start
         ) {
 
-                Title(title = "${stringResource(R.string.hi)}")
+            Title(title = "${stringResource(R.string.hi)}")
 
             Title(
                 title = stringResource(R.string.what_are_u_eating),
@@ -367,7 +368,7 @@ private fun Preview () {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_info),
                         contentDescription = "Info Icon",
-                        tint =  MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.width(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
