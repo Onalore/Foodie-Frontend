@@ -113,8 +113,13 @@ fun NewRecipeScreen(navController: NavController, userViewModel: UserViewModel) 
                                     quantity = parts[1],
                                     unit = parts[2]
                                 )
-                            } else null
+                            } else {
+                                Log.e("NewRecipeScreen", "Ingredient format error: $it")
+                                null
+                            }
                         }
+
+                        Log.d("NewRecipeScreen", "Ingredientes list: $ingredientesList")
 
                         val receta = Recipe(
                             name = nombre,

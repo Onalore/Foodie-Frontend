@@ -2,6 +2,7 @@ package com.example.foodiefrontend.viewmodel
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.LiveData
@@ -32,6 +33,7 @@ import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.cancellation.CancellationException
 
 class UserViewModel : ViewModel() {
 
@@ -67,6 +69,7 @@ class UserViewModel : ViewModel() {
 
     private val _filteredRecipes = MutableLiveData<List<Recipe>?>()
     val filteredRecipes: LiveData<List<Recipe>?> = _filteredRecipes
+
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(mail = mail, password = password)
@@ -435,43 +438,71 @@ class UserViewModel : ViewModel() {
                             _temporaryRecipe.postValue(recipe)
                             Log.d("UserViewModel", "Temporal recipe fetched successfully")
                         } else {
+                            _temporaryRecipe.postValue(null)
                             Log.e("UserViewModel", "No temporal recipe found in the response")
                         }
                     } else {
                         Log.e(
                             "UserViewModel",
-                            "Error fetching favorite recipes: ${response.code()} ${response.message()}"
+                            "Error fetching temporary recipe: ${response.code()} ${response.message()}"
                         )
                         Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                        _temporaryRecipe.postValue(null)
                     }
                 } catch (e: Exception) {
-                    Log.e("UserViewModel", "Error fetching favorite recipes: ${e.message}")
+                    Log.e("UserViewModel", "Error fetching temporary recipe: ${e.message}", e)
+                    _temporaryRecipe.postValue(null)
                 }
             } else {
                 Log.e("UserViewModel", "Token not found")
+                _temporaryRecipe.postValue(null)
             }
         }
     }
 
-    fun rateRecipe(context: Context, puntuacion: Int, favorita: Boolean) {
-        viewModelScope.launch {
+    fun rateRecipe(context: Context, puntuacion: Int, favorita: Boolean, onComplete: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
             val token = getToken(context)
+            Log.d("UserViewModel", "Retrieved token: $token")
             if (token != null) {
                 try {
                     val ratingData = RatingData(puntuacion, favorita)
+                    Log.d("UserViewModel", "Rating data: $ratingData")
                     val response = apiRecipeService.rateRecipe("Bearer $token", ratingData)
-                    if (response.isSuccessful) {
-                        Log.d("UserViewModel", "Recipe rated successfully")
-                        fetchTemporaryRecipe(context) // Refresh temporary recipe
-                    } else {
-                        Log.e(
-                            "UserViewModel",
-                            "Error rating recipe: ${response.code()} ${response.message()}"
-                        )
-                        Log.e("UserViewModel", "Error body: ${response.errorBody()?.string()}")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("UserViewModel", "Recipe rated successfully")
+                            Toast.makeText(
+                                context,
+                                "Receta puntuada exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            fetchTemporaryRecipe(context) // Actualiza la recetaTemporal a null
+                            onComplete()
+                        } else {
+                            val errorBody = response.errorBody()?.string()
+                            Log.e("UserViewModel", "Error body: $errorBody")
+                            Toast.makeText(
+                                context,
+                                "Error al puntuar la receta",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    Log.e("UserViewModel", "Job was cancelled", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Operación cancelada", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
-                    Log.e("UserViewModel", "Error rating recipe: ${e.message}")
+                    Log.e("UserViewModel", "Error rating recipe: ${e.message}", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error al puntuar la receta: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } else {
                 Log.e("UserViewModel", "Token not found")
@@ -616,12 +647,20 @@ class UserViewModel : ViewModel() {
                     .enqueue(object : Callback<Unit> {
                         override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                             if (response.isSuccessful) {
-                                Log.d("UserViewModel", "Recipe created successfully")
+                                Log.d(
+                                    "UserViewModel",
+                                    "Recipe created successfully: ${response.body()}"
+                                )
                                 onResult(true)
                             } else {
                                 Log.e(
                                     "UserViewModel",
                                     "Error creating recipe: ${response.message()}"
+                                )
+                                Log.e("UserViewModel", "Response code: ${response.code()}")
+                                Log.e(
+                                    "UserViewModel",
+                                    "Error body: ${response.errorBody()?.string()}"
                                 )
                                 onResult(false)
                             }
@@ -638,6 +677,7 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
 }
 
 
