@@ -129,8 +129,8 @@ fun HomeScreen(
                             text = stringResource(R.string.suggest_with_my_ingredients),
                             containerColor = MaterialTheme.colorScheme.primary,
                             icon = R.drawable.stock,
-                            modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
+                            modifier = Modifier.height(100.dp),
                             enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
@@ -229,7 +229,9 @@ fun HomeScreen(
                                         )
                                     )
                                 },
-                                containerColor = MaterialTheme.colorScheme.secondary,
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                icon = R.drawable.ic_star_outlined,
+                                colorIcon = ColorFilter.tint(Color.White),
                                 text = "Puntuar",
                                 modifier = Modifier.padding(horizontal = 15.dp)
 
@@ -248,12 +250,14 @@ fun HomeScreen(
 //                            )
                         }
                     }
-                    Subtitle(
-                        title = "Tus recetas favoritas",
-                        modifier = Modifier
-                            .padding(start = 15.dp, top = 30.dp)
-                            .fillMaxWidth()
-                    )
+                    if (favoriteRecipes != null) {
+                        Subtitle(
+                            title = "Tus recetas favoritas",
+                            modifier = Modifier
+                                .padding(start = 15.dp, top = 30.dp)
+                                .fillMaxWidth()
+                        )
+                    }
                     favoriteRecipes?.let {
                         HorizontalCardList(
                             items = it,
