@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,11 +33,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.SampleData
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.CookingAnimation
@@ -62,9 +67,9 @@ fun AlertIngredientScanned(
     val confirmationResult by viewModel.confirmationResult.observeAsState()
 
     var shortageAlert by remember { mutableStateOf(false) }
-    val quantityState = remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
-    var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 1) }
-    var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
+    var quantityState by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf(1) }
+    var alertaEscasez by remember { mutableStateOf(0) }
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -122,13 +127,17 @@ fun AlertIngredientScanned(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier
                                 .width(200.dp)
-                                .padding(start = 40.dp)
+                                .padding(start = 20.dp)
                         ) {
                             IngredientEditable(
                                 quantity = quantityState,
+                                onValueChange = { quantityState = it },
                                 unit = null,
-                                onDecrement = { if (quantityState.value > 0) quantityState.value-- },
-                                onIncrement = { quantityState.value++ }
+                                onDecrement = { if (quantityState.toInt() > 0) (quantityState.toInt() - 1).toString() },
+                                onIncrement = {
+                                    quantityState =
+                                        (quantityState.toInt() + 1).toString()
+                                }
                             )
                             Text(
                                 text = productType?.unitMesure?.let {
@@ -243,7 +252,7 @@ fun AlertIngredientScanned(
                             val stockConfirmationRequest = mapOf(
                                 "ean" to codeEan,
                                 "tipoProducto" to productType!!.description,
-                                "cantidad" to quantityState.value,
+                                "cantidad" to quantityState,
                                 "unidad" to unit,
                                 "alerta" to alertaEscasez,
                                 "unidadMedida" to productType!!.unitMesure
@@ -252,7 +261,7 @@ fun AlertIngredientScanned(
                                 context,
                                 codeEan,
                                 productType!!.description,
-                                quantityState.value,
+                                quantityState.toInt(),
                                 unit.toString(),
                                 alertaEscasez,
                                 productType!!.unitMesure
@@ -293,7 +302,6 @@ fun AlertIngredientScanned(
 }
 
 
-/*
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
@@ -301,6 +309,7 @@ private fun Preview() {
     var shortageAlert by remember { mutableStateOf(false) }
 
     FoodieFrontendTheme {
+        @SuppressLint("UnrememberedMutableState")
         @Composable
         fun AlertIngredientScannedPreview(
             navController: NavController,
@@ -312,7 +321,7 @@ private fun Preview() {
             val addProductResult = true
 
             var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
-            var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
+            var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 1) }
             var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
 
             AlertDialog(
@@ -363,16 +372,17 @@ private fun Preview() {
                             productType?.quantity?.let {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    //horizontalArrangement = Arrangement.spacedBy(10.dp),
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .padding(start = 40.dp)
+                                        .padding(start = 10.dp)
                                 ) {
-                                    IngredientQuantity(
-                                        quantity = quantity.toString(),
+                                    IngredientEditable(
+                                        quantity = "0",
+                                        onValueChange = { quantity = it.toInt() },
                                         unit = null,
-                                        onDecrement = { if (quantity > 0) quantity-- },
-                                        onIncrement = { quantity++ }
+                                        onDecrement = { },
+                                        onIncrement = { }
                                     )
                                     Text(
                                         text = productType?.unitMesure?.let {
@@ -396,8 +406,8 @@ private fun Preview() {
                                     IngredientQuantity(
                                         quantity = unit.toString(),
                                         unit = null,
-                                        onDecrement = { if (unit > 0) unit-- },
-                                        onIncrement = { unit++ }
+                                        onDecrement = { },
+                                        onIncrement = { }
                                     )
                                     Text(
                                         text = "u.",
@@ -438,10 +448,8 @@ private fun Preview() {
                                     IngredientQuantity(
                                         quantity = alertaEscasez.toString(),
                                         unit = null,
-                                        onDecrement = {
-                                            if (alertaEscasez > 0) alertaEscasez--
-                                        },
-                                        onIncrement = { alertaEscasez++ },
+                                        onDecrement = { },
+                                        onIncrement = { },
                                         available = shortageAlert
                                     )
                                     Text(
@@ -487,15 +495,7 @@ private fun Preview() {
                             onClick = {
                                 setShowDialog(false)
                                 if (productType != null) {
-                                    val eanRequest = mapOf(
-                                        "ean" to codeEan,
-                                        "tipoProducto" to productType.description,
-                                        "cantidad" to quantity,
-                                        "unidad" to unit,
-                                        "alerta" to shortageAlert,
-                                        "unidadMedida" to productType.unitMesure
-                                    )
-                                    viewModel.confirmUser(eanRequest, context)
+
                                 }
                             },
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -540,4 +540,4 @@ private fun Preview() {
         )
     }
 }
-*/
+
