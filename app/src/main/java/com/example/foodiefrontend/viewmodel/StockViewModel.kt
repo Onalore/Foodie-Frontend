@@ -7,12 +7,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.ApiErrorResponse
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.StockConfirmationRequest
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.StockService
 import com.example.foodiefrontend.utils.dataStore
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.awaitResponse
@@ -58,8 +60,10 @@ class StockViewModel : ViewModel() {
                     }
                     _productType.postValue(ingredient)
                 } else {
-                    Log.d("StockViewModel", "Error fetching product: ${response.message()}")
-                    _error.postValue("No se pudo encontrar el producto: ${response.message()}")
+                    val errorBody = response.errorBody()?.string()
+                    val apiErrorResponse = Gson().fromJson(errorBody, ApiErrorResponse::class.java)
+                    Log.d("StockViewModel", "Error fetching product: ${apiErrorResponse.error}")
+                    _error.postValue("No se pudo encontrar el producto: ${apiErrorResponse.error}")
                 }
             } catch (e: Exception) {
                 Log.d("StockViewModel", "Exception fetching product: $e")
