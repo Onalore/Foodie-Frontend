@@ -61,7 +61,7 @@ fun RecipeScreen(
 
     LaunchedEffect(Unit) {
         Log.d("RecipeScreen: ", recipe.toString())
-        delay(30000L) // 30 segundos de retraso
+        delay(15000L) // 30 segundos de retraso
         showDialog = true
     }
 

@@ -267,7 +267,7 @@ fun AlertIngredientScanned(
             }
         },
         confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            /*Column(modifier = Modifier.fillMaxWidth()) {
                 CustomButton(
                     onClick = {
                         setShowDialog(false)
@@ -276,7 +276,7 @@ fun AlertIngredientScanned(
                     text = stringResource(R.string.enter_manually),
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
-            }
+            }*/
         }
     )
 

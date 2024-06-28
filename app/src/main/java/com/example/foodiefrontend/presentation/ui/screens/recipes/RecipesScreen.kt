@@ -115,7 +115,7 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
             }
 
-            CustomTextField(
+           /* CustomTextField(
                 value = recipe,
                 placeholder = stringResource(R.string.look_for_recipe),
                 onValueChange = { newValue ->
@@ -124,7 +124,7 @@ fun RecipesScreen(navController: NavController, userViewModel: UserViewModel) {
                 trailingIcon = R.drawable.ic_search,
                 modifier = Modifier,
                 enabled = true
-            )
+            )*/
         }
 
         Column(
