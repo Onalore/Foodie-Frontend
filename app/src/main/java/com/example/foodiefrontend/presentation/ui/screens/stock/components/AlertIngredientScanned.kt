@@ -62,8 +62,8 @@ fun AlertIngredientScanned(
     val confirmationResult by viewModel.confirmationResult.observeAsState()
 
     var shortageAlert by remember { mutableStateOf(false) }
-    var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
-    var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 0) }
+    val quantityState = remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
+    var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 1) }
     var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
 
     AlertDialog(
@@ -124,11 +124,11 @@ fun AlertIngredientScanned(
                                 .width(200.dp)
                                 .padding(start = 40.dp)
                         ) {
-                            IngredientQuantity(
-                                quantity = quantity.toString(),
+                            IngredientEditable(
+                                quantity = quantityState,
                                 unit = null,
-                                onDecrement = { if (quantity > 0) quantity-- },
-                                onIncrement = { quantity++ }
+                                onDecrement = { if (quantityState.value > 0) quantityState.value-- },
+                                onIncrement = { quantityState.value++ }
                             )
                             Text(
                                 text = productType?.unitMesure?.let {
@@ -243,7 +243,7 @@ fun AlertIngredientScanned(
                             val stockConfirmationRequest = mapOf(
                                 "ean" to codeEan,
                                 "tipoProducto" to productType!!.description,
-                                "cantidad" to quantity,
+                                "cantidad" to quantityState.value,
                                 "unidad" to unit,
                                 "alerta" to alertaEscasez,
                                 "unidadMedida" to productType!!.unitMesure
@@ -252,7 +252,7 @@ fun AlertIngredientScanned(
                                 context,
                                 codeEan,
                                 productType!!.description,
-                                quantity,
+                                quantityState.value,
                                 unit.toString(),
                                 alertaEscasez,
                                 productType!!.unitMesure
