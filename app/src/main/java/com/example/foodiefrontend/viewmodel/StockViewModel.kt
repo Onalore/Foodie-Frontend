@@ -63,7 +63,7 @@ class StockViewModel : ViewModel() {
                     val errorBody = response.errorBody()?.string()
                     val apiErrorResponse = Gson().fromJson(errorBody, ApiErrorResponse::class.java)
                     Log.d("StockViewModel", "Error fetching product: ${apiErrorResponse.error}")
-                    _error.postValue("No se pudo encontrar el producto: ${apiErrorResponse.error}")
+                    _error.postValue("${apiErrorResponse.error}")
                 }
             } catch (e: Exception) {
                 Log.d("StockViewModel", "Exception fetching product: $e")
