@@ -2,8 +2,7 @@ package com.example.foodiefrontend.presentation.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
@@ -44,15 +43,11 @@ fun CustomizedTextField(
     singleLine: Boolean = true,
     height: Dp = 50.dp
 ) {
-    val shape = RoundedCornerShape(16.dp)
 
     Surface(
-        elevation = 4.dp,
-        //shape = shape,
         modifier = Modifier
             .height(height)
-            //.width(70.dp)
-            .size(70.dp)
+            .width(70.dp)
             .then(modifier),
         onClick = { onClickIcon() }
     ) {
@@ -65,23 +60,23 @@ fun CustomizedTextField(
                     textAlign = TextAlign.Center
                 )
             },
-            //trailingIcon = trailingIcon,
             readOnly = readOnly,
             keyboardOptions = keyboardOptions,
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.onTertiary)
-                //.border(1.dp, MaterialTheme.colorScheme.onTertiary, shape)
                 .then(modifier),
-            //shape = shape,
             singleLine = singleLine,
-            //maxLines = 1,
-            textStyle = TextStyle(fontSize = 16.sp, textAlign = TextAlign.Center),
+            textStyle = TextStyle(fontSize = 14.sp, textAlign = TextAlign.Center),
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colorScheme.onSurface,
+                backgroundColor = if (enabled)
+                    MaterialTheme.colorScheme.onSurface
+                else
+                    Color(0xFFD8D8D8),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Black
             ),
+            enabled = enabled
         )
     }
 }
@@ -96,9 +91,7 @@ private fun PreviewCustomizedTextField() {
             value = text,
             placeholder = "placeholder",
             label = "label",
-            onValueChange = { newValue ->
-                text = newValue
-            },
+            onValueChange = { text = it },
             enabled = true
         )
     }

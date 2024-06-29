@@ -67,9 +67,9 @@ fun AlertIngredientScanned(
     val confirmationResult by viewModel.confirmationResult.observeAsState()
 
     var shortageAlert by remember { mutableStateOf(false) }
-    var quantityState by remember { mutableStateOf("") }
+    var quantityState by remember { mutableStateOf("0") }
     var unit by remember { mutableStateOf(1) }
-    var alertaEscasez by remember { mutableStateOf(0) }
+    var alertaEscasez by remember { mutableStateOf("0") }
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -126,19 +126,30 @@ fun AlertIngredientScanned(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier
-                                .width(200.dp)
-                                .padding(start = 20.dp)
+                                .width(240.dp)
+                                .padding(start = 30.dp)
                         ) {
                             IngredientEditable(
                                 quantity = quantityState,
                                 onValueChange = { quantityState = it },
                                 unit = null,
-                                onDecrement = { if (quantityState.toInt() > 0) (quantityState.toInt() - 1).toString() },
+                                onDecrement = {
+                                    if (quantityState == "") {
+                                        quantityState = "0"
+                                    } else {
+                                        quantityState =
+                                            (quantityState.toInt() - 1).coerceAtLeast(0).toString()
+                                    }
+                                },
                                 onIncrement = {
-                                    quantityState =
-                                        (quantityState.toInt() + 1).toString()
-                                }
+                                    if (quantityState == "") {
+                                        quantityState = "1"
+                                    } else {
+                                        quantityState = (quantityState.toInt() + 1).toString()
+                                    }
+                                },
                             )
+
                             Text(
                                 text = productType?.unitMesure?.let {
                                     if (it.length >= 2) it.substring(
@@ -197,16 +208,28 @@ fun AlertIngredientScanned(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier
-                                .width(200.dp)
-                                .padding(start = 40.dp)
+                                .width(240.dp)
+                                .padding(start = 30.dp)
                         ) {
-                            IngredientQuantity(
-                                quantity = alertaEscasez.toString(),
+                            IngredientEditable(
+                                quantity = alertaEscasez,
+                                onValueChange = { alertaEscasez = it },
                                 unit = null,
                                 onDecrement = {
-                                    if (alertaEscasez > 0) alertaEscasez--
+                                    if (alertaEscasez == "") {
+                                        alertaEscasez = "0"
+                                    } else {
+                                        alertaEscasez =
+                                            (alertaEscasez.toInt() - 1).coerceAtLeast(0).toString()
+                                    }
                                 },
-                                onIncrement = { alertaEscasez++ },
+                                onIncrement = {
+                                    if (alertaEscasez == "") {
+                                        alertaEscasez = "1"
+                                    } else {
+                                        alertaEscasez = (alertaEscasez.toInt() + 1).toString()
+                                    }
+                                },
                                 available = shortageAlert
                             )
                             Text(
@@ -249,6 +272,7 @@ fun AlertIngredientScanned(
                     onClick = {
                         setShowDialog(false)
                         if (productType != null) {
+                            if (quantityState == "") quantityState = "0"
                             val stockConfirmationRequest = mapOf(
                                 "ean" to codeEan,
                                 "tipoProducto" to productType!!.description,
@@ -263,7 +287,7 @@ fun AlertIngredientScanned(
                                 productType!!.description,
                                 quantityState.toInt(),
                                 unit.toString(),
-                                alertaEscasez,
+                                alertaEscasez.toInt(),
                                 productType!!.unitMesure
                             )
                         }

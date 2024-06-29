@@ -32,7 +32,7 @@ fun IngredientEditable(
 ) {
     Card(
         modifier = Modifier
-            .height(30.dp),
+            .height(50.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (!modify)
                 Color.Transparent
@@ -49,8 +49,7 @@ fun IngredientEditable(
             if (modify) {
                 IconButton(
                     onClick = {
-                        if (available) onDecrement() else {
-                        }
+                        if (available) onDecrement()
                     }
                 ) {
                     Icon(
@@ -65,14 +64,13 @@ fun IngredientEditable(
                 placeholder = "",
                 onValueChange = onValueChange,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                enabled = true
+                enabled = available
             )
 
             if (modify) {
                 IconButton(
                     onClick = {
-                        if (available) onIncrement() else {
-                        }
+                        if (available) onIncrement()
                     }
                 ) {
                     Icon(
