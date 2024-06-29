@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,14 +34,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.navigation.AppScreens
+import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.RecipeDescription
 import com.example.foodiefrontend.presentation.ui.components.RoundedImage
@@ -55,8 +63,7 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun HomeScreen(
     navController: NavController,
-    username: String,
-    userViewModel: UserViewModel = viewModel(), // Add ViewModel here
+    userViewModel: UserViewModel = viewModel(),
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var withStock by remember { mutableStateOf(true) }
@@ -64,13 +71,15 @@ fun HomeScreen(
     val favoriteRecipes by userViewModel.favoriteRecipes.observeAsState(emptyList())
     val context = LocalContext.current
     val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState(null) // Observe temporaryRecipe
+    val userInfo by userViewModel.userInfo.observeAsState()
 
     LaunchedEffect(Unit) {
+        userViewModel.getUserInfo(context)
         userViewModel.getFamilyMembers(context)
         userViewModel.fetchFavoriteRecipes(context)
         userViewModel.fetchTemporaryRecipe(context)
     }
-
+    Log.d("HomeScreen-------- ", temporaryRecipe.toString())
     if (showDialog) {
         AlertAskDiners(
             navController = navController,
@@ -92,15 +101,22 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.Start
             ) {
                 item {
+                    val padding = if (temporaryRecipe != null) Modifier
+                        .padding(start = 15.dp, top = 40.dp, end = 15.dp)
+                    else
+                        Modifier.padding(horizontal = 15.dp, vertical = 40.dp)
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = MaterialTheme.colorScheme.onTertiary)
-                            .padding(horizontal = 15.dp, vertical = 40.dp),
+                            .then(padding),
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Title(title = "${stringResource(R.string.hi)} $username")
+                        userInfo?.let { user ->
+                            Title(title = "${stringResource(R.string.hi)} ${user.persona.nombre}")
+                        }
 
                         Title(
                             title = stringResource(R.string.what_are_u_eating),
@@ -113,8 +129,9 @@ fun HomeScreen(
                             text = stringResource(R.string.suggest_with_my_ingredients),
                             containerColor = MaterialTheme.colorScheme.primary,
                             icon = R.drawable.stock,
-                            modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
+                            modifier = Modifier.height(100.dp),
+                            enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
                             }
@@ -128,17 +145,42 @@ fun HomeScreen(
                             icon = R.drawable.dice,
                             modifier = Modifier.height(100.dp),
                             colorIcon = ColorFilter.tint(Color.White),
+                            enabled = temporaryRecipe == null,
                             onClick = {
                                 showDialog = true
+                                withStock = false
                             }
                         )
+
+                        if (temporaryRecipe != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_info),
+                                    contentDescription = "Info Icon",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.width(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Puntúa la receta en proceso para generar más recetas",
+                                    color = MaterialTheme.colorScheme.primary, // Color morado del texto
+                                    fontSize = 16.sp,
+                                    lineHeight = 20.sp
+                                )
+                            }
+                        }
                     }
 
                     if (temporaryRecipe != null) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(vertical = 30.dp, horizontal = 15.dp),
+                                .padding(top = 30.dp, start = 15.dp, end = 15.dp),
                             verticalArrangement = Arrangement.spacedBy(20.dp),
                             horizontalAlignment = Alignment.Start
                         ) {
@@ -150,7 +192,6 @@ fun HomeScreen(
                             RecipesCardItem(
                                 title = temporaryRecipe!!.name,
                                 image = temporaryRecipe!!.imageUrl,
-                                scored = false,
                                 onClick = {
                                     val recipeJson = Gson().toJson(temporaryRecipe)
                                     val encodedRecipeJson =
@@ -169,14 +210,55 @@ fun HomeScreen(
                                     )
                                 }
                             )
+
+                            CustomButton(
+                                onClick = {
+                                    Log.d("HomeScreen", "Puntuar text clicked")
+                                    val recipeJson = Gson().toJson(temporaryRecipe)
+                                    val encodedRecipeJson =
+                                        URLEncoder.encode(
+                                            recipeJson,
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                    Log.d(
+                                        "HomeScreen",
+                                        "Navigating to RateRecipeScreen with encoded recipe JSON: $encodedRecipeJson"
+                                    )
+                                    navController.navigate(
+                                        AppScreens.RateRecipeScreen.createRoute(
+                                            encodedRecipeJson
+                                        )
+                                    )
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                icon = R.drawable.ic_star_outlined,
+                                colorIcon = ColorFilter.tint(Color.White),
+                                text = "Puntuar",
+                                modifier = Modifier.padding(horizontal = 15.dp)
+
+                            )
+//                            Text(
+//                                text = "Puntuar",
+//                                modifier = Modifier
+//                                    .clickable {
+//                                    }
+//                                    .padding(8.dp)
+//                                    .background(MaterialTheme.colorScheme.primary)
+//                                    .fillMaxWidth()
+//                                    .padding(8.dp),
+//                                color = Color.White,
+//                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+//                            )
                         }
                     }
-                    Subtitle(
-                        title = "Tus recetas favoritas",
-                        modifier = Modifier
-                            .padding(start = 15.dp)
-                            .fillMaxWidth()
-                    )
+                    if (favoriteRecipes != null) {
+                        Subtitle(
+                            title = "Tus recetas favoritas",
+                            modifier = Modifier
+                                .padding(start = 15.dp, top = 30.dp)
+                                .fillMaxWidth()
+                        )
+                    }
                     favoriteRecipes?.let {
                         HorizontalCardList(
                             items = it,
@@ -233,8 +315,16 @@ fun HomeCardItem(
                 .padding(start = 10.dp, top = 150.dp)
                 .width(250.dp)
                 .height(90.dp),
-            punctuation = true,
-            initialRating = 0
         )
+    }
+}
+
+
+@Preview
+@Composable
+private fun Preview() {
+    FoodieFrontendTheme {
+        val userViewModel: UserViewModel = viewModel()
+       HomeScreen(navController = rememberNavController(), userViewModel = userViewModel)
     }
 }

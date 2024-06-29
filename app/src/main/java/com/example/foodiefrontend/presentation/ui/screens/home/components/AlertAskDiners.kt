@@ -33,18 +33,19 @@ import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.screens.register.components.CustomComboBox
 import com.example.foodiefrontend.utils.Constants
-import com.example.foodiefrontend.viewmodel.UserViewModel
+import com.example.foodiefrontend.viewmodel.SuggestedRecipesViewModel
 
 @Composable
 fun AlertAskDiners(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
     withStock: Boolean,
-    grupoFamiliar: List<Persona>, // Pass the user's family group here
-    userViewModel: UserViewModel = viewModel()
+    grupoFamiliar: List<Persona>,
+    suggestedRecipesViewModel: SuggestedRecipesViewModel = viewModel()
 ) {
     var comensales by remember { mutableStateOf(emptyList<Persona>()) }
     var comida by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     AlertDialog(
@@ -93,40 +94,65 @@ fun AlertAskDiners(
                     label = stringResource(R.string.select_meal),
                     items = Constants.comidas
                 )
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         },
         dismissButton = {
             CustomButton(
                 onClick = {
-                    setShowDialog(false)
+                    Log.d("AlertAskDiners", "Confirm button clicked")
+                    if (comida.isEmpty()) {
+                        errorMessage = "Por favor, selecciona una comida."
+                    } else {
+                        setShowDialog(false)
+                        errorMessage = ""
+                        if (withStock) {
+                            suggestedRecipesViewModel.fetchRecipes(context, comensales, comida)
+                            navController.navigate(
+                                AppScreens.SuggestedRecipesScreen.createRoute(
+                                    comensales,
+                                    comida
+                                )
+                            )
+                        } else {
+                            suggestedRecipesViewModel.fetchRandomRecipes(
+                                context,
+                                comensales,
+                                comida
+                            )
+                            navController.navigate(
+                                AppScreens.RandomRecipesScreen.createRoute(
+                                    comensales,
+                                    comida
+                                )
+                            )
+                        }
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.btn_cancel),
-                modifier = Modifier
+                text = "Generar receta",
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         },
         confirmButton = {
             CustomButton(
                 onClick = {
-                    Log.d("AlertAskDiners", "Confirm button clicked")
-                    userViewModel.sendSelectedData(context, comensales, comida)
                     setShowDialog(false)
-                    if (withStock) {
-                        Log.d("AlertAskDiners", "Navigating to SuggestedRecipesScreen")
-                        navController.navigate(AppScreens.SuggestedRecipesScreen.route)
-                    } else {
-                        Log.d("AlertAskDiners", "Navigating to RandomRecipesScreen")
-                        navController.navigate(AppScreens.RandomRecipesScreen.route)
-                    }
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
-                text = "Generar receta",
-                contentColor = MaterialTheme.colorScheme.onSurface
+                text = stringResource(R.string.btn_cancel),
+                modifier = Modifier
             )
         }
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable

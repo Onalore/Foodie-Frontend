@@ -54,33 +54,38 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val loginResult by viewModel.loginResult.observeAsState()
     val userInfo by viewModel.userInfo.observeAsState()
+    val error by viewModel.error.observeAsState()
 
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
             // Login successful, get user info
             viewModel.getUserInfo(context)
-        } else if (loginResult == null && showError) {
-            // Show error message
+        } else if (showError) {
+            showError = true
             Log.d("LoginScreen", "Login failed or no response.")
         }
     }
 
     LaunchedEffect(userInfo) {
         userInfo?.let {
-            val persona = it.persona
-            if (persona != null && persona.nombre != null) {
-                val username = persona.nombre
-                Log.d("LoginScreen", "Navigating to HomeScreen with username: $username (type: ${username::class.simpleName})")
-                // Navigate to HomeScreen with the user's name
-                navController.navigate("${AppScreens.HomeScreen.route}/$username")
-            } else {
-                Log.e("LoginScreen", "Persona or persona.nombre is null")
+            Log.d("LoginScreen", "Navigating to HomeScreen")
+            // Navigate to HomeScreen without passing username
+            navController.navigate(AppScreens.HomeScreen.route) {
+                popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
             }
         } ?: run {
             Log.e("LoginScreen", "User info is null")
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let {
+            errorMessage = it
+            showError = true
         }
     }
 

@@ -7,5 +7,7 @@ data class Ingredient(
     @SerializedName("description") val description: String = "",
     @SerializedName("quantity") val quantity: String = "",
     @SerializedName("unit") val unit: String = "",
-    @SerializedName("imageUrl") val imageUrl: String = ""
+    @SerializedName("unitMesure") val unitMesure: String = "",
+    @SerializedName("imageUrl") val imageUrl: String = "",
+    @SerializedName("alertaEscasez") val alertaEscasez: Int = 0
 )

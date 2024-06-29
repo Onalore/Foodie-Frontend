@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.DinersData
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.utils.dataStore
@@ -19,16 +21,30 @@ class SuggestedRecipesViewModel : ViewModel() {
     private val _recipes = MutableLiveData<List<Recipe>>()
     val recipes: LiveData<List<Recipe>> get() = _recipes
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
-    fun fetchRecipes(context: Context) {
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    init {
+        _isLoading.value = false
+    }
+
+    fun fetchRecipes(context: Context, comensales: List<Persona>, comida: String) {
+        _isLoading.value = true
+        _error.value = null
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
                 Log.d("SuggestedRecipesViewModel", "fetchRecipes called with token $token")
-                val response = BackendApi.createRecipesService().getRecipes(token).awaitResponse()
+
+                val dinersData = DinersData(comensales, comida)
+                val response =
+                    BackendApi.createRecipesService().getRecipes(token, dinersData).awaitResponse()
+
                 if (response.isSuccessful) {
+                    Log.d("SuggestedRecipes", "Response: ${response.body()}")
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)
                 } else {
@@ -46,18 +62,27 @@ class SuggestedRecipesViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.d("SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
                 _error.postValue("Error de excepción: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
-    fun fetchRandomRecipes(context: Context) {
+    fun fetchRandomRecipes(context: Context, comensales: List<Persona>, comida: String) {
+        _isLoading.value = true
+        _error.value = null
+
         viewModelScope.launch {
             try {
                 val token = "Bearer " + getToken(context)
                 Log.d("SuggestedRecipesViewModel", "fetchRecipes called with token $token")
-                val response =
-                    BackendApi.createRecipesService().randomRecipes(token).awaitResponse()
+
+                val dinersData = DinersData(comensales, comida)
+                val response = BackendApi.createRecipesService().randomRecipes(token, dinersData)
+                    .awaitResponse()
+
                 if (response.isSuccessful) {
+                    Log.d("SuggestedRecipes", "Response: ${response.body()}")
                     val recipesList = response.body() ?: emptyList()
                     _recipes.postValue(recipesList)
                 } else {
@@ -75,6 +100,8 @@ class SuggestedRecipesViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.d("SuggestedRecipesViewModel", "Catch Recipes fetched: $e")
                 _error.postValue("Error de excepción: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }

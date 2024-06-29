@@ -32,7 +32,8 @@ fun RecipeDescription(
     punctuation: Boolean = false,
     initialRating: Int? = 0,
     modifier: Modifier,
-    scored: Boolean = true
+    scored: Boolean = true,
+    onClickScore: () -> Unit = {}
 ) {
 
     var isSelected by remember { mutableStateOf(false) }
@@ -77,7 +78,7 @@ fun RecipeDescription(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clickable(onClick = { /*TODO*/ })
+                            .clickable(onClick = { onClickScore() })
                             .weight(0.5f)
                     ) {
                         ImageWithResource(

@@ -1,7 +1,12 @@
 package com.example.foodiefrontend.navigation
 
+import SuggestedRecipesScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -10,19 +15,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.AddFamilyScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.FamilyConfigScreen
 import com.example.foodiefrontend.presentation.ui.screens.familyConfig.ModifyFamilyScreen
 import com.example.foodiefrontend.presentation.ui.screens.home.HomeScreen
+import com.example.foodiefrontend.presentation.ui.screens.home.components.AlertScore
 import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.RandomRecipesScreen
-import com.example.foodiefrontend.presentation.ui.screens.home.suggestedRecipes.SuggestedRecipesScreen
 import com.example.foodiefrontend.presentation.ui.screens.login.LoginScreen
 import com.example.foodiefrontend.presentation.ui.screens.profile.ProfileScreen
 import com.example.foodiefrontend.presentation.ui.screens.recipe.RecipeScreen
+import com.example.foodiefrontend.presentation.ui.screens.recipes.RecipesScreen
+import com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe.NewRecipeScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
+import com.example.foodiefrontend.presentation.ui.screens.register.SuccessfulRegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 import com.example.foodiefrontend.viewmodel.UserViewModel
 import com.google.gson.Gson
@@ -46,17 +56,32 @@ fun AppNavigation(navController: NavHostController) {
             Log.d("AppNavigation", "Navigating to LoginScreen")
             LoginScreen(navController)
         }
+        composable(route = AppScreens.SuccessfulRegisterScreen.route) {
+            Log.d("AppNavigation", "Navigating to SuccessfulRegisterScreen")
+            SuccessfulRegisterScreen(navController)
+        }
         composable(route = AppScreens.RegisterScreen.route) {
             Log.d("AppNavigation", "Navigating to RegisterScreen")
             RegisterScreen(navController)
         }
-        composable(
-            route = "${AppScreens.HomeScreen.route}/{username}",
-            arguments = listOf(navArgument("username") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            Log.d("AppNavigation", "Navigating to HomeScreen with username: $username")
-            HomeScreen(navController, username)
+        composable(route = AppScreens.HomeScreen.route) {
+            Log.d("AppNavigation", "Navigating to HomeScreen")
+            HomeScreen(navController)
+        }
+        composable(AppScreens.RateRecipeScreen.route) { backStackEntry ->
+            val recipeJson = backStackEntry.arguments?.getString("recipeJson")
+            val recipe = Gson().fromJson(recipeJson, Recipe::class.java)
+            var showDialog by remember { mutableStateOf(true) }
+
+            if (showDialog) {
+                Log.d("AppNavigation", "Showing AlertScore for recipe: $recipe")
+                AlertScore(
+                    navController = navController,
+                    recipe = recipe,
+                    setShowDialog = { showDialog = it },
+                    userViewModel = viewModel()
+                )
+            }
         }
         composable(
             route = AppScreens.RecipeScreen.route,
@@ -68,11 +93,41 @@ fun AppNavigation(navController: NavHostController) {
             Log.d("Navigation", "Navigating to RecipeScreen with recipe: $recipe")
             RecipeScreen(navController, recipe)
         }
-        composable(route = AppScreens.SuggestedRecipesScreen.route) {
-            SuggestedRecipesScreen(navController)
+        composable(
+            route = AppScreens.SuggestedRecipesScreen.route,
+            arguments = listOf(navArgument("comensales") { type = NavType.StringType },
+                navArgument("comida") { type = NavType.StringType })
+        ) { entry ->
+            val comensalesJson = entry.arguments?.getString("comensales") ?: "[]"
+            val comensales = Gson().fromJson(
+                URLDecoder.decode(
+                    comensalesJson,
+                    StandardCharsets.UTF_8.toString()
+                ), Array<Persona>::class.java
+            ).toList()
+            val comida = entry.arguments?.getString("comida") ?: ""
+            SuggestedRecipesScreen(navController, comensales, comida)
         }
-        composable(route = AppScreens.RandomRecipesScreen.route) {
-            RandomRecipesScreen(navController)
+        composable(
+            route = AppScreens.RandomRecipesScreen.route,
+            arguments = listOf(navArgument("comensales") { type = NavType.StringType },
+                navArgument("comida") { type = NavType.StringType })
+        ) { entry ->
+            val comensalesJson = entry.arguments?.getString("comensales") ?: "[]"
+            val comensales = Gson().fromJson(
+                URLDecoder.decode(
+                    comensalesJson,
+                    StandardCharsets.UTF_8.toString()
+                ), Array<Persona>::class.java
+            ).toList()
+            val comida = entry.arguments?.getString("comida") ?: ""
+            RandomRecipesScreen(navController, comensales, comida)
+        }
+        composable(route = AppScreens.RecipesScreen.route) {
+            RecipesScreen(navController, userViewModel)
+        }
+        composable(AppScreens.NewRecipeScreen.route) {
+            NewRecipeScreen(navController, userViewModel)
         }
         composable(route = AppScreens.StockScreen.route) {
             StockScreen(navController)
@@ -87,10 +142,18 @@ fun AppNavigation(navController: NavHostController) {
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController, userViewModel, context)
         }
-        composable(route = AppScreens.CameraScreen.route) {
-            CameraScreen(navController) { codeEan ->
-                navController.navigate("stock_screen/$codeEan")
+        composable("camera_screen") {
+            CameraScreen(navController) { ean ->
+                navController.navigate("alertIngredientScanned/$ean")
             }
+        }
+        composable("alertIngredientScanned/{ean}") { backStackEntry ->
+            val ean = backStackEntry.arguments?.getString("ean") ?: ""
+            AlertIngredientScanned(
+                navController,
+                setShowDialog = { /* Implementar lógica */ },
+                codeEan = ean
+            )
         }
         composable(route = AppScreens.FamilyConfigScreen.route) {
             FamilyConfigScreen(navController, userViewModel)
