@@ -24,12 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,11 +60,19 @@ fun RecipeScreen(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val userViewModel: UserViewModel = viewModel()
+    val context = LocalContext.current
+    val temporaryRecipe by userViewModel.temporaryRecipe.observeAsState()
+    Log.d("RecipeScreen: ", temporaryRecipe.toString())
 
     LaunchedEffect(Unit) {
-        Log.d("RecipeScreen: ", recipe.toString())
-        delay(15000L) // 30 segundos de retraso
-        showDialog = true
+        userViewModel.fetchTemporaryRecipe(context)
+    }
+
+    LaunchedEffect(temporaryRecipe) {
+        if (temporaryRecipe == null) {
+            delay(30000L) // 30 segundos de retraso
+            showDialog = true
+        }
     }
 
     if (showDialog) {
