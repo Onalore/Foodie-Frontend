@@ -70,9 +70,11 @@ class UserViewModel : ViewModel() {
     private val _filteredRecipes = MutableLiveData<List<Recipe>?>()
     val filteredRecipes: LiveData<List<Recipe>?> = _filteredRecipes
 
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
 
     fun loginUser(context: Context, mail: String, password: String) {
-        val loginRequest = LoginRequest(mail = mail, password = password)
+        val loginRequest = LoginRequest(email = mail, password = password)
         viewModelScope.launch {
             Log.d("UserViewModel", "Starting loginUser with email: $mail")
             apiService.loginUser(loginRequest).enqueue(object : Callback<AuthResponse> {
@@ -95,12 +97,12 @@ class UserViewModel : ViewModel() {
                             "UserViewModel",
                             "Login failed with response code: ${response.code()}"
                         )
-                        Log.d("UserViewModel", "Response message: ${response.message()}")
                         Log.d(
                             "UserViewModel",
                             "Response error body: ${response.errorBody()?.string()}"
                         )
                         _loginResult.value = null
+                        _error.postValue("Por favor, ingrese un correo electrónico y una contraseña válidos")
                     }
                 }
 

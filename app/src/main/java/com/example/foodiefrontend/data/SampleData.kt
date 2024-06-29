@@ -1,4 +1,3 @@
-
 package com.example.foodiefrontend.data
 
 object SampleData {
@@ -12,7 +11,8 @@ object SampleData {
         Ingredient(id = "Queso", quantity = "1/4", unit = "kg", imageUrl = "")
     )
 
-    val sampleIngredient = Ingredient(id = "Espinaca", quantity = "1", unit = "u.", imageUrl = "")
+    val sampleIngredient =
+        Ingredient(id = "Espinaca", quantity = "1", unit = "1", unitMesure = "u.", imageUrl = "")
 
     val samplePreparation = listOf(
         "Mezcle en una fuente la harina, el aceite, las zanahorias, la carne de soya hidratada, la cebolla y la sal",
