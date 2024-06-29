@@ -433,14 +433,11 @@ class UserViewModel : ViewModel() {
                     Log.d("UserViewModel", "Request sent to /ver with token: Bearer $token")
                     if (response.isSuccessful) {
                         val responseBody = response.body()
-                        Log.d("UserViewModel", "Response body: $responseBody")
-
                         val recipe = responseBody?.recetaTemporal
+                        _temporaryRecipe.postValue(recipe)
                         if (recipe != null) {
-                            _temporaryRecipe.postValue(recipe)
                             Log.d("UserViewModel", "Temporal recipe fetched successfully")
                         } else {
-                            _temporaryRecipe.postValue(null)
                             Log.e("UserViewModel", "No temporal recipe found in the response")
                         }
                     } else {
@@ -461,6 +458,7 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
 
     fun rateRecipe(context: Context, puntuacion: Int, favorita: Boolean, onComplete: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
