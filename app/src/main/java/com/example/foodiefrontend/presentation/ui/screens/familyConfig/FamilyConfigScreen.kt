@@ -63,7 +63,7 @@ fun FamilyConfigScreen(
         ) {
             Row {
                 Title(
-                    title = "Tus familiares",
+                    title = "Tus comensales",
                     modifier = Modifier
                         .weight(1f)
                         .padding(bottom = 30.dp)

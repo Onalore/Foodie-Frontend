@@ -67,7 +67,7 @@ fun AddFamilyScreen(navController: NavController, viewModel: UserViewModel = vie
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Añade un familiar",
+                    text = "Añade un comensal",
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )

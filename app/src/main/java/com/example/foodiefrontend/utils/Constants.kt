@@ -9,7 +9,8 @@ object Constants {
         "Diabetes",
         "Kosher",
         "Hipertensión",
-        "Intolerancia a la Lactosa"
+        "Intolerancia a la Lactosa",
+        "Ninguna"
     )
 
     val comidas = listOf(
