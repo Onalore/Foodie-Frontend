@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodiefrontend.R
+import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
@@ -52,7 +53,7 @@ fun AlertIngredient(
     navController: NavController,
     setShowDialog: (Boolean) -> Unit,
     codeEan: String,
-    tipoProducto: String,
+    tipoProducto: Ingredient? = null,
 ) {
     val context = LocalContext.current
     val viewModel: StockViewModel = viewModel()
@@ -63,13 +64,8 @@ fun AlertIngredient(
         }
     }
 
-    if (tipoProducto.isNotEmpty()) {
-        LaunchedEffect(tipoProducto) {
-            //viewModel.findProductByEan(tipoProducto)
-        }
-    }
-
-    val productType by viewModel.productType.observeAsState()
+    val observedProductType by viewModel.productType.observeAsState()
+    val productType = tipoProducto ?: observedProductType
     val error by viewModel.error.observeAsState()
     val confirmationResult by viewModel.confirmationResult.observeAsState()
 
