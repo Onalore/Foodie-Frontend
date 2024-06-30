@@ -145,10 +145,10 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable("camera_screen") {
             CameraScreen(navController) { ean ->
-                navController.navigate("alertIngredientScanned/$ean")
+                navController.navigate("alertIngredient/$ean")
             }
         }
-        composable("alertIngredientScanned/{ean}") { backStackEntry ->
+        composable("alertIngredient/{ean}") { backStackEntry ->
             val ean = backStackEntry.arguments?.getString("ean") ?: ""
             AlertIngredient(
                 navController,
