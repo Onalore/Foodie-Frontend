@@ -34,7 +34,6 @@ import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScree
 import com.example.foodiefrontend.presentation.ui.screens.register.SuccessfulRegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredient
-import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 import com.example.foodiefrontend.viewmodel.UserViewModel
 import com.google.gson.Gson
@@ -151,7 +150,7 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable("alertIngredientScanned/{ean}") { backStackEntry ->
             val ean = backStackEntry.arguments?.getString("ean") ?: ""
-            AlertIngredientScanned(
+            AlertIngredient(
                 navController,
                 setShowDialog = { /* Implementar lógica */ },
                 codeEan = ean

@@ -36,7 +36,6 @@ import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredient
-import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertLookForIngredient
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
@@ -69,7 +68,7 @@ fun StockScreen(
             codeEan = ""
         )
     } else if (showDialog && codeEan != null) {
-        AlertIngredientScanned(
+        AlertIngredient(
             navController = navController,
             setShowDialog = { param ->
                 showDialog = param
