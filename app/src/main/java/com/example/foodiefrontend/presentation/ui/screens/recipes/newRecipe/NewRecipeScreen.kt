@@ -105,7 +105,7 @@ fun NewRecipeScreen(navController: NavController, userViewModel: UserViewModel) 
             CustomButton(
                 onClick = {
                     if (nombre.isNotBlank() && ingredientes.isNotBlank() && preparacion.isNotBlank()) {
-                        val ingredientesList = ingredientes.split("\n").mapNotNull {
+                        /*val ingredientesList = ingredientes.split("\n").mapNotNull {
                             val parts = it.split(",").map { part -> part.trim() }
                             if (parts.size == 3) {
                                 Ingredient(
@@ -113,7 +113,19 @@ fun NewRecipeScreen(navController: NavController, userViewModel: UserViewModel) 
                                     quantity = parts[1],
                                     unit = parts[2]
                                 )
-                            } else {
+                            */
+                        val ingredientesList = ingredientes.split("\n").mapNotNull {
+                            val parts = it.trim().split(" ")
+                            if (parts.size >= 3) {
+                                val unit = parts.last()
+                                val quantity = parts[parts.size - 2]
+                                val description = parts.subList(0, parts.size - 2).joinToString(" ")
+                                Ingredient(
+                                    description = description,
+                                    quantity = quantity,
+                                    unit = unit
+                                )
+                        }else {
                                 Log.e("NewRecipeScreen", "Ingredient format error: $it")
                                 null
                             }

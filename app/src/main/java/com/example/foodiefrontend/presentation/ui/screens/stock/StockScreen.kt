@@ -119,7 +119,7 @@ fun StockScreen(
                 )
             }
 
-            CustomTextField(
+            /*CustomTextField(
                 value = ingredient,
                 placeholder = stringResource(R.string.look_for_ingredient),
                 onValueChange = { newValue ->
@@ -128,7 +128,7 @@ fun StockScreen(
                 trailingIcon = R.drawable.ic_search,
                 modifier = Modifier,
                 enabled = false
-            )
+            )*/
         }
         Box() {
             LazyVerticalGrid(

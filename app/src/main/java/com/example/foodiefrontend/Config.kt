@@ -6,6 +6,7 @@ import java.util.Properties
 
 object Config {
     private lateinit var properties: Properties
+    private const val API_PATH = "/api/"
 
     fun load(context: Context) {
         properties = Properties().apply {
@@ -13,7 +14,12 @@ object Config {
         }
     }
 
+    fun getUrl(): String {
+        return properties.getProperty("URL")
+    }
+
     fun getBaseUrl(): String {
-        return properties.getProperty("BASE_URL")
+        val url = getUrl()
+        return "$url$API_PATH"
     }
 }

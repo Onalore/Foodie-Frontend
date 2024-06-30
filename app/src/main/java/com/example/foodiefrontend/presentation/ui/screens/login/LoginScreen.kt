@@ -54,16 +54,18 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val loginResult by viewModel.loginResult.observeAsState()
     val userInfo by viewModel.userInfo.observeAsState()
+    val error by viewModel.error.observeAsState()
 
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
             // Login successful, get user info
             viewModel.getUserInfo(context)
-        } else if (loginResult == null && showError) {
-            // Show error message
+        } else if (showError) {
+            showError = true
             Log.d("LoginScreen", "Login failed or no response.")
         }
     }
@@ -77,6 +79,13 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel = viewMod
             }
         } ?: run {
             Log.e("LoginScreen", "User info is null")
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let {
+            errorMessage = it
+            showError = true
         }
     }
 
