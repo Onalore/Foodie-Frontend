@@ -1,28 +1,18 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,28 +23,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
 import com.example.foodiefrontend.R
-import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
-import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
-import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientManual
-import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertLookForIngredient
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredient
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertLookForIngredient
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,10 +62,11 @@ fun StockScreen(
     }
 
     if (showManualDialog && ingredientSelected != null) {
-        AlertIngredientManual(
+        AlertIngredient(
             navController = navController,
             setShowDialog = { showManualDialog = it },
-            productType = ingredientSelected
+            tipoProducto = ingredientSelected,
+            codeEan = ""
         )
     } else if (showDialog && codeEan != null) {
         AlertIngredientScanned(
@@ -129,7 +113,9 @@ fun StockScreen(
                         lookForManually = true
                     },
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.padding(end = 30.dp).size(50.dp)
+                    modifier = Modifier
+                        .padding(end = 30.dp)
+                        .size(50.dp)
                 )
                 ImageWithResource(
                     resourceId = R.drawable.ic_scan,
@@ -183,10 +169,11 @@ fun Preview() {
     FoodieFrontendTheme {
 
         if (showManualDialog && ingredientSelected != null) {
-            AlertIngredientManual(
+            AlertIngredient(
                 navController = rememberNavController(),
                 setShowDialog = { showManualDialog = it },
-                productType = ingredientSelected
+                tipoProducto = ingredientSelected,
+                codeEan = ""
             )
         }
 
@@ -216,7 +203,9 @@ fun Preview() {
                             lookForManually = true
                         },
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier.padding(end = 30.dp).size(50.dp)
+                        modifier = Modifier
+                            .padding(end = 30.dp)
+                            .size(50.dp)
                     )
                     ImageWithResource(
                         resourceId = R.drawable.ic_scan,
@@ -247,8 +236,8 @@ fun Preview() {
                     items(stockIngredients) { ingredient ->
                         IngredientCard(
                             ingredient = ingredient,
-                            onIncrement = { /* Implement increment action */ },
-                            onDecrement = { /* Implement decrement action */ }
+                            onIncrement = {},
+                            onDecrement = {}
                         )
                     }
                 }

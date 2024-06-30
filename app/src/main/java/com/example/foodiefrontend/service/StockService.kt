@@ -9,6 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface StockService {
     @GET("escaner/ean/{ean}")
@@ -28,7 +29,13 @@ interface StockService {
 
     @POST("stock/manual")
     fun addProductByName(
-        @Body productRequest: Map<String, Any>,
+        @Body requestBody: Map<String, Any>,
         @Header("Authorization") token: String
     ): Call<Void>
+
+    @GET("stock/search")
+    fun searchProducts(
+        @Header("Authorization") token: String,
+        @Query("nombreProducto") nombreProducto: String
+    ): Call<List<IngredientResponse>>
 }
