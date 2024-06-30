@@ -1,21 +1,16 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material3.AlertDialog
@@ -24,7 +19,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +46,10 @@ import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.CustomTextField
+import com.example.foodiefrontend.viewmodel.StockViewModel
+import com.google.gson.Gson
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun AlertLookForIngredient(
@@ -60,13 +58,12 @@ fun AlertLookForIngredient(
     productList: List<Ingredient>? = null
 ) {
     val context = LocalContext.current
+    val viewModel: StockViewModel = viewModel()
     var showManualDialog by remember { mutableStateOf(false) }
     var recentlyOpen by remember { mutableStateOf(true) }
     var ingredient by remember { mutableStateOf("") }
-    var ingredientSelected by remember {
-        mutableStateOf(SampleData.sampleIngredient)
-    }
-
+    var ingredientSelected by remember { mutableStateOf(SampleData.sampleIngredient) }
+    val searchResults by viewModel.stockResult.observeAsState(emptyList())
 
     AlertDialog(
         onDismissRequest = { setShowDialog(false) },
@@ -102,12 +99,12 @@ fun AlertLookForIngredient(
                     onValueChange = { newValue ->
                         ingredient = newValue
                         recentlyOpen = false
+                        viewModel.searchProducts(context, newValue)
                     },
                     trailingIcon = R.drawable.ic_search,
-                    modifier = Modifier,
-                    enabled = false
+                    modifier = Modifier.fillMaxWidth()
                 )
-                if (productList != null) {
+                if (searchResults.isNotEmpty()) {
                     Surface(
                         elevation = 4.dp,
                         shape = RoundedCornerShape(10.dp)
@@ -121,23 +118,23 @@ fun AlertLookForIngredient(
                             LazyColumn(
                                 modifier = Modifier.height(300.dp),
                             ) {
-                                productList.forEach { ingredient ->
-                                    item {
-                                        IngredientCard(
-                                            ingredient,
-                                            setShowManualDialog = { param ->
-                                                showManualDialog = param
-                                            },
-                                            setIngredientScan = {
-                                                ingredientSelected = ingredient
-                                            }
-                                        )
-                                    }
+                                items(searchResults) { ingredient ->
+                                    IngredientCard(
+                                        ingredient,
+                                        onClick = {
+                                            setShowDialog(false)
+                                            val ingredientJson = URLEncoder.encode(
+                                                Gson().toJson(ingredient),
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                            navController.navigate("alertIngredient/$ingredientJson")
+                                        }
+                                    )
                                 }
                             }
                         }
                     }
-                } else if (recentlyOpen){
+                } else if (recentlyOpen) {
                     null
                 } else {
                     Column(
@@ -145,7 +142,6 @@ fun AlertLookForIngredient(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
                         Text(
                             text = "No se encontraron productos con ese nombre",
                             style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.tertiary),
@@ -178,8 +174,7 @@ fun AlertLookForIngredient(
 @Composable
 fun IngredientCard(
     ingredient: Ingredient,
-    setShowManualDialog: (Boolean) -> Unit,
-    setIngredientScan: (Ingredient) -> Unit
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -187,8 +182,7 @@ fun IngredientCard(
             .padding(4.dp)
             .height(80.dp)
             .clickable {
-                setShowManualDialog(true)
-                setIngredientScan(ingredient)
+                onClick()
             }
     ) {
         Row(
@@ -199,7 +193,7 @@ fun IngredientCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${ingredient.description}",
+                text = ingredient.description,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -219,7 +213,7 @@ fun IngredientCard(
                 painter = if (ingredient.imageUrl.isNotEmpty()) {
                     rememberAsyncImagePainter(ingredient.imageUrl)
                 } else {
-                    painterResource(id = R.drawable.box) // Reemplaza con tu recurso de imagen de marcador de posición
+                    painterResource(id = R.drawable.box) // Placeholder image
                 },
                 contentDescription = ingredient.id,
                 modifier = Modifier.size(45.dp),
@@ -228,6 +222,7 @@ fun IngredientCard(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

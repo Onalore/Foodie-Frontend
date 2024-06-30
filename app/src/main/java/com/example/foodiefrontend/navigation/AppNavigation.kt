@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.example.foodiefrontend.data.Ingredient
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.presentation.ui.screens.camera.CameraScreen
@@ -32,6 +33,7 @@ import com.example.foodiefrontend.presentation.ui.screens.recipes.newRecipe.NewR
 import com.example.foodiefrontend.presentation.ui.screens.register.RegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.register.SuccessfulRegisterScreen
 import com.example.foodiefrontend.presentation.ui.screens.stock.StockScreen
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredient
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.presentation.ui.screens.welcome.WelcomeScreen
 import com.example.foodiefrontend.viewmodel.UserViewModel
@@ -155,6 +157,25 @@ fun AppNavigation(navController: NavHostController) {
                 codeEan = ean
             )
         }
+        composable(
+            route = "alertIngredient/{ingredientJson}",
+            arguments = listOf(navArgument("ingredientJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val ingredientJson = backStackEntry.arguments?.getString("ingredientJson") ?: ""
+            val ingredient = Gson().fromJson(
+                URLDecoder.decode(
+                    ingredientJson,
+                    StandardCharsets.UTF_8.toString()
+                ), Ingredient::class.java
+            )
+            AlertIngredient(
+                navController = navController,
+                setShowDialog = { /* Implement your logic here */ },
+                tipoProducto = ingredient,
+                codeEan = ""
+            )
+        }
+
         composable(route = AppScreens.FamilyConfigScreen.route) {
             FamilyConfigScreen(navController, userViewModel)
         }

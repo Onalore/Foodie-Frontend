@@ -140,7 +140,7 @@ class StockViewModel : ViewModel() {
             try {
                 val token = getToken(context)
                 Log.d("StockViewModel", "Token obtained for addProductByName: $token")
-                val requestBody = mapOf(
+                val requestBody: Map<String, Any> = mapOf(
                     "nombreProducto" to nombreProducto,
                     "cantidad" to cantidad,
                     "unidad" to unidad,
@@ -195,9 +195,40 @@ class StockViewModel : ViewModel() {
         }
     }
 
+    fun searchProducts(context: Context, nombreProducto: String) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                val response =
+                    stockService.searchProducts("Bearer $token", nombreProducto).awaitResponse()
+                if (response.isSuccessful) {
+                    val ingredientResponses = response.body() ?: emptyList()
+                    val ingredients = ingredientResponses.map { response ->
+                        Ingredient(
+                            id = response.id,
+                            description = response.id,
+                            quantity = response.cantidad.toString(),
+                            unitMesure = response.unidadMedida,
+                            imageUrl = response.imageUrl
+                        )
+                    }
+                    _stockResult.postValue(ingredients)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val apiErrorResponse = Gson().fromJson(errorBody, ApiErrorResponse::class.java)
+                    _error.postValue(apiErrorResponse.error)
+                }
+            } catch (e: Exception) {
+                _error.postValue("Error de excepción: ${e.message}")
+            }
+        }
+    }
+
+}
+
     private suspend fun getToken(context: Context): String? {
         val token = context.dataStore.data.first()[stringPreferencesKey("auth_token")]
         Log.d("StockViewModel", "Retrieved token: $token")
         return token
     }
-}
+
