@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,6 +53,7 @@ import com.example.foodiefrontend.presentation.ui.components.CustomTextField
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
 import com.example.foodiefrontend.presentation.ui.components.Title
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientManual
+import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertLookForIngredient
 import com.example.foodiefrontend.presentation.ui.screens.stock.components.AlertIngredientScanned
 import com.example.foodiefrontend.viewmodel.StockViewModel
 
@@ -66,7 +69,7 @@ fun StockScreen(
     var showDialog by remember { mutableStateOf(!codeEan.isNullOrEmpty()) }
     var showManualDialog by remember { mutableStateOf(false) }
     var ingredientSelected by remember { mutableStateOf(SampleData.sampleIngredient) }
-    val lookFor by remember { mutableStateOf(false) }
+    var lookForManually by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")
@@ -89,6 +92,13 @@ fun StockScreen(
             },
             codeEan = codeEan
         )
+    } else if (lookForManually) {
+        AlertLookForIngredient(
+            navController = navController,
+            setShowDialog = { param ->
+                lookForManually = param
+            },
+        )
     }
 
     Column(
@@ -104,18 +114,29 @@ fun StockScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 30.dp)
+            ) {
                 Title(
                     title = stringResource(R.string.your_stock),
                     modifier = Modifier
                         .weight(1f)
-                        .padding(bottom = 30.dp)
+                )
+                ImageWithResource(
+                    resourceId = R.drawable.ic_keyboard,
+                    onClick = {
+                        lookForManually = true
+                    },
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.padding(end = 30.dp).size(50.dp)
                 )
                 ImageWithResource(
                     resourceId = R.drawable.ic_scan,
                     onClick = {
                         navController.navigate("camera_screen")
-                    }
+                    },
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )
             }
 
@@ -143,89 +164,10 @@ fun StockScreen(
                     )
                 }
             }
-            if (lookFor) {
-
-                Surface(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Card(
-                        modifier = Modifier.padding(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    ) {
-                        Column(
-                        ) {
-                            SampleData.sampleIngredients.forEach { ingredient ->
-                                IngredientCard(
-                                    ingredient,
-                                    setShowManualDialog = { param ->
-                                        showManualDialog = param
-                                    },
-                                    setIngredientScan = {
-                                        ingredientSelected = ingredient
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
 
-@Composable
-fun IngredientCard(
-    ingredient: Ingredient,
-    setShowManualDialog: (Boolean) -> Unit,
-    setIngredientScan: (Ingredient) -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .height(80.dp)
-            .clickable { setShowManualDialog(true) }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "${ingredient.description}",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "${ingredient.quantity} ${ingredient.unitMesure}",
-                    fontSize = 16.sp
-                )
-            }
-            Image(
-                painter = if (ingredient.imageUrl.isNotEmpty()) {
-                    rememberAsyncImagePainter(ingredient.imageUrl)
-                } else {
-                    painterResource(id = R.drawable.box) // Reemplaza con tu recurso de imagen de marcador de posición
-                },
-                contentDescription = ingredient.id,
-                modifier = Modifier.size(45.dp),
-                contentScale = ContentScale.Crop
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -235,6 +177,7 @@ fun Preview() {
     var ingredient by remember { mutableStateOf("") }
     var lookFor by remember { mutableStateOf(true) }
     var showManualDialog by remember { mutableStateOf(false) }
+    var lookForManually by remember { mutableStateOf(false) }
     var ingredientSelected by remember { mutableStateOf(SampleData.sampleIngredient) }
 
     FoodieFrontendTheme {
@@ -258,31 +201,42 @@ fun Preview() {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 30.dp)
+                ) {
                     Title(
                         title = stringResource(R.string.your_stock),
                         modifier = Modifier
                             .weight(1f)
-                            .padding(bottom = 30.dp)
+                    )
+                    ImageWithResource(
+                        resourceId = R.drawable.ic_keyboard,
+                        onClick = {
+                            lookForManually = true
+                        },
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.padding(end = 30.dp).size(50.dp)
                     )
                     ImageWithResource(
                         resourceId = R.drawable.ic_scan,
                         onClick = {
                             //navController.navigate("camera_screen")
-                        }
+                        },
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                     )
                 }
 
-                CustomTextField(
-                    value = ingredient,
-                    placeholder = stringResource(R.string.look_for_ingredient),
-                    onValueChange = { newValue ->
-                        ingredient = newValue
-                    },
-                    trailingIcon = R.drawable.ic_search,
-                    modifier = Modifier,
-                    enabled = false
-                )
+//                CustomTextField(
+//                    value = ingredient,
+//                    placeholder = stringResource(R.string.look_for_ingredient),
+//                    onValueChange = { newValue ->
+//                        ingredient = newValue
+//                    },
+//                    trailingIcon = R.drawable.ic_search,
+//                    modifier = Modifier,
+//                    enabled = false
+//                )
             }
             Box() {
                 LazyVerticalGrid(
@@ -298,44 +252,15 @@ fun Preview() {
                         )
                     }
                 }
-                if (lookFor) {
-
-                    Surface(
-                        elevation = 4.dp,
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Card(
-                            modifier = Modifier,
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.onSurface,
-                            ),
-                        ) {
-                            Column(
-                            ) {
-                                SampleData.sampleIngredients.forEach { ingredient ->
-                                    IngredientCard(
-                                        ingredient,
-                                        setShowManualDialog = { param ->
-                                            showManualDialog = param
-                                        },
-                                        setIngredientScan = {
-                                            ingredientSelected = ingredient
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewScaned() {
-    FoodieFrontendTheme {
-        StockScreen(navController = rememberNavController(), codeEan = "123498389")
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewScaned() {
+//    FoodieFrontendTheme {
+//        StockScreen(navController = rememberNavController(), codeEan = "123498389")
+//    }
+//}
