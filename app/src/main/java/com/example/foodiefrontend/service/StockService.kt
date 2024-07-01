@@ -1,5 +1,6 @@
 package com.example.foodiefrontend.service
 
+import com.example.foodiefrontend.data.AddManualRequest
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.IngredientResponse
 import com.example.foodiefrontend.data.StockConfirmationRequest
@@ -29,7 +30,7 @@ interface StockService {
 
     @POST("stock/manual")
     fun addProductByName(
-        @Body requestBody: Map<String, Any>,
+        @Body requestBody: AddManualRequest,
         @Header("Authorization") token: String
     ): Call<Void>
 

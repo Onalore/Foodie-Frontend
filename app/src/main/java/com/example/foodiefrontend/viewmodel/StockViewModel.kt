@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.AddManualRequest
 import com.example.foodiefrontend.data.ApiErrorResponse
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
@@ -140,11 +141,11 @@ class StockViewModel : ViewModel() {
             try {
                 val token = getToken(context)
                 Log.d("StockViewModel", "Token obtained for addProductByName: $token")
-                val requestBody: Map<String, Any> = mapOf(
-                    "nombreProducto" to nombreProducto,
-                    "cantidad" to cantidad,
-                    "unidad" to unidad,
-                    "alerta" to alertaEscasez
+                val requestBody = AddManualRequest(
+                    nombreProducto = nombreProducto,
+                    cantidad = cantidad,
+                    unidad = unidad,
+                    alerta = alertaEscasez
                 )
                 val response =
                     stockService.addProductByName(requestBody, "Bearer $token").awaitResponse()
@@ -161,6 +162,7 @@ class StockViewModel : ViewModel() {
             }
         }
     }
+
 
     fun confirmUser(
         context: Context,
