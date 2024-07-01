@@ -1,6 +1,5 @@
 package com.example.foodiefrontend.presentation.ui.screens.stock.components
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,7 +40,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodiefrontend.R
 import com.example.foodiefrontend.data.Ingredient
-import com.example.foodiefrontend.data.SampleData
 import com.example.foodiefrontend.presentation.theme.FoodieFrontendTheme
 import com.example.foodiefrontend.presentation.ui.components.CustomButton
 import com.example.foodiefrontend.presentation.ui.components.ImageWithResource
@@ -197,6 +195,9 @@ fun AlertIngredient(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.clickable {
                                 shortageAlert = !shortageAlert
+                                if (!shortageAlert) {
+                                    alertaEscasez = "-1"
+                                }
                             },
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -206,7 +207,12 @@ fun AlertIngredient(
                             else
                                 R.drawable.ic_bell_off,
                             modifier = Modifier.size(20.dp),
-                            onClick = { shortageAlert = !shortageAlert }
+                            onClick = {
+                                shortageAlert = !shortageAlert
+                                if (!shortageAlert) {
+                                    alertaEscasez = "-1"
+                                }
+                            }
                         )
                     }
 
@@ -268,7 +274,7 @@ fun AlertIngredient(
             ) {
                 CustomButton(
                     onClick = {
-                        navController.navigate("camera_screen")
+                        navController.navigate("stock_screen")
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     icon = R.drawable.ic_retry,
@@ -280,6 +286,7 @@ fun AlertIngredient(
                         setShowDialog(false)
                         if (productType != null) {
                             if (quantityState == "") quantityState = "0"
+                            if (!shortageAlert) alertaEscasez = "-1"
                             val stockConfirmationRequest = mapOf(
                                 "ean" to codeEan,
                                 "tipoProducto" to productType!!.description,
@@ -288,16 +295,29 @@ fun AlertIngredient(
                                 "alerta" to alertaEscasez,
                                 "unidadMedida" to productType!!.unitMesure
                             )
-                            viewModel.confirmUser(
-                                context,
-                                codeEan,
-                                productType!!.description,
-                                quantityState.toInt(),
-                                unit.toString(),
-                                alertaEscasez.toInt(),
-                                productType!!.unitMesure
-                            )
+                            if (codeEan.isNotEmpty()) {
+                                viewModel.confirmUser(
+                                    context,
+                                    codeEan,
+                                    productType!!.description,
+                                    quantityState.toInt(),
+                                    unit.toString(),
+                                    alertaEscasez.toInt(),
+                                    productType!!.unitMesure
+                                )
+                            };
+                            else {
+                                viewModel.addProductByName(
+                                    context,
+                                    productType!!.description,
+                                    quantityState.toInt(),
+                                    unit,
+                                    alertaEscasez.toInt()
+                                )
+                            }
+
                         }
+                        navController.navigate("stock_screen")
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     icon = R.drawable.ic_check,
@@ -332,7 +352,6 @@ fun AlertIngredient(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
@@ -340,235 +359,12 @@ private fun Preview() {
     var shortageAlert by remember { mutableStateOf(false) }
 
     FoodieFrontendTheme {
-        @SuppressLint("UnrememberedMutableState")
-        @Composable
-        fun AlertIngredientScannedPreview(
-            navController: NavController,
-            setShowDialog: (Boolean) -> Unit,
-            codeEan: String,
-        ) {
-            val productType = SampleData.sampleIngredient
-            val error = "Producto no encontrado"
-            val addProductResult = true
-
-            var quantity by remember { mutableStateOf(productType?.quantity?.toInt() ?: 0) }
-            var unit by remember { mutableStateOf(productType?.unit?.toInt() ?: 1) }
-            var alertaEscasez by remember { mutableStateOf(productType?.alertaEscasez ?: 0) }
-
-            AlertDialog(
-                onDismissRequest = { setShowDialog(false) },
-                title = {
-                    Text(
-                        text = stringResource(R.string.is_this_product),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        textAlign = TextAlign.Center,
-                    )
-                },
-                text = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(15.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (productType != null) {
-                            Log.d("Product", "Detected Product: $productType")
-                            Text(
-                                text = productType?.description ?: "Producto desconocido",
-                                textAlign = TextAlign.Center
-                            )
-                            productType?.imageUrl?.let {
-                                Surface(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(100.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .background(
-                                                color = MaterialTheme.colorScheme.surface,
-                                                shape = RoundedCornerShape(100.dp)
-                                            )
-                                            .padding(20.dp)
-                                    ) {
-                                        Image(
-                                            painter = rememberAsyncImagePainter(it),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(80.dp)
-                                        )
-                                    }
-                                }
-                            }
-                            productType?.quantity?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    //horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(start = 10.dp)
-                                ) {
-                                    IngredientEditable(
-                                        quantity = "0",
-                                        onValueChange = { quantity = it.toInt() },
-                                        unit = null,
-                                        onDecrement = { },
-                                        onIncrement = { }
-                                    )
-                                    Text(
-                                        text = productType?.unitMesure?.let {
-                                            if (it.length >= 2) it.substring(
-                                                0,
-                                                2
-                                            ) else ""
-                                        } ?: "",
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                            productType?.unit?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(start = 40.dp)
-                                ) {
-                                    IngredientQuantity(
-                                        quantity = unit.toString(),
-                                        unit = null,
-                                        onDecrement = { },
-                                        onIncrement = { }
-                                    )
-                                    Text(
-                                        text = "u.",
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Recibir alerta de escasez",
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.clickable {
-                                        shortageAlert = !shortageAlert
-                                    },
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                                ImageWithResource(
-                                    resourceId = if (shortageAlert)
-                                        R.drawable.ic_bell_on
-                                    else
-                                        R.drawable.ic_bell_off,
-                                    modifier = Modifier.size(20.dp),
-                                    onClick = { shortageAlert = !shortageAlert }
-                                )
-                            }
-
-                            productType?.alertaEscasez?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(start = 40.dp)
-                                ) {
-                                    IngredientQuantity(
-                                        quantity = alertaEscasez.toString(),
-                                        unit = null,
-                                        onDecrement = { },
-                                        onIncrement = { },
-                                        available = shortageAlert
-                                    )
-                                    Text(
-                                        text = productType?.unitMesure?.let {
-                                            if (it.length >= 2) it.substring(
-                                                0,
-                                                2
-                                            ) else ""
-                                        } ?: "",
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        } else if (error != null) {
-                            Text(
-                                text = error ?: "Error desconocido",
-                                textAlign = TextAlign.Center,
-                                color = Color.Red
-                            )
-                        } else {
-                            Text(
-                                text = "Cargando...",
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                },
-                dismissButton = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        CustomButton(
-                            onClick = {
-                                navController.navigate("camera_screen")
-                            },
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            icon = R.drawable.ic_retry,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(15.dp))
-                        CustomButton(
-                            onClick = {
-                                setShowDialog(false)
-                                if (productType != null) {
-
-                                }
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            icon = R.drawable.ic_check,
-                            iconHeight = 30.dp,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                },
-                confirmButton = {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        CustomButton(
-                            onClick = {
-                                setShowDialog(false)
-                            },
-                            containerColor = Color(0xFFE8BB66),
-                            text = stringResource(R.string.enter_manually),
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            )
-
-            LaunchedEffect(addProductResult) {
-                addProductResult?.let {
-                    if (it) {
-                        Log.d("AddProduct", "Product successfully added to stock.")
-                        navController.navigate("stock_screen")
-                    } else {
-                        Log.d("AddProduct", "Failed to add product to stock.")
-                    }
-                }
-            }
-        }
-
-        AlertIngredientScannedPreview(
+        AlertIngredient(
             navController = rememberNavController(),
-            setShowDialog = {
-                showDialog = false
+            setShowDialog = { param ->
+                showDialog = param
             },
             codeEan = "EAN398243"
         )
     }
 }
-
