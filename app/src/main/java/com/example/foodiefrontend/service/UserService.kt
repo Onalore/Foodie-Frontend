@@ -4,6 +4,7 @@ import com.example.foodiefrontend.data.AuthResponse
 import com.example.foodiefrontend.data.LoginRequest
 import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.RegisterResponse
+import com.example.foodiefrontend.data.Restricciones
 import com.example.foodiefrontend.data.User
 import retrofit2.Call
 import retrofit2.http.Body
@@ -42,4 +43,11 @@ interface UserService {
         @Query("nombre") nombre: String,
         @Query("apellido") apellido: String
     ): Call<Void>
+
+    @PUT("usuarios/update/restrictions")
+    fun actualizarRestriccionesUsuario(
+        @Header("Authorization") token: String,
+        @Body restricciones: Restricciones
+    ): Call<Void>
+
 }

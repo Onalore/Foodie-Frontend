@@ -17,6 +17,7 @@ import com.example.foodiefrontend.data.Persona
 import com.example.foodiefrontend.data.RatingData
 import com.example.foodiefrontend.data.Recipe
 import com.example.foodiefrontend.data.RegisterResponse
+import com.example.foodiefrontend.data.Restricciones
 import com.example.foodiefrontend.data.User
 import com.example.foodiefrontend.service.BackendApi
 import com.example.foodiefrontend.service.Config
@@ -33,6 +34,7 @@ import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.awaitResponse
 import kotlin.coroutines.cancellation.CancellationException
 
 class UserViewModel : ViewModel() {
@@ -72,6 +74,9 @@ class UserViewModel : ViewModel() {
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
+
+    private val _updateResult = MutableLiveData<Boolean>()
+    val updateResult: LiveData<Boolean> get() = _updateResult
 
     fun loginUser(context: Context, mail: String, password: String) {
         val loginRequest = LoginRequest(email = mail, password = password)
@@ -341,6 +346,29 @@ class UserViewModel : ViewModel() {
             } else {
                 Log.e("UserViewModel", "Token not found")
                 onResult(false)
+            }
+        }
+    }
+
+    fun actualizarRestriccionesUsuario(context: Context, restricciones: List<String>) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                if (token != null) {
+                    val requestBody = Restricciones(restricciones)
+                    val response =
+                        apiService.actualizarRestriccionesUsuario("Bearer $token", requestBody)
+                            .awaitResponse()
+                    if (response.isSuccessful) {
+                        _updateResult.value = true
+                    } else {
+                        _updateResult.value = false
+                    }
+                } else {
+                    _updateResult.value = false
+                }
+            } catch (e: Exception) {
+                _updateResult.value = false
             }
         }
     }
