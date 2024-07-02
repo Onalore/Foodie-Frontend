@@ -159,8 +159,6 @@ fun StockScreen(
 fun Preview() {
 
     val stockIngredients = SampleData.sampleIngredients
-    var ingredient by remember { mutableStateOf("") }
-    var lookFor by remember { mutableStateOf(true) }
     var showManualDialog by remember { mutableStateOf(false) }
     var lookForManually by remember { mutableStateOf(false) }
     var ingredientSelected by remember { mutableStateOf(SampleData.sampleIngredient) }
