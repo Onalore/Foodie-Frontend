@@ -241,7 +241,6 @@ class StockViewModel : ViewModel() {
             }
         }
     }
-
 }
 
     private suspend fun getToken(context: Context): String? {

@@ -274,7 +274,7 @@ fun AlertIngredient(
             ) {
                 CustomButton(
                     onClick = {
-                        navController.navigate("camera_screen")
+                        navController.navigate("stock_screen")
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     icon = R.drawable.ic_retry,
@@ -319,7 +319,7 @@ fun AlertIngredient(
             }
         },
         confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+/*            Column(modifier = Modifier.fillMaxWidth()) {
                 CustomButton(
                     onClick = {
                         setShowDialog(false)
@@ -329,7 +329,7 @@ fun AlertIngredient(
                     text = stringResource(R.string.enter_manually),
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
-            }
+            }*/
         }
     )
 
