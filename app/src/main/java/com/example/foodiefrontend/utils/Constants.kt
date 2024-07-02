@@ -9,7 +9,7 @@ object Constants {
         "Diabetes",
         "Kosher",
         "Hipertensión",
-        "Intolerancia a la Lactosa",
+        "Intolerancia a la lactosa",
         "Ninguna"
     )
 

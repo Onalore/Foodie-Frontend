@@ -131,7 +131,7 @@ fun CameraScreen(navController: NavController, navigateToScreen: (String?) -> Un
 
             Button(
                 onClick = {
-                    navController.popBackStack()
+                    navController.navigate("StockScreen")
                 },
                 modifier = Modifier
                     .padding(top = 32.dp, start = 16.dp)

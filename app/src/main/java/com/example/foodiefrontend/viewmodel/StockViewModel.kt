@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodiefrontend.data.AddManualRequest
 import com.example.foodiefrontend.data.ApiErrorResponse
 import com.example.foodiefrontend.data.EanResponse
 import com.example.foodiefrontend.data.Ingredient
@@ -104,17 +105,34 @@ class StockViewModel : ViewModel() {
                     val stockIngredients = response.body()
                     val ingredients = mutableListOf<Ingredient>()
                     stockIngredients?.forEach { ingredientResponse ->
-                        ingredients.add(
-                            Ingredient(
-                                id = ingredientResponse.id,
-                                description = ingredientResponse.id,
-                                quantity = ingredientResponse.cantidad.toString(),
-                                unit = ingredientResponse.unidad,
-                                unitMesure = ingredientResponse.unidadMedida,
-                                imageUrl = ingredientResponse.imageUrl,
-                                alertaEscasez = 0
+                        try {
+                            // Loguear los valores recibidos
+                            Log.d("StockViewModel", "Ingredient Response: $ingredientResponse")
+
+                            // Validar campos para evitar valores null
+                            val id = ingredientResponse.id ?: "unknown_id"
+                            val description = ingredientResponse.id ?: "No description"
+                            val quantity = ingredientResponse.cantidad ?: 0
+                            val unit = ingredientResponse.unidad ?: 1
+                            val unitMesure = ingredientResponse.unidadMedida ?: "No unit"
+                            val imageUrl = ingredientResponse.imageUrl ?: ""
+
+                            ingredients.add(
+                                Ingredient(
+                                    id = id,
+                                    description = description,
+                                    quantity = quantity.toString(),
+                                    unit = unit.toString(),
+                                    unitMesure = unitMesure,
+                                    imageUrl = imageUrl,
+                                )
                             )
-                        )
+                        } catch (e: NullPointerException) {
+                            Log.e(
+                                "StockViewModel",
+                                "Null value found in ingredient response: ${e.message}"
+                            )
+                        }
                     }
                     _stockIngredients.postValue(ingredients)
                     Log.d("ingredientes", stockIngredients.toString())
@@ -122,7 +140,6 @@ class StockViewModel : ViewModel() {
                 } else {
                     Log.e("StockViewModel", "Error fetching stock: ${response.message()}")
                 }
-
             } else {
                 Log.e("StockViewModel", "Token not found")
             }
@@ -140,11 +157,11 @@ class StockViewModel : ViewModel() {
             try {
                 val token = getToken(context)
                 Log.d("StockViewModel", "Token obtained for addProductByName: $token")
-                val requestBody = mapOf(
-                    "nombreProducto" to nombreProducto,
-                    "cantidad" to cantidad,
-                    "unidad" to unidad,
-                    "alerta" to alertaEscasez
+                val requestBody = AddManualRequest(
+                    nombreProducto = nombreProducto,
+                    cantidad = cantidad,
+                    unidad = unidad,
+                    alerta = alertaEscasez
                 )
                 val response =
                     stockService.addProductByName(requestBody, "Bearer $token").awaitResponse()
@@ -161,6 +178,7 @@ class StockViewModel : ViewModel() {
             }
         }
     }
+
 
     fun confirmUser(
         context: Context,
@@ -195,9 +213,39 @@ class StockViewModel : ViewModel() {
         }
     }
 
+    fun searchProducts(context: Context, nombreProducto: String) {
+        viewModelScope.launch {
+            try {
+                val token = getToken(context)
+                val response =
+                    stockService.searchProducts("Bearer $token", nombreProducto).awaitResponse()
+                if (response.isSuccessful) {
+                    val ingredientResponses = response.body() ?: emptyList()
+                    val ingredients = ingredientResponses.map { response ->
+                        Ingredient(
+                            id = response.id,
+                            description = response.id,
+                            quantity = response.cantidad.toString(),
+                            unitMesure = response.unidadMedida,
+                            imageUrl = response.imageUrl
+                        )
+                    }
+                    _stockResult.postValue(ingredients)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val apiErrorResponse = Gson().fromJson(errorBody, ApiErrorResponse::class.java)
+                    _error.postValue(apiErrorResponse.error)
+                }
+            } catch (e: Exception) {
+                _error.postValue("Error de excepción: ${e.message}")
+            }
+        }
+    }
+}
+
     private suspend fun getToken(context: Context): String? {
         val token = context.dataStore.data.first()[stringPreferencesKey("auth_token")]
         Log.d("StockViewModel", "Retrieved token: $token")
         return token
     }
-}
+
