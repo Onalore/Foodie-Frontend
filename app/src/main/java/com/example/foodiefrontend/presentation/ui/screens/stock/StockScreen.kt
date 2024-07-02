@@ -51,7 +51,7 @@ fun StockScreen(
     var showDialog by remember { mutableStateOf(!codeEan.isNullOrEmpty()) }
     var showManualDialog by remember { mutableStateOf(false) }
     var ingredientSelected by remember { mutableStateOf(SampleData.sampleIngredient) }
-    var lookForManually by remember { mutableStateOf(true) }
+    var lookForManually by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Log.d("Barcode", "Código recibido en stock: $codeEan")

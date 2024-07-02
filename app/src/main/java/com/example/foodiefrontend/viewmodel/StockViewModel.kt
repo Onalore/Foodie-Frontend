@@ -105,17 +105,34 @@ class StockViewModel : ViewModel() {
                     val stockIngredients = response.body()
                     val ingredients = mutableListOf<Ingredient>()
                     stockIngredients?.forEach { ingredientResponse ->
-                        ingredients.add(
-                            Ingredient(
-                                id = ingredientResponse.id,
-                                description = ingredientResponse.id,
-                                quantity = ingredientResponse.cantidad.toString(),
-                                unit = ingredientResponse.unidad,
-                                unitMesure = ingredientResponse.unidadMedida,
-                                imageUrl = ingredientResponse.imageUrl,
-                                alertaEscasez = 0
+                        try {
+                            // Loguear los valores recibidos
+                            Log.d("StockViewModel", "Ingredient Response: $ingredientResponse")
+
+                            // Validar campos para evitar valores null
+                            val id = ingredientResponse.id ?: "unknown_id"
+                            val description = ingredientResponse.id ?: "No description"
+                            val quantity = ingredientResponse.cantidad ?: 0
+                            val unit = ingredientResponse.unidad ?: 1
+                            val unitMesure = ingredientResponse.unidadMedida ?: "No unit"
+                            val imageUrl = ingredientResponse.imageUrl ?: ""
+
+                            ingredients.add(
+                                Ingredient(
+                                    id = id,
+                                    description = description,
+                                    quantity = quantity.toString(),
+                                    unit = unit.toString(),
+                                    unitMesure = unitMesure,
+                                    imageUrl = imageUrl,
+                                )
                             )
-                        )
+                        } catch (e: NullPointerException) {
+                            Log.e(
+                                "StockViewModel",
+                                "Null value found in ingredient response: ${e.message}"
+                            )
+                        }
                     }
                     _stockIngredients.postValue(ingredients)
                     Log.d("ingredientes", stockIngredients.toString())
@@ -123,7 +140,6 @@ class StockViewModel : ViewModel() {
                 } else {
                     Log.e("StockViewModel", "Error fetching stock: ${response.message()}")
                 }
-
             } else {
                 Log.e("StockViewModel", "Token not found")
             }

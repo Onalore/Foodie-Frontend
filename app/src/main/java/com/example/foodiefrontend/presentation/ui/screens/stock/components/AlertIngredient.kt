@@ -287,14 +287,6 @@ fun AlertIngredient(
                         if (productType != null) {
                             if (quantityState == "") quantityState = "0"
                             if (!shortageAlert) alertaEscasez = "-1"
-                            val stockConfirmationRequest = mapOf(
-                                "ean" to codeEan,
-                                "tipoProducto" to productType!!.description,
-                                "cantidad" to quantityState,
-                                "unidad" to unit,
-                                "alerta" to alertaEscasez,
-                                "unidadMedida" to productType!!.unitMesure
-                            )
                             if (codeEan.isNotEmpty()) {
                                 viewModel.confirmUser(
                                     context,
